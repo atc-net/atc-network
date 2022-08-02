@@ -7,3 +7,4 @@ global using Atc.Network.Extensions;
 global using Atc.Network.Tcp;
 
 global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Logging.Abstractions;

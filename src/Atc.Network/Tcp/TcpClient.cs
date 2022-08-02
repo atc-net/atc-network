@@ -107,6 +107,32 @@ public partial class TcpClient : IDisposable
         this.port = ipEndpoint.Port;
     }
 
+    public TcpClient(
+        string hostname,
+        int port,
+        TcpClientConfig? clientConfig = default,
+        TcpClientKeepAliveConfig? keepAliveConfig = default)
+        : this(NullLogger.Instance, hostname, port, clientConfig, keepAliveConfig)
+    {
+    }
+
+    public TcpClient(
+        IPAddress ipAddress,
+        int port,
+        TcpClientConfig? clientConfig = default,
+        TcpClientKeepAliveConfig? keepAliveConfig = default)
+        : this(NullLogger.Instance, ipAddress, port, clientConfig, keepAliveConfig)
+    {
+    }
+
+    public TcpClient(
+        IPEndPoint ipEndpoint,
+        TcpClientConfig? clientConfig = default,
+        TcpClientKeepAliveConfig? keepAliveConfig = default)
+        : this(NullLogger.Instance, ipEndpoint, clientConfig, keepAliveConfig)
+    {
+    }
+
     /// <summary>
     /// Connect.
     /// </summary>
@@ -390,41 +416,41 @@ public partial class TcpClient : IDisposable
 
     private async Task<byte[]> ReadData(
         CancellationToken cancellationToken)
+    {
+        if (networkStream is null ||
+            !networkStream.CanRead)
         {
-            if (networkStream is null ||
-                !networkStream.CanRead)
+            return Array.Empty<byte>();
+        }
+
+        try
+        {
+            var numberOfBytesToRead = await networkStream.ReadAsync(
+                receiveBuffer.AsMemory(0, receiveBuffer.Length),
+                cancellationToken);
+
+            if (numberOfBytesToRead == 0)
             {
                 return Array.Empty<byte>();
             }
 
-            try
-            {
-                var numberOfBytesToRead = await networkStream.ReadAsync(
-                    receiveBuffer.AsMemory(0, receiveBuffer.Length),
-                    cancellationToken);
+            using var memoryStream = new MemoryStream();
+            await memoryStream.WriteAsync(
+                receiveBuffer.AsMemory(0, numberOfBytesToRead),
+                cancellationToken);
 
-                if (numberOfBytesToRead == 0)
-                {
-                    return Array.Empty<byte>();
-                }
-
-                using var memoryStream = new MemoryStream();
-                await memoryStream.WriteAsync(
-                    receiveBuffer.AsMemory(0, numberOfBytesToRead),
-                    cancellationToken);
-
-                return memoryStream.ToArray();
-            }
-            catch (Exception exception)
-            {
-                if (IsConnected)
-                {
-                    LogDataReceiveError(exception.Message);
-                }
-            }
-
-            return Array.Empty<byte>();
+            return memoryStream.ToArray();
         }
+        catch (Exception exception)
+        {
+            if (IsConnected)
+            {
+                LogDataReceiveError(exception.Message);
+            }
+        }
+
+        return Array.Empty<byte>();
+    }
 
     private void DisposeTcpClientAndStream()
     {
