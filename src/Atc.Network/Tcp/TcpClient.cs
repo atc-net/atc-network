@@ -111,6 +111,7 @@ public partial class TcpClient : IDisposable
     /// <summary>
     /// Connect.
     /// </summary>
+    /// <param name="cancellationToken">The cancellationToken.</param>
     public async Task<bool> Connect(
         CancellationToken cancellationToken = default)
     {
