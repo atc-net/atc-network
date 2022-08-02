@@ -43,7 +43,7 @@ public partial class TcpClient : IDisposable
     public event Action<byte[]>? DataReceived;
 
     private TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         TcpClientConfig? clientConfig,
         TcpClientKeepAliveConfig? keepAliveConfig)
     {
@@ -64,7 +64,7 @@ public partial class TcpClient : IDisposable
     }
 
     public TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         string hostname,
         int port,
         TcpClientConfig? clientConfig = default,
@@ -81,7 +81,7 @@ public partial class TcpClient : IDisposable
     }
 
     public TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         IPAddress ipAddress,
         int port,
         TcpClientConfig? clientConfig = default,
@@ -95,7 +95,7 @@ public partial class TcpClient : IDisposable
     }
 
     public TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         IPEndPoint ipEndpoint,
         TcpClientConfig? clientConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
