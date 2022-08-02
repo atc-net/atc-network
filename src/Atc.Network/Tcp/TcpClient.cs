@@ -21,12 +21,11 @@ public partial class TcpClient : IDisposable
 
     private System.Net.Sockets.TcpClient? tcpClient;
     private Stream? networkStream;
-    private bool isConnected;
 
     /// <summary>
     /// Is client connected
     /// </summary>
-    public bool IsConnected => isConnected;
+    public bool IsConnected { get; private set; }
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -115,18 +114,32 @@ public partial class TcpClient : IDisposable
     public async Task<bool> Connect(
         CancellationToken cancellationToken = default)
     {
-        if (isConnected)
+        if (IsConnected)
         {
             return false;
         }
 
         tcpClient = new System.Net.Sockets.TcpClient();
+        SetBufferSizeAndTimeouts();
 
         LogConnecting(ipAddressOrHostname, port);
 
         try
         {
-            await tcpClient.ConnectAsync(ipAddressOrHostname, port, cancellationToken);
+            var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, cancellationToken);
+            var connectTask = tcpClient
+                .ConnectAsync(ipAddressOrHostname, port, cancellationToken)
+                .AsTask();
+
+            // Double await so if cancelTask throws exception, this throws it
+            await await Task.WhenAny(connectTask, connectTimeoutTask);
+
+            if (connectTimeoutTask.IsCompleted)
+            {
+                // If cancelTask and connectTask both finish at the same time,
+                // we'll consider it to be a timeout.
+                throw new TcpException("Timed out");
+            }
         }
         catch (Exception ex)
         {
@@ -166,10 +179,10 @@ public partial class TcpClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        if (!isConnected)
+        if (!IsConnected)
         {
             LogClientNotConnected(ipAddressOrHostname, port);
-            throw new IOException("Client is not connected!");
+            throw new TcpException("Client is not connected!");
         }
 
         LogDataSendingByteLength(data.Length);
@@ -259,12 +272,12 @@ public partial class TcpClient : IDisposable
         {
             await SyncLock.WaitAsync();
 
-            if (isConnected)
+            if (IsConnected)
             {
                 return;
             }
 
-            isConnected = true;
+            IsConnected = true;
             Connected?.Invoke();
         }
         finally
@@ -279,7 +292,7 @@ public partial class TcpClient : IDisposable
         {
             await SyncLock.WaitAsync();
 
-            if (!isConnected)
+            if (!IsConnected)
             {
                 return;
             }
@@ -289,13 +302,22 @@ public partial class TcpClient : IDisposable
                 tcpClient.Close();
             }
 
-            isConnected = false;
+            IsConnected = false;
             Disconnected?.Invoke();
         }
         finally
         {
             SyncLock.Release();
         }
+    }
+
+    private void SetBufferSizeAndTimeouts()
+    {
+        tcpClient!.SetBufferSizeAndTimeouts(
+            clientConfig.SendTimeout,
+            clientConfig.ReceiveTimeout,
+            clientConfig.SendBufferSize,
+            clientConfig.ReceiveBufferSize);
     }
 
     private void PrepareNetworkStream()
@@ -313,7 +335,7 @@ public partial class TcpClient : IDisposable
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (!isConnected ||
+            if (!IsConnected ||
                 networkStream is null)
             {
                 continue;
@@ -352,13 +374,18 @@ public partial class TcpClient : IDisposable
         var data = await readDataTask;
         if (data.Length == 0)
         {
-            LogDataReceiveNoData();
-            await SetDisconnected();
+            if (IsConnected)
+            {
+                LogDataReceiveNoData();
+                await SetDisconnected();
+            }
         }
+        else
+        {
+            LogDataReceivedByteLength(data.Length);
 
-        LogDataReceivedByteLength(data.Length);
-
-        DataReceived?.Invoke(data);
+            DataReceived?.Invoke(data);
+        }
     }
 
     private async Task<byte[]> ReadData(
@@ -390,7 +417,10 @@ public partial class TcpClient : IDisposable
             }
             catch (Exception exception)
             {
-                LogDataReceiveError(exception.Message);
+                if (IsConnected)
+                {
+                    LogDataReceiveError(exception.Message);
+                }
             }
 
             return Array.Empty<byte>();
