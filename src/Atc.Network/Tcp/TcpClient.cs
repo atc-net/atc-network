@@ -157,12 +157,12 @@ public partial class TcpClient : IDisposable
                 .ConnectAsync(ipAddressOrHostname, port, cancellationToken)
                 .AsTask();
 
-            // Double await so if cancelTask throws exception, this throws it
+            // Double await so if connectTimeoutTask throws exception, this throws it
             await await Task.WhenAny(connectTask, connectTimeoutTask);
 
             if (connectTimeoutTask.IsCompleted)
             {
-                // If cancelTask and connectTask both finish at the same time,
+                // If connectTimeoutTask and connectTask both finish at the same time,
                 // we'll consider it to be a timeout.
                 throw new TcpException("Timed out");
             }
