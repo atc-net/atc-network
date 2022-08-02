@@ -1,4 +1,4 @@
-﻿namespace Atc.Network.Extensions;
+namespace Atc.Network.Extensions;
 
 public static class ExceptionExtensions
 {
