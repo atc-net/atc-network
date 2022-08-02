@@ -1,7 +1,7 @@
-using Atc.Network.Tcp;
-
 namespace Atc.Network.Test.Tcp;
 
+[Trait(Traits.Category, Traits.Categories.Integration)]
+[Trait(Traits.Category, Traits.Categories.SkipWhenLiveUnitTesting)]
 public class TcpClientTests
 {
     private const string ExternalTcpServer = "tcpbin.com";
