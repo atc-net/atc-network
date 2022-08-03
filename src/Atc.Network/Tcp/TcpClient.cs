@@ -12,6 +12,7 @@ public partial class TcpClient : IDisposable
     private readonly TcpClientKeepAliveConfig keepAliveConfig;
     private readonly CancellationTokenSource cancellationTokenSource;
     private readonly CancellationTokenRegistration cancellationTokenRegistration;
+    private readonly int TimeToWaitForDisconnectionInMs = 200;
 
     private readonly string ipAddressOrHostname = string.Empty;
     private readonly int port;
@@ -402,8 +403,12 @@ public partial class TcpClient : IDisposable
         {
             if (IsConnected)
             {
-                LogDataReceiveNoData();
-                await SetDisconnected();
+                await Task.Delay(TimeToWaitForDisconnectionInMs);
+                if (IsConnected)
+                {
+                    LogDataReceiveNoData();
+                    await SetDisconnected();
+                }
             }
         }
         else
