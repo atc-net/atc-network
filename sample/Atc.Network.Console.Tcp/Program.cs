@@ -23,6 +23,7 @@ var tcpClient = new TcpClient(
     new TcpClientConfig
     {
         TerminationType = TcpTerminationType.LineFeed,
+        ConnectTimeout = 1000,
     });
 
 tcpClient.Connected += () => Console.WriteLine("Connected");
