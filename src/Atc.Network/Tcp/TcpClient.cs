@@ -112,7 +112,7 @@ public partial class TcpClient : IDisposable
         int port,
         TcpClientConfig? clientConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-        : this(NullLogger.Instance, hostname, port, clientConfig, keepAliveConfig)
+            : this(NullLogger.Instance, hostname, port, clientConfig, keepAliveConfig)
     {
     }
 
@@ -121,7 +121,7 @@ public partial class TcpClient : IDisposable
         int port,
         TcpClientConfig? clientConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-        : this(NullLogger.Instance, ipAddress, port, clientConfig, keepAliveConfig)
+            : this(NullLogger.Instance, ipAddress, port, clientConfig, keepAliveConfig)
     {
     }
 
@@ -129,7 +129,7 @@ public partial class TcpClient : IDisposable
         IPEndPoint ipEndpoint,
         TcpClientConfig? clientConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-        : this(NullLogger.Instance, ipEndpoint, clientConfig, keepAliveConfig)
+            : this(NullLogger.Instance, ipEndpoint, clientConfig, keepAliveConfig)
     {
     }
 
@@ -383,7 +383,7 @@ public partial class TcpClient : IDisposable
         {
             if (readDataTask.Exception is not null)
             {
-                var (isKnownException, socketError) = readDataTask.Exception.IsKnownException();
+                var (isKnownException, socketError) = readDataTask.Exception.IsKnownExceptionForNetworkCableUnplugged();
                 if (isKnownException)
                 {
                     LogDataReceiveError($"SocketErrorCode = {socketError?.GetDescription()}");
@@ -443,7 +443,8 @@ public partial class TcpClient : IDisposable
         }
         catch (Exception exception)
         {
-            if (IsConnected)
+            var (isKnownException, _) = exception.IsKnownExceptionForConsumerDisposed();
+            if (!isKnownException)
             {
                 LogDataReceiveError(exception.Message);
             }
