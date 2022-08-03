@@ -21,12 +21,11 @@ public partial class TcpClient : IDisposable
 
     private System.Net.Sockets.TcpClient? tcpClient;
     private Stream? networkStream;
-    private bool isConnected;
 
     /// <summary>
     /// Is client connected
     /// </summary>
-    public bool IsConnected => isConnected;
+    public bool IsConnected { get; private set; }
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -44,7 +43,7 @@ public partial class TcpClient : IDisposable
     public event Action<byte[]>? DataReceived;
 
     private TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         TcpClientConfig? clientConfig,
         TcpClientKeepAliveConfig? keepAliveConfig)
     {
@@ -65,7 +64,7 @@ public partial class TcpClient : IDisposable
     }
 
     public TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         string hostname,
         int port,
         TcpClientConfig? clientConfig = default,
@@ -82,7 +81,7 @@ public partial class TcpClient : IDisposable
     }
 
     public TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         IPAddress ipAddress,
         int port,
         TcpClientConfig? clientConfig = default,
@@ -96,7 +95,7 @@ public partial class TcpClient : IDisposable
     }
 
     public TcpClient(
-        ILogger<TcpClient> logger,
+        ILogger logger,
         IPEndPoint ipEndpoint,
         TcpClientConfig? clientConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
@@ -108,6 +107,32 @@ public partial class TcpClient : IDisposable
         this.port = ipEndpoint.Port;
     }
 
+    public TcpClient(
+        string hostname,
+        int port,
+        TcpClientConfig? clientConfig = default,
+        TcpClientKeepAliveConfig? keepAliveConfig = default)
+        : this(NullLogger.Instance, hostname, port, clientConfig, keepAliveConfig)
+    {
+    }
+
+    public TcpClient(
+        IPAddress ipAddress,
+        int port,
+        TcpClientConfig? clientConfig = default,
+        TcpClientKeepAliveConfig? keepAliveConfig = default)
+        : this(NullLogger.Instance, ipAddress, port, clientConfig, keepAliveConfig)
+    {
+    }
+
+    public TcpClient(
+        IPEndPoint ipEndpoint,
+        TcpClientConfig? clientConfig = default,
+        TcpClientKeepAliveConfig? keepAliveConfig = default)
+        : this(NullLogger.Instance, ipEndpoint, clientConfig, keepAliveConfig)
+    {
+    }
+
     /// <summary>
     /// Connect.
     /// </summary>
@@ -115,18 +140,32 @@ public partial class TcpClient : IDisposable
     public async Task<bool> Connect(
         CancellationToken cancellationToken = default)
     {
-        if (isConnected)
+        if (IsConnected)
         {
             return false;
         }
 
         tcpClient = new System.Net.Sockets.TcpClient();
+        SetBufferSizeAndTimeouts();
 
         LogConnecting(ipAddressOrHostname, port);
 
         try
         {
-            await tcpClient.ConnectAsync(ipAddressOrHostname, port, cancellationToken);
+            var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, cancellationToken);
+            var connectTask = tcpClient
+                .ConnectAsync(ipAddressOrHostname, port, cancellationToken)
+                .AsTask();
+
+            // Double await so if connectTimeoutTask throws exception, this throws it
+            await await Task.WhenAny(connectTask, connectTimeoutTask);
+
+            if (connectTimeoutTask.IsCompleted)
+            {
+                // If connectTimeoutTask and connectTask both finish at the same time,
+                // we'll consider it to be a timeout.
+                throw new TcpException("Timed out");
+            }
         }
         catch (Exception ex)
         {
@@ -166,10 +205,10 @@ public partial class TcpClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        if (!isConnected)
+        if (!IsConnected)
         {
             LogClientNotConnected(ipAddressOrHostname, port);
-            throw new IOException("Client is not connected!");
+            throw new TcpException("Client is not connected!");
         }
 
         LogDataSendingByteLength(data.Length);
@@ -259,12 +298,12 @@ public partial class TcpClient : IDisposable
         {
             await SyncLock.WaitAsync();
 
-            if (isConnected)
+            if (IsConnected)
             {
                 return;
             }
 
-            isConnected = true;
+            IsConnected = true;
             Connected?.Invoke();
         }
         finally
@@ -279,7 +318,7 @@ public partial class TcpClient : IDisposable
         {
             await SyncLock.WaitAsync();
 
-            if (!isConnected)
+            if (!IsConnected)
             {
                 return;
             }
@@ -289,13 +328,22 @@ public partial class TcpClient : IDisposable
                 tcpClient.Close();
             }
 
-            isConnected = false;
+            IsConnected = false;
             Disconnected?.Invoke();
         }
         finally
         {
             SyncLock.Release();
         }
+    }
+
+    private void SetBufferSizeAndTimeouts()
+    {
+        tcpClient!.SetBufferSizeAndTimeouts(
+            clientConfig.SendTimeout,
+            clientConfig.ReceiveTimeout,
+            clientConfig.SendBufferSize,
+            clientConfig.ReceiveBufferSize);
     }
 
     private void PrepareNetworkStream()
@@ -313,7 +361,7 @@ public partial class TcpClient : IDisposable
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (!isConnected ||
+            if (!IsConnected ||
                 networkStream is null)
             {
                 continue;
@@ -352,49 +400,57 @@ public partial class TcpClient : IDisposable
         var data = await readDataTask;
         if (data.Length == 0)
         {
-            LogDataReceiveNoData();
-            await SetDisconnected();
+            if (IsConnected)
+            {
+                LogDataReceiveNoData();
+                await SetDisconnected();
+            }
         }
+        else
+        {
+            LogDataReceivedByteLength(data.Length);
 
-        LogDataReceivedByteLength(data.Length);
-
-        DataReceived?.Invoke(data);
+            DataReceived?.Invoke(data);
+        }
     }
 
     private async Task<byte[]> ReadData(
         CancellationToken cancellationToken)
+    {
+        if (networkStream is null ||
+            !networkStream.CanRead)
         {
-            if (networkStream is null ||
-                !networkStream.CanRead)
+            return Array.Empty<byte>();
+        }
+
+        try
+        {
+            var numberOfBytesToRead = await networkStream.ReadAsync(
+                receiveBuffer.AsMemory(0, receiveBuffer.Length),
+                cancellationToken);
+
+            if (numberOfBytesToRead == 0)
             {
                 return Array.Empty<byte>();
             }
 
-            try
-            {
-                var numberOfBytesToRead = await networkStream.ReadAsync(
-                    receiveBuffer.AsMemory(0, receiveBuffer.Length),
-                    cancellationToken);
+            using var memoryStream = new MemoryStream();
+            await memoryStream.WriteAsync(
+                receiveBuffer.AsMemory(0, numberOfBytesToRead),
+                cancellationToken);
 
-                if (numberOfBytesToRead == 0)
-                {
-                    return Array.Empty<byte>();
-                }
-
-                using var memoryStream = new MemoryStream();
-                await memoryStream.WriteAsync(
-                    receiveBuffer.AsMemory(0, numberOfBytesToRead),
-                    cancellationToken);
-
-                return memoryStream.ToArray();
-            }
-            catch (Exception exception)
+            return memoryStream.ToArray();
+        }
+        catch (Exception exception)
+        {
+            if (IsConnected)
             {
                 LogDataReceiveError(exception.Message);
             }
-
-            return Array.Empty<byte>();
         }
+
+        return Array.Empty<byte>();
+    }
 
     private void DisposeTcpClientAndStream()
     {

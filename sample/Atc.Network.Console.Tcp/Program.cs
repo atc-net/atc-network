@@ -2,7 +2,10 @@ void OnDataReceived(
     byte[] data)
 {
     Console.WriteLine($"Received Data Length: {data.Length}");
-    Console.WriteLine($"Received Data: {Encoding.ASCII.GetString(data)}");
+    var dataStr = Encoding.ASCII
+        .GetString(data)
+        .RemoveNonPrintableCharacter();
+    Console.WriteLine($"Received Data: {dataStr}");
 }
 
 using var loggerFactory = LoggerFactory.Create(builder =>

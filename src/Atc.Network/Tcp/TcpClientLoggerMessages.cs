@@ -7,7 +7,7 @@ namespace Atc.Network.Tcp;
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OK")]
 public partial class TcpClient
 {
-    private readonly ILogger<TcpClient> logger;
+    private readonly ILogger logger;
 
     [LoggerMessage(
         EventId = LoggingEventIdConstants.Connecting,
