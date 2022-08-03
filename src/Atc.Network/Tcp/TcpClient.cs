@@ -7,12 +7,12 @@ namespace Atc.Network.Tcp;
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK")]
 public partial class TcpClient : IDisposable
 {
+    private const int TimeToWaitForDisconnectionInMs = 200;
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
     private readonly TcpClientConfig clientConfig;
     private readonly TcpClientKeepAliveConfig keepAliveConfig;
     private readonly CancellationTokenSource cancellationTokenSource;
     private readonly CancellationTokenRegistration cancellationTokenRegistration;
-    private readonly int TimeToWaitForDisconnectionInMs = 200;
 
     private readonly string ipAddressOrHostname = string.Empty;
     private readonly int port;
