@@ -7,6 +7,7 @@ namespace Atc.Network.Tcp;
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK")]
 public partial class TcpClient : IDisposable
 {
+    private const int TimeToWaitForDisconnectionInMs = 200;
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
     private readonly TcpClientConfig clientConfig;
     private readonly TcpClientKeepAliveConfig keepAliveConfig;
@@ -402,8 +403,12 @@ public partial class TcpClient : IDisposable
         {
             if (IsConnected)
             {
-                LogDataReceiveNoData();
-                await SetDisconnected();
+                await Task.Delay(TimeToWaitForDisconnectionInMs);
+                if (IsConnected)
+                {
+                    LogDataReceiveNoData();
+                    await SetDisconnected();
+                }
             }
         }
         else
