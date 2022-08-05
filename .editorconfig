@@ -517,3 +517,4 @@ dotnet_diagnostic.MA0004.severity = none            # Use Task.ConfigureAwait(fa
 dotnet_diagnostic.MA0046.severity = none            # The delegate must have 2 parameters
 
 dotnet_diagnostic.S1172.severity = suggestion       # Temporary, due to false positive in latest version of the analyzer package
+dotnet_diagnostic.S3263.severity = none             # Initialize static values from static constructor

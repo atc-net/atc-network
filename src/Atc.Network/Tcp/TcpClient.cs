@@ -200,8 +200,23 @@ public partial class TcpClient : IDisposable
     /// </summary>
     /// <param name="data">The data to send.</param>
     /// <param name="cancellationToken">The cancellationToken.</param>
+    /// <remarks>
+    /// TerminationType is resolved from TcpClientConfig.
+    /// </remarks>
+    public Task Send(
+        byte[] data,
+        CancellationToken cancellationToken = default)
+        => Send(data, clientConfig.TerminationType, cancellationToken);
+
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="data">The data to send.</param>
+    /// <param name="terminationType">The terminationType.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
     public async Task Send(
         byte[] data,
+        TcpTerminationType terminationType,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -211,6 +226,8 @@ public partial class TcpClient : IDisposable
             LogClientNotConnected(ipAddressOrHostname, port);
             throw new TcpException("Client is not connected!");
         }
+
+        AppendTerminationBytesIfNeeded(ref data, terminationType);
 
         LogDataSendingByteLength(data.Length);
 
@@ -249,12 +266,10 @@ public partial class TcpClient : IDisposable
             throw new ArgumentException("Data is empty.", nameof(data));
         }
 
-        if (clientConfig.TerminationType != TcpTerminationType.None)
-        {
-            data += TcpTerminationHelper.GetTermination(clientConfig.TerminationType);
-        }
-
-        return Send(encoding.GetBytes(data), cancellationToken);
+        return Send(
+            encoding.GetBytes(data),
+            clientConfig.TerminationType,
+            cancellationToken);
     }
 
     /// <inheritdoc />
@@ -357,6 +372,26 @@ public partial class TcpClient : IDisposable
             keepAliveConfig.KeepAliveRetryCount);
     }
 
+    private static void AppendTerminationBytesIfNeeded(
+        ref byte[] data,
+        TcpTerminationType terminationType)
+    {
+        if (terminationType != TcpTerminationType.None)
+        {
+            var terminationTypeAsBytes = TcpTerminationTypeHelper.ConvertToBytes(terminationType);
+            if (data.Length >= terminationTypeAsBytes.Length)
+            {
+                var x = data[^terminationTypeAsBytes.Length..];
+                if (!x.SequenceEqual(terminationTypeAsBytes))
+                {
+                    data = data
+                        .Concat(terminationTypeAsBytes)
+                        .ToArray();
+                }
+            }
+        }
+    }
+
     private async Task DataReceiver(
         CancellationToken cancellationToken = default)
     {
@@ -445,6 +480,10 @@ public partial class TcpClient : IDisposable
                 cancellationToken);
 
             return memoryStream.ToArray();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Skip
         }
         catch (Exception exception)
         {
