@@ -195,6 +195,14 @@ public partial class TcpClient : IDisposable
         LogDisconnected(ipAddressOrHostname, port);
     }
 
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="data">The data to send.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    /// <remarks>
+    /// TerminationType is resolved from TcpClientConfig.
+    /// </remarks>
     public Task Send(
         byte[] data,
         CancellationToken cancellationToken = default)
