@@ -1,4 +1,5 @@
-namespace Atc.Network.Extensions;
+// ReSharper disable once CheckNamespace
+namespace Atc.Network;
 
 public static class TcpClientExtensions
 {

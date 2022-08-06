@@ -1,4 +1,5 @@
-namespace Atc.Network.Extensions;
+// ReSharper disable once CheckNamespace
+namespace Atc.Network;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
 public static class ExceptionExtensions

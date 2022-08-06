@@ -39,6 +39,11 @@ public partial class TcpClient : IDisposable
     public event Action? Disconnected;
 
     /// <summary>
+    /// Event to raise when connection state is changed.
+    /// </summary>
+    public event EventHandler<ConnectionStateEventArgs>? ConnectionStateChanged;
+
+    /// <summary>
     /// Event to raise when data has become available from the server.
     /// </summary>
     public event Action<byte[]>? DataReceived;
@@ -146,6 +151,8 @@ public partial class TcpClient : IDisposable
             return false;
         }
 
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Connecting));
+
         tcpClient = new System.Net.Sockets.TcpClient();
         SetBufferSizeAndTimeouts();
 
@@ -171,6 +178,9 @@ public partial class TcpClient : IDisposable
         catch (Exception ex)
         {
             LogConnectionError(ipAddressOrHostname, port, ex.Message);
+
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.ConnectionFailed, ex.Message));
+
             return false;
         }
 
@@ -178,6 +188,8 @@ public partial class TcpClient : IDisposable
 
         await SetConnected();
         PrepareNetworkStream();
+
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Connected));
 
         return true;
     }
@@ -187,12 +199,16 @@ public partial class TcpClient : IDisposable
     /// </summary>
     public async Task Disconnect()
     {
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Disconnecting));
+
         LogDisconnecting(ipAddressOrHostname, port);
 
         DisposeTcpClientAndStream();
         await SetDisconnected();
 
         LogDisconnected(ipAddressOrHostname, port);
+
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Disconnected));
     }
 
     /// <summary>
