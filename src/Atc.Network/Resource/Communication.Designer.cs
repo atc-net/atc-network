@@ -196,6 +196,24 @@ namespace Atc.Network.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reconnected.
+        /// </summary>
+        public static string Reconnected {
+            get {
+                return ResourceManager.GetString("Reconnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reconnecting.
+        /// </summary>
+        public static string Reconnecting {
+            get {
+                return ResourceManager.GetString("Reconnecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Trying to reconnect.
         /// </summary>
         public static string TryingToReconnect {

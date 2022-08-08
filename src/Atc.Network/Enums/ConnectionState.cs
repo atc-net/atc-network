@@ -42,6 +42,18 @@ public enum ConnectionState
     ConnectionFailed,
 
     /// <summary>
+    /// Reconnecting.
+    /// </summary>
+    [LocalizedDescription(nameof(Reconnecting), typeof(Resource.Communication))]
+    Reconnecting,
+
+    /// <summary>
+    /// Reconnected.
+    /// </summary>
+    [LocalizedDescription(nameof(Reconnected), typeof(Resource.Communication))]
+    Reconnected,
+
+    /// <summary>
     /// Pulse.
     /// </summary>
     [LocalizedDescription(nameof(Pulse), typeof(Resource.Communication))]
