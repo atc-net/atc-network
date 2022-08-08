@@ -10,9 +10,9 @@ public class ConnectionStateEventArgs : EventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="ConnectionStateEventArgs"/> class.
     /// </summary>
-    /// <param name="state">The state of connection type.</param>
+    /// <param name="state">The state of the connection.</param>
     public ConnectionStateEventArgs(
-        ConnectionType state)
+        ConnectionState state)
     {
         this.State = state;
         this.ErrorMessage = null;
@@ -21,10 +21,10 @@ public class ConnectionStateEventArgs : EventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="ConnectionStateEventArgs"/> class.
     /// </summary>
-    /// <param name="state">The state of connection type.</param>
+    /// <param name="state">The state of the connection.</param>
     /// <param name="errorMessage">The error message.</param>
     public ConnectionStateEventArgs(
-        ConnectionType state,
+        ConnectionState state,
         string errorMessage)
     {
         this.State = state;
@@ -37,7 +37,7 @@ public class ConnectionStateEventArgs : EventArgs
     /// <value>
     /// The state.
     /// </value>
-    public ConnectionType State { get; }
+    public ConnectionState State { get; }
 
     /// <summary>
     /// Gets the error message.

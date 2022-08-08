@@ -16,6 +16,28 @@
 
 <br />
 
+## ConnectionState
+Enumeration: ConnectionType.
+
+>```csharp
+>public enum ConnectionState
+>```
+
+
+| Value | Name | Description | Summary | 
+| --- | --- | --- | --- | 
+| 0 | None | None | Default None. | 
+| 1 | Connecting | Connecting | Connecting. | 
+| 2 | Connected | Connected | Connected. | 
+| 3 | Disconnecting | Disconnecting | Disconnecting. | 
+| 4 | Disconnected | Disconnected | Disconnected. | 
+| 5 | ConnectionFailed | Connection failed | The connection failed. | 
+| 6 | Pulse | Pulse | Pulse. | 
+
+
+
+<br />
+
 ## ConnectionStateEventArgs
 ConnectionStateEventArgs.
 
@@ -41,28 +63,6 @@ ConnectionStateEventArgs.
 >```csharp
 >string ToString()
 >```
-
-<br />
-
-## ConnectionType
-Enumeration: ConnectionType.
-
->```csharp
->public enum ConnectionType
->```
-
-
-| Value | Name | Description | Summary | 
-| --- | --- | --- | --- | 
-| 0 | None | None | Default None. | 
-| 1 | Connecting | Connecting | Connecting. | 
-| 2 | Connected | Connected | Connected. | 
-| 3 | Disconnecting | Disconnecting | Disconnecting. | 
-| 4 | Disconnected | Disconnected | Disconnected. | 
-| 5 | ConnectionFailed | Connection failed | The connection failed. | 
-| 6 | Pulse | Pulse | Pulse. | 
-
-
 
 <br />
 

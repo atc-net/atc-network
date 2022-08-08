@@ -7,13 +7,13 @@
 ## [Atc.Network](Atc.Network.md)
 
 - [AtcNetworkAssemblyTypeInitializer](Atc.Network.md#atcnetworkassemblytypeinitializer)
+- [ConnectionState](Atc.Network.md#connectionstate)
 - [ConnectionStateEventArgs](Atc.Network.md#connectionstateeventargs)
   -  Properties
      - ErrorMessage
      - State
   -  Methods
      - ToString()
-- [ConnectionType](Atc.Network.md#connectiontype)
 - [ExceptionExtensions](Atc.Network.md#exceptionextensions)
   -  Static Methods
      - IsKnownExceptionForConsumerDisposed(this Exception exception)

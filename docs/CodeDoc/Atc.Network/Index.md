@@ -7,8 +7,8 @@
 ## [Atc.Network](Atc.Network.md)
 
 - [AtcNetworkAssemblyTypeInitializer](Atc.Network.md#atcnetworkassemblytypeinitializer)
+- [ConnectionState](Atc.Network.md#connectionstate)
 - [ConnectionStateEventArgs](Atc.Network.md#connectionstateeventargs)
-- [ConnectionType](Atc.Network.md#connectiontype)
 - [ExceptionExtensions](Atc.Network.md#exceptionextensions)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
