@@ -148,73 +148,15 @@ public partial class TcpClient : IDisposable
     /// Connect.
     /// </summary>
     /// <param name="cancellationToken">The cancellationToken.</param>
-    public async Task<bool> Connect(
+    public Task<bool> Connect(
         CancellationToken cancellationToken = default)
-    {
-        if (IsConnected)
-        {
-            return false;
-        }
-
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
-
-        tcpClient = new System.Net.Sockets.TcpClient();
-        SetBufferSizeAndTimeouts();
-
-        LogConnecting(ipAddressOrHostname, port);
-
-        try
-        {
-            var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, cancellationToken);
-            var connectTask = tcpClient
-                .ConnectAsync(ipAddressOrHostname, port, cancellationToken)
-                .AsTask();
-
-            // Double await so if connectTimeoutTask throws exception, this throws it
-            await await Task.WhenAny(connectTask, connectTimeoutTask);
-
-            if (connectTimeoutTask.IsCompleted)
-            {
-                // If connectTimeoutTask and connectTask both finish at the same time,
-                // we'll consider it to be a timeout.
-                throw new TcpException("Timed out");
-            }
-        }
-        catch (Exception ex)
-        {
-            LogConnectionError(ipAddressOrHostname, port, ex.Message);
-
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
-
-            return false;
-        }
-
-        LogConnected(ipAddressOrHostname, port);
-
-        await SetConnected();
-        PrepareNetworkStream();
-
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
-
-        return true;
-    }
+        => DoConnect(raiseEventsAndLog: true, cancellationToken);
 
     /// <summary>
     /// Disconnect.
     /// </summary>
-    public async Task Disconnect()
-    {
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
-
-        LogDisconnecting(ipAddressOrHostname, port);
-
-        DisposeTcpClientAndStream();
-        await SetDisconnected(false);
-
-        LogDisconnected(ipAddressOrHostname, port);
-
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
-    }
+    public Task Disconnect()
+        => DoDisconnect(raiseEventsAndLog: true);
 
     /// <summary>
     /// Send data.
@@ -329,7 +271,100 @@ public partial class TcpClient : IDisposable
         DisposeTcpClientAndStream();
     }
 
-    private async Task SetConnected()
+    private async Task<bool> DoConnect(
+        bool raiseEventsAndLog,
+        CancellationToken cancellationToken = default)
+    {
+        if (IsConnected)
+        {
+            return false;
+        }
+
+        if (raiseEventsAndLog)
+        {
+            LogConnecting(ipAddressOrHostname, port);
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
+        }
+
+        tcpClient = new System.Net.Sockets.TcpClient();
+        SetBufferSizeAndTimeouts();
+
+        try
+        {
+            var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, cancellationToken);
+            var connectTask = tcpClient
+                .ConnectAsync(ipAddressOrHostname, port, cancellationToken)
+                .AsTask();
+
+            // Double await so if connectTimeoutTask throws exception, this throws it
+            await await Task.WhenAny(connectTask, connectTimeoutTask);
+
+            if (connectTimeoutTask.IsCompleted)
+            {
+                // If connectTimeoutTask and connectTask both finish at the same time,
+                // we'll consider it to be a timeout.
+                throw new TcpException("Timed out");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (raiseEventsAndLog)
+            {
+                LogConnectionError(ipAddressOrHostname, port, ex.Message);
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
+            }
+
+            return false;
+        }
+
+        await SetConnected(raiseEventsAndLog);
+        PrepareNetworkStream();
+
+        if (raiseEventsAndLog)
+        {
+            LogConnected(ipAddressOrHostname, port);
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
+        }
+
+        return true;
+    }
+
+    private async Task DoDisconnect(
+        bool raiseEventsAndLog)
+    {
+        if (raiseEventsAndLog)
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
+
+            LogDisconnecting(ipAddressOrHostname, port);
+        }
+
+        DisposeTcpClientAndStream();
+        await SetDisconnected(raiseEvents: false);
+
+        if (raiseEventsAndLog)
+        {
+            LogDisconnected(ipAddressOrHostname, port);
+
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
+        }
+    }
+
+    private async Task DoReconnect()
+    {
+        LogReconnecting(ipAddressOrHostname, port);
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnecting));
+
+        DisposeTcpClientAndStream();
+        await SetDisconnected(raiseEvents: false);
+        await DoConnect(raiseEventsAndLog: false, CancellationToken.None);
+
+        LogReconnected(ipAddressOrHostname, port);
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnected));
+    }
+
+    private async Task SetConnected(
+        bool raiseEvents)
     {
         try
         {
@@ -341,7 +376,10 @@ public partial class TcpClient : IDisposable
             }
 
             IsConnected = true;
-            Connected?.Invoke();
+            if (raiseEvents)
+            {
+                Connected?.Invoke();
+            }
         }
         finally
         {
@@ -350,7 +388,7 @@ public partial class TcpClient : IDisposable
     }
 
     private async Task SetDisconnected(
-        bool raiseChangeState = true)
+        bool raiseEvents = true)
     {
         try
         {
@@ -363,7 +401,7 @@ public partial class TcpClient : IDisposable
 
             if (tcpClient is { Connected: true })
             {
-                if (raiseChangeState)
+                if (raiseEvents)
                 {
                     ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
                 }
@@ -372,10 +410,9 @@ public partial class TcpClient : IDisposable
             }
 
             IsConnected = false;
-            Disconnected?.Invoke();
-
-            if (raiseChangeState)
+            if (raiseEvents)
             {
+                Disconnected?.Invoke();
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
             }
         }
@@ -470,18 +507,28 @@ public partial class TcpClient : IDisposable
         {
             if (IsConnected)
             {
-                await Task.Delay(TimeToWaitForDisconnectionInMs);
+                await Task.Delay(TimeToWaitForDisconnectionInMs, CancellationToken.None);
                 if (IsConnected)
                 {
                     LogDataReceiveNoData();
                     NoDataReceived?.Invoke();
+
+                    if (keepAliveConfig.ReconnectOnSenderSocketClosed)
+                    {
+                        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
+
+                        await DoReconnect();
+                    }
+                    else
+                    {
+                        await SetDisconnected(raiseEvents: true);
+                    }
                 }
             }
         }
         else
         {
             LogDataReceivedByteLength(data.Length);
-
             DataReceived?.Invoke(data);
         }
     }
