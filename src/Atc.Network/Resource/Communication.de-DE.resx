@@ -165,4 +165,10 @@
   <data name="TryingToReconnect" xml:space="preserve">
     <value>Proberen opnieuw verbinding te maken</value>
   </data>
+  <data name="Reconnected" xml:space="preserve">
+    <value>Wieder verbunden</value>
+  </data>
+  <data name="Reconnecting" xml:space="preserve">
+    <value>Wiederverbinden</value>
+  </data>
 </root>

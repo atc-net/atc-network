@@ -19,4 +19,9 @@ public class TcpClientKeepAliveConfig
     /// KeepAliveRetryCount
     /// </summary>
     public int KeepAliveRetryCount { get; set; } = 3;
+
+    /// <summary>
+    /// ReconnectOnSenderSocketClosed
+    /// </summary>
+    public bool ReconnectOnSenderSocketClosed { get; set; } = true;
 }

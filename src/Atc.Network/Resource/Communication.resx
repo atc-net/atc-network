@@ -165,4 +165,10 @@
   <data name="_Communication" xml:space="preserve">
     <value>_Communication</value>
   </data>
+  <data name="Reconnecting" xml:space="preserve">
+    <value>Reconnecting</value>
+  </data>
+  <data name="Reconnected" xml:space="preserve">
+    <value>Reconnected</value>
+  </data>
 </root>

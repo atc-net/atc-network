@@ -22,6 +22,18 @@ public partial class TcpClient
     private partial void LogConnected(string ipAddressOrHostName, int port);
 
     [LoggerMessage(
+        EventId = LoggingEventIdConstants.Reconnecting,
+        Level = LogLevel.Trace,
+        Message = "Trying to reconnect to '{ipAddressOrHostName}' on port '{port}'.")]
+    private partial void LogReconnecting(string ipAddressOrHostName, int port);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.Reconnected,
+        Level = LogLevel.Information,
+        Message = "Reconnected to '{ipAddressOrHostName}' on port '{port}'.")]
+    private partial void LogReconnected(string ipAddressOrHostName, int port);
+
+    [LoggerMessage(
         EventId = LoggingEventIdConstants.ConnectionError,
         Level = LogLevel.Error,
         Message = "Could not connected to '{ipAddressOrHostName}' on port '{port}': '{errorMessage}'.")]
