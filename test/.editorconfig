@@ -52,3 +52,5 @@ dotnet_diagnostic.SA1133.severity = none            # https://github.com/atc-net
 ##########################################
 # Custom - Code Analyzers Rules
 ##########################################
+
+dotnet_diagnostic.CA2201.severity = none            # Do not raise reserved exception types

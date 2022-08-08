@@ -4,7 +4,7 @@ namespace Atc.Network;
 /// <summary>
 /// Enumeration: ConnectionType.
 /// </summary>
-public enum ConnectionType
+public enum ConnectionState
 {
     /// <summary>
     /// Default None.

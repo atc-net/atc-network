@@ -151,7 +151,7 @@ public partial class TcpClient : IDisposable
             return false;
         }
 
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Connecting));
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
 
         tcpClient = new System.Net.Sockets.TcpClient();
         SetBufferSizeAndTimeouts();
@@ -179,7 +179,7 @@ public partial class TcpClient : IDisposable
         {
             LogConnectionError(ipAddressOrHostname, port, ex.Message);
 
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.ConnectionFailed, ex.Message));
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
 
             return false;
         }
@@ -189,7 +189,7 @@ public partial class TcpClient : IDisposable
         await SetConnected();
         PrepareNetworkStream();
 
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Connected));
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
 
         return true;
     }
@@ -199,7 +199,7 @@ public partial class TcpClient : IDisposable
     /// </summary>
     public async Task Disconnect()
     {
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Disconnecting));
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
 
         LogDisconnecting(ipAddressOrHostname, port);
 
@@ -208,7 +208,7 @@ public partial class TcpClient : IDisposable
 
         LogDisconnected(ipAddressOrHostname, port);
 
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionType.Disconnected));
+        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
     }
 
     /// <summary>
