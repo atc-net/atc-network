@@ -1,9 +1,9 @@
-using System.Net.Sockets;
-
 namespace Atc.Network.Test.Extensions;
 
 [SuppressMessage("Blocker Bug", "S2930:\"IDisposables\" should be disposed", Justification = "OK.")]
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "OK.")]
+[Trait(Traits.Category, Traits.Categories.Integration)]
+[Trait(Traits.Category, Traits.Categories.SkipWhenLiveUnitTesting)]
 public class TcpClientExtensionsTests
 {
     [Theory]
