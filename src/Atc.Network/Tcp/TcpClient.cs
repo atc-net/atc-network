@@ -44,6 +44,11 @@ public partial class TcpClient : IDisposable
     public event EventHandler<ConnectionStateEventArgs>? ConnectionStateChanged;
 
     /// <summary>
+    /// Event to raise when no data received.
+    /// </summary>
+    public event Action? NoDataReceived;
+
+    /// <summary>
     /// Event to raise when data has become available from the server.
     /// </summary>
     public event Action<byte[]>? DataReceived;
@@ -204,7 +209,7 @@ public partial class TcpClient : IDisposable
         LogDisconnecting(ipAddressOrHostname, port);
 
         DisposeTcpClientAndStream();
-        await SetDisconnected();
+        await SetDisconnected(false);
 
         LogDisconnected(ipAddressOrHostname, port);
 
@@ -344,7 +349,8 @@ public partial class TcpClient : IDisposable
         }
     }
 
-    private async Task SetDisconnected()
+    private async Task SetDisconnected(
+        bool raiseChangeState = true)
     {
         try
         {
@@ -357,11 +363,21 @@ public partial class TcpClient : IDisposable
 
             if (tcpClient is { Connected: true })
             {
+                if (raiseChangeState)
+                {
+                    ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
+                }
+
                 tcpClient.Close();
             }
 
             IsConnected = false;
             Disconnected?.Invoke();
+
+            if (raiseChangeState)
+            {
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
+            }
         }
         finally
         {
@@ -458,7 +474,7 @@ public partial class TcpClient : IDisposable
                 if (IsConnected)
                 {
                     LogDataReceiveNoData();
-                    await SetDisconnected();
+                    NoDataReceived?.Invoke();
                 }
             }
         }
