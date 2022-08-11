@@ -12,6 +12,7 @@ global using Atc.Helpers;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
 global using Atc.Network.Models;
+global using Atc.Network.Resource;
 global using Atc.Network.Tcp;
 
 global using Microsoft.Extensions.Logging;
