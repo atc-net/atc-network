@@ -32,7 +32,9 @@ Enumeration: ConnectionType.
 | 3 | Disconnecting | Disconnecting | Disconnecting. | 
 | 4 | Disconnected | Disconnected | Disconnected. | 
 | 5 | ConnectionFailed | Connection failed | The connection failed. | 
-| 6 | Pulse | Pulse | Pulse. | 
+| 6 | Reconnecting | Reconnecting | Reconnecting. | 
+| 7 | Reconnected | Reconnected | Reconnected. | 
+| 8 | Pulse | Pulse | Pulse. | 
 
 
 
@@ -81,6 +83,50 @@ ConnectionStateEventArgs.
 #### IsKnownExceptionForNetworkCableUnplugged
 >```csharp
 >ValueTuple<bool, SocketError?> IsKnownExceptionForNetworkCableUnplugged(this Exception exception)
+>```
+
+<br />
+
+## IpAddressExtensions
+
+>```csharp
+>public static class IpAddressExtensions
+>```
+
+
+<br />
+
+## IPProtocolType
+
+>```csharp
+>public enum IPProtocolType
+>```
+
+
+| Value | Name | Description | Summary | 
+| --- | --- | --- | --- | 
+| 0 | None | None |  | 
+| 1 | Tcp | Tcp |  | 
+| 2 | Https | Https |  | 
+| 3 | Http | Http |  | 
+| 4 | Ftps | Ftps |  | 
+| 5 | Ftp | Ftp |  | 
+
+
+
+<br />
+
+## IPScannerConfigExtensions
+
+>```csharp
+>public static class IPScannerConfigExtensions
+>```
+
+### Static Methods
+
+#### GetTasksToProcessCount
+>```csharp
+>int GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
 >```
 
 <br />
@@ -137,6 +183,37 @@ ConnectionStateEventArgs.
 >```csharp
 >int Disconnecting
 >```
+#### Reconnected
+>```csharp
+>int Reconnected
+>```
+#### Reconnecting
+>```csharp
+>int Reconnecting
+>```
+
+<br />
+
+## NetworkQualityCategoryType
+Enumeration: NetworkQualityCategoryType.
+
+>```csharp
+>public enum NetworkQualityCategoryType
+>```
+
+
+| Value | Name | Description | Summary | 
+| --- | --- | --- | --- | 
+| 0 | None | None |  | 
+| 1 | VeryPoor | Very Poor | The very poor | 
+| 2 | Poor | Poor | The poor | 
+| 3 | Fair | Fair | The fair | 
+| 4 | Good | Good | The good | 
+| 5 | VeryGood | Very Good | The very good | 
+| 6 | Excellent | Excellent | The excellent | 
+| 7 | Perfect | Perfect | The perfect | 
+
+
 
 <br />
 
