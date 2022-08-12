@@ -17,22 +17,24 @@ public static class DnsLookupHelper
         {
             await SyncLock.WaitAsync(cancellationToken);
 
-            if (hostname is null &&
-                hostAddresses is null)
+            if (ipAddress.IsPrivate())
             {
-                hostname = Dns.GetHostName();
-                hostAddresses = await Dns.GetHostAddressesAsync(hostname, cancellationToken);
-            }
+                if (hostname is null &&
+                    hostAddresses is null)
+                {
+                    hostname = Dns.GetHostName();
+                    hostAddresses = await Dns.GetHostAddressesAsync(hostname, cancellationToken);
+                }
 
-            if (hostAddresses is null)
-            {
-                return null;
-            }
+                if (hostAddresses is null)
+                {
+                    return null;
+                }
 
-            var hostAddress = hostAddresses.FirstOrDefault(x => x.Equals(ipAddress));
-            if (hostAddress is not null)
-            {
-                return hostname;
+                var hostAddress = hostAddresses.FirstOrDefault(x => x.Equals(ipAddress));
+                return hostAddress is null
+                    ? null
+                    : hostname;
             }
 
             var result = await Dns.GetHostEntryAsync(ipAddress.ToString(), cancellationToken);
