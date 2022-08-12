@@ -109,7 +109,7 @@ public static class IPAddressV4Helper
         return (startIpAddress, endIpAddress);
     }
 
-    public static bool IsInRange(
+    public static bool IsAddressInRange(
         IPAddress ipAddress,
         string cidrNotation)
     {

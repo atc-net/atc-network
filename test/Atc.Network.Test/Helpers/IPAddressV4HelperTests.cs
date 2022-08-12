@@ -85,10 +85,10 @@ public class IPAddressV4HelperTests
 
     [Theory]
     [InlineData(true, "10.50.30.7", "10.0.0.0/8")]
-    public void IsInRange(bool expected, string ipAddress, string cidrMask)
+    public void IsAddressInRange(bool expected, string ipAddress, string cidrMask)
         => Assert.Equal(
             expected,
-            IPAddressV4Helper.IsInRange(
+            IPAddressV4Helper.IsAddressInRange(
                 IPAddress.Parse(ipAddress),
                 cidrMask));
 }
