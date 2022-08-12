@@ -1,8 +1,9 @@
+// ReSharper disable InconsistentNaming
 // ReSharper disable SuggestBaseTypeForParameter
 // ReSharper disable SwitchStatementHandlesSomeKnownEnumValuesWithDefault
 namespace Atc.Network.Helpers;
 
-public static class IPAddressV4Helper
+public static class IPv4AddressHelper
 {
     public static (bool IsValid, string? ErrorMessage) ValidateAddresses(
         IPAddress startIpAddress,
@@ -33,7 +34,7 @@ public static class IPAddressV4Helper
         return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
     }
 
-    public static IPAddress[] GetAddressesInRange(
+    public static IReadOnlyCollection<IPAddress> GetAddressesInRange(
         IPAddress startIpAddress,
         IPAddress endIpAddress)
     {
@@ -51,20 +52,20 @@ public static class IPAddressV4Helper
             list.Add(new IPAddress(bytes));
         }
 
-        return list.ToArray();
+        return list;
     }
 
-    public static IPAddress[] GetAddressesInRange(
+    public static IReadOnlyCollection<IPAddress> GetAddressesInRange(
         IPAddress ipAddress,
         int cidrLength)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
-        var (startIpAddress, endIpAddress) = GetStartAndEndAddressesInRange(ipAddress, cidrLength);
+        var (startIpAddress, endIpAddress) = GetFirstAndLastAddressInRange(ipAddress, cidrLength);
         return GetAddressesInRange(startIpAddress, endIpAddress);
     }
 
-    public static (IPAddress StartIpAddress, IPAddress EndIpAddress) GetStartAndEndAddressesInRange(
+    public static (IPAddress StartIpAddress, IPAddress EndIpAddress) GetFirstAndLastAddressInRange(
         IPAddress ipAddress,
         int cidrLength)
     {
@@ -95,28 +96,6 @@ public static class IPAddressV4Helper
                     b: null)));
 
         return (startIpAddress, endIpAddress);
-    }
-
-    public static bool IsAddressInRange(
-        IPAddress ipAddress,
-        string cidrNotation)
-    {
-        ArgumentNullException.ThrowIfNull(ipAddress);
-        ArgumentNullException.ThrowIfNull(cidrNotation);
-
-        var sa = cidrNotation.Split('/');
-        if (sa.Length != 2)
-        {
-            throw new ArgumentException("Invalid CIDR notation", nameof(cidrNotation));
-        }
-
-        var network = IPAddress.Parse(sa[0]);
-        var cidr = byte.Parse(sa[1], GlobalizationConstants.EnglishCultureInfo);
-        var ipAddressAsBytes = BitConverter.ToInt32(ipAddress.GetAddressBytes());
-        var networkAsBytes = BitConverter.ToInt32(network.GetAddressBytes());
-        var calc = IPAddress.HostToNetworkOrder(-1 << (32 - cidr));
-
-        return (ipAddressAsBytes & calc) == (networkAsBytes & calc);
     }
 
     private static byte[] GetBitMask(

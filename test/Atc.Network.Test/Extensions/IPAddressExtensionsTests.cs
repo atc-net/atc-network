@@ -43,4 +43,11 @@ public class IPAddressExtensionsTests
         => Assert.Equal(
             expected,
             IPAddress.Parse(ipAddress).ToUnsignedInt());
+
+    [Theory]
+    [InlineData(true, "10.50.30.7", "10.0.0.0/8")]
+    public void IsInRange(bool expected, string ipAddress, string cidrNotation)
+        => Assert.Equal(
+            expected,
+            IPAddress.Parse(ipAddress).IsInRange(cidrNotation));
 }

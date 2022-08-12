@@ -4,7 +4,7 @@ public class IPScanPortResult
 {
     public IPAddress? IPAddress { get; set; }
 
-    public int Port { get; set; }
+    public ushort Port { get; set; }
 
     public TransportProtocolType TransportProtocol { get; set; }
 

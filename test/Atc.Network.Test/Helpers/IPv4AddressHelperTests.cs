@@ -1,6 +1,7 @@
+// ReSharper disable InconsistentNaming
 namespace Atc.Network.Test.Helpers;
 
-public class IPAddressV4HelperTests
+public class IPv4AddressHelperTests
 {
     [Theory]
     [InlineData(true, "10.50.30.7", "10.50.30.7")]
@@ -11,7 +12,7 @@ public class IPAddressV4HelperTests
     public void ValidateAddresses(bool expected, string ipAddressStart, string ipAddressEnd)
     {
         // Atc
-        var (isValid, _) = IPAddressV4Helper.ValidateAddresses(
+        var (isValid, _) = IPv4AddressHelper.ValidateAddresses(
             IPAddress.Parse(ipAddressStart),
             IPAddress.Parse(ipAddressEnd));
 
@@ -21,7 +22,7 @@ public class IPAddressV4HelperTests
 
     [Fact]
     public void GetLocalAddress()
-        => Assert.NotNull(IPAddressV4Helper.GetLocalAddress());
+        => Assert.NotNull(IPv4AddressHelper.GetLocalAddress());
 
     [Theory]
     [InlineData(1, "10.50.30.7", "10.50.30.7")]
@@ -31,12 +32,12 @@ public class IPAddressV4HelperTests
     public void GetAddressesInRange(int expected, string ipAddressStart, string ipAddressEnd)
     {
         // Atc
-        var actual = IPAddressV4Helper.GetAddressesInRange(
+        var actual = IPv4AddressHelper.GetAddressesInRange(
             IPAddress.Parse(ipAddressStart),
             IPAddress.Parse(ipAddressEnd));
 
         // Asset
-        Assert.Equal(expected, actual.Length);
+        Assert.Equal(expected, actual.Count);
     }
 
     [Theory]
@@ -52,12 +53,12 @@ public class IPAddressV4HelperTests
     public void GetAddressesInRange_Cidr(int expected, string ipAddress, int cidrMaskLength)
     {
         // Atc
-        var actual = IPAddressV4Helper.GetAddressesInRange(
+        var actual = IPv4AddressHelper.GetAddressesInRange(
             IPAddress.Parse(ipAddress),
             cidrMaskLength);
 
         // Asset
-        Assert.Equal(expected, actual.Length);
+        Assert.Equal(expected, actual.Count);
     }
 
     [Theory]
@@ -71,10 +72,10 @@ public class IPAddressV4HelperTests
     [InlineData("10.0.0.0", "10.0.0.1", "10.0.0.0", 31)]
     [InlineData("10.0.0.0", "10.0.0.0", "10.0.0.0", 32)]
     [InlineData("192.168.0.0", "192.168.0.255", "192.168.0.7", 24)]
-    public void GetStartAndEndAddressesInRange(string expected1, string expected2, string ipAddress, int cidrMaskLength)
+    public void GetFirstAndLastAddressInRange(string expected1, string expected2, string ipAddress, int cidrMaskLength)
     {
         // Atc
-        var actual = IPAddressV4Helper.GetStartAndEndAddressesInRange(
+        var actual = IPv4AddressHelper.GetFirstAndLastAddressInRange(
             IPAddress.Parse(ipAddress),
             cidrMaskLength);
 
@@ -82,13 +83,4 @@ public class IPAddressV4HelperTests
         Assert.Equal(IPAddress.Parse(expected1), actual.StartIpAddress);
         Assert.Equal(IPAddress.Parse(expected2), actual.EndIpAddress);
     }
-
-    [Theory]
-    [InlineData(true, "10.50.30.7", "10.0.0.0/8")]
-    public void IsAddressInRange(bool expected, string ipAddress, string cidrMask)
-        => Assert.Equal(
-            expected,
-            IPAddressV4Helper.IsAddressInRange(
-                IPAddress.Parse(ipAddress),
-                cidrMask));
 }

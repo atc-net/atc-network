@@ -37,54 +37,33 @@
 
 <br />
 
-## IPAddressV4Helper
+## IPv4AddressHelper
 
 >```csharp
->public static class IPAddressV4Helper
+>public static class IPv4AddressHelper
 >```
 
 ### Static Methods
 
 #### GetAddressesInRange
 >```csharp
->IPAddress[] GetAddressesInRange(IPAddress startIpAddress, IPAddress endIpAddress)
+>IReadOnlyCollection<IPAddress> GetAddressesInRange(IPAddress startIpAddress, IPAddress endIpAddress)
 >```
 #### GetAddressesInRange
 >```csharp
->IPAddress[] GetAddressesInRange(IPAddress ipAddress, int cidrLength)
+>IReadOnlyCollection<IPAddress> GetAddressesInRange(IPAddress ipAddress, int cidrLength)
+>```
+#### GetFirstAndLastAddressInRange
+>```csharp
+>ValueTuple<IPAddress, IPAddress> GetFirstAndLastAddressInRange(IPAddress ipAddress, int cidrLength)
 >```
 #### GetLocalAddress
 >```csharp
 >IPAddress GetLocalAddress()
 >```
-#### GetStartAndEndAddressesInRange
->```csharp
->ValueTuple<IPAddress, IPAddress> GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrLength)
->```
-#### IsAddressInRange
->```csharp
->bool IsAddressInRange(IPAddress ipAddress, string cidrNotation)
->```
 #### ValidateAddresses
 >```csharp
 >ValueTuple<bool, string> ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
->```
-
-<br />
-
-## KnowTcpUdpPortsLookupHelper
-KnowIPPortsLookupHelper.
-><b>Remarks:</b> https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-
->```csharp
->public static class KnowTcpUdpPortsLookupHelper
->```
-
-### Static Methods
-
-#### IsKnow
->```csharp
->bool IsKnow(ServiceProtocolType serviceProtocolType, int portNumber)
 >```
 
 <br />

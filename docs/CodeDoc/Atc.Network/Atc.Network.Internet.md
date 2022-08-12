@@ -55,7 +55,7 @@ IPScanner LoggerMessages.
 >```
 #### ScanCidrRange
 >```csharp
->Task<IPScanResults> ScanCidrRange(IPAddress ipAddress, int cidrMaskLength, CancellationToken cancellationToken = null)
+>Task<IPScanResults> ScanCidrRange(IPAddress ipAddress, byte cidrLength, CancellationToken cancellationToken = null)
 >```
 #### ScanRange
 >```csharp
@@ -72,6 +72,10 @@ IPScanner LoggerMessages.
 
 ### Properties
 
+#### IcmpPing
+>```csharp
+>IcmpPing
+>```
 #### PortNumbers
 >```csharp
 >PortNumbers
@@ -83,18 +87,6 @@ IPScanner LoggerMessages.
 #### ResolveMacAddress
 >```csharp
 >ResolveMacAddress
->```
-#### ResolveOnlyKnowTcpUdpPorts
->```csharp
->ResolveOnlyKnowTcpUdpPorts
->```
-#### ResolvePing
->```csharp
->ResolvePing
->```
-#### ResolveServiceProtocolHttp
->```csharp
->ResolveServiceProtocolHttp
 >```
 #### ResolveVendorFromMacAddress
 >```csharp
@@ -115,6 +107,10 @@ IPScanner LoggerMessages.
 #### TimeoutTcp
 >```csharp
 >TimeoutTcp
+>```
+#### TreatOpenPortsAsWebServices
+>```csharp
+>TreatOpenPortsAsWebServices
 >```
 
 <br />

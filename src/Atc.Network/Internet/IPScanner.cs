@@ -38,19 +38,19 @@ public partial class IPScanner : IDisposable
 
     public Task<IPScanResults> ScanCidrRange(
         IPAddress ipAddress,
-        int cidrMaskLength,
+        byte cidrLength,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
-        if (cidrMaskLength is < 0 or > 32)
+        if (cidrLength > 32)
         {
-            throw new ArgumentOutOfRangeException(nameof(cidrMaskLength));
+            throw new ArgumentOutOfRangeException(nameof(cidrLength), "CIDR length can maximum be 32");
         }
 
-        var (startIpAddress, endIpAddress) = IPAddressV4Helper.GetStartAndEndAddressesInRange(
+        var (startIpAddress, endIpAddress) = IPv4AddressHelper.GetFirstAndLastAddressInRange(
             ipAddress,
-            cidrMaskLength);
+            cidrLength);
 
         return ScanRange(startIpAddress, endIpAddress, cancellationToken);
     }
@@ -62,7 +62,7 @@ public partial class IPScanner : IDisposable
     {
         var scanResults = new IPScanResults();
 
-        var validationResult = IPAddressV4Helper.ValidateAddresses(startIpAddress, endIpAddress);
+        var validationResult = IPv4AddressHelper.ValidateAddresses(startIpAddress, endIpAddress);
         if (!validationResult.IsValid)
         {
             scanResults.ErrorMessage = validationResult.ErrorMessage;
@@ -70,7 +70,7 @@ public partial class IPScanner : IDisposable
             return await Task.FromResult(scanResults);
         }
 
-        var ipAddresses = IPAddressV4Helper.GetAddressesInRange(startIpAddress, endIpAddress);
+        var ipAddresses = IPv4AddressHelper.GetAddressesInRange(startIpAddress, endIpAddress);
         if (!ipAddresses.Any())
         {
             scanResults.ErrorMessage = "Nothing to process";
@@ -87,7 +87,7 @@ public partial class IPScanner : IDisposable
                 arpEntities = ArpHelper.GetArpResult();
             }
 
-            tasksToProcessCount = ipAddresses.Length * scannerConfig.GetTasksToProcessCount();
+            tasksToProcessCount = ipAddresses.Count * scannerConfig.GetTasksToProcessCount();
             tasksProcessedCount = 0;
             processedScanResults.Clear();
 
@@ -160,7 +160,7 @@ public partial class IPScanner : IDisposable
         processedScanResults.Add(ipScanResult);
         RaiseProgressReporting(IPScannerProgressReportingType.IPAddressStart, ipScanResult);
 
-        if (scannerConfig.ResolvePing)
+        if (scannerConfig.IcmpPing)
         {
             await HandlePing(ipScanResult, ipAddress);
         }
@@ -188,9 +188,9 @@ public partial class IPScanner : IDisposable
                 await HandleTcpPort(ipScanResult, ipAddress, portNumber, cancellationToken);
             }
 
-            if (scannerConfig.ResolveServiceProtocolHttp)
+            if (scannerConfig.TreatOpenPortsAsWebServices != IPServicePortExaminationLevel.None)
             {
-                await HandleHttpPort(ipScanResult, ipAddress, cancellationToken);
+                await HandleTreatOpenPortsAsWebServices(ipScanResult, ipAddress, cancellationToken);
             }
         }
 
@@ -258,7 +258,7 @@ public partial class IPScanner : IDisposable
     private async Task HandleTcpPort(
         IPScanResult ipScanResult,
         IPAddress ipAddress,
-        int portNumber,
+        ushort portNumber,
         CancellationToken cancellationToken)
     {
         var ipPortScan = new IPPortScan(ipAddress, (int)scannerConfig.TimeoutTcp.TotalMilliseconds);
@@ -280,7 +280,7 @@ public partial class IPScanner : IDisposable
         RaiseProgressReporting(IPScannerProgressReportingType.Tcp, ipScanResult);
     }
 
-    private async Task HandleHttpPort(
+    private async Task HandleTreatOpenPortsAsWebServices(
         IPScanResult ipScanResult,
         IPAddress ipAddress,
         CancellationToken cancellationToken)
@@ -288,9 +288,8 @@ public partial class IPScanner : IDisposable
         var handledCount = 0;
         foreach (var portNumber in ipScanResult.OpenPort)
         {
-            if (scannerConfig.ResolveOnlyKnowTcpUdpPorts &&
-                !KnowTcpUdpPortsLookupHelper.IsKnow(ServiceProtocolType.Http, portNumber) &&
-                !KnowTcpUdpPortsLookupHelper.IsKnow(ServiceProtocolType.Http, portNumber))
+            if (!portNumber.IsPortForIPService(ServiceProtocolType.Http, scannerConfig.TreatOpenPortsAsWebServices) &&
+                !portNumber.IsPortForIPService(ServiceProtocolType.Https, scannerConfig.TreatOpenPortsAsWebServices))
             {
                 continue;
             }
@@ -298,12 +297,6 @@ public partial class IPScanner : IDisposable
             await HandleHttpPort(ipScanResult, ipAddress, portNumber, cancellationToken);
             RaiseProgressReporting(IPScannerProgressReportingType.ServiceHttp, ipScanResult);
             handledCount++;
-            if (!ipScanResult.Ports.Any(x => x.ServiceProtocol is ServiceProtocolType.Http or ServiceProtocolType.Https))
-            {
-                continue;
-            }
-
-            break;
         }
 
         var sendLastReport = false;

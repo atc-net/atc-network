@@ -3,9 +3,9 @@ namespace Atc.Network.Models;
 public class IPScanResult
 {
     public IPScanResult(
-        IPAddress iPAddress)
+        IPAddress ipAddress)
     {
-        this.IPAddress = iPAddress;
+        this.IPAddress = ipAddress;
     }
 
     public IPAddress IPAddress { get; }
@@ -34,7 +34,7 @@ public class IPScanResult
             ? Start.GetPrettyTimeDiff(End.Value)
             : null;
 
-    public IEnumerable<int> OpenPort
+    public IEnumerable<ushort> OpenPort
         => Ports
             .Where(x => x.TransportProtocol != TransportProtocolType.None && x.CanConnect)
             .Select(x => x.Port)

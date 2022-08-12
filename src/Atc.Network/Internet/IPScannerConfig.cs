@@ -10,7 +10,7 @@ public class IPScannerConfig
 
     public TimeSpan TimeoutHttp { get; set; } = TimeSpan.FromMilliseconds(IPScannerConstants.TimeoutHttpInMs);
 
-    public bool ResolvePing { get; set; } = true;
+    public bool IcmpPing { get; set; } = true;
 
     public bool ResolveHostName { get; set; } = true;
 
@@ -18,9 +18,7 @@ public class IPScannerConfig
 
     public bool ResolveVendorFromMacAddress { get; set; } = true;
 
-    public ICollection<int> PortNumbers { get; set; } = new List<int>();
+    public ICollection<ushort> PortNumbers { get; set; } = new List<ushort>();
 
-    public bool ResolveOnlyKnowTcpUdpPorts { get; set; } = true;
-
-    public bool ResolveServiceProtocolHttp { get; set; } = true;
+    public IPServicePortExaminationLevel TreatOpenPortsAsWebServices { get; set; } = IPServicePortExaminationLevel.WellKnownAndCommon;
 }

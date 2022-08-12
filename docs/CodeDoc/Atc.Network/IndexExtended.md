@@ -20,6 +20,7 @@
      - IsKnownExceptionForNetworkCableUnplugged(this Exception exception)
 - [IPAddressExtensions](Atc.Network.md#ipaddressextensions)
   -  Static Methods
+     - IsInRange(this IPAddress ipAddress, string cidrNotation)
      - IsPrivate(this IPAddress ipAddress)
      - IsPublic(this IPAddress ipAddress)
      - ToUnsignedInt(this IPAddress ipAddress)
@@ -27,6 +28,7 @@
   -  Static Methods
      - GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
 - [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
+- [IPServicePortExaminationLevel](Atc.Network.md#ipserviceportexaminationlevel)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
   -  Static Fields
      - int ClientNotConnected
@@ -49,6 +51,11 @@
      - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
 - [TransportProtocolType](Atc.Network.md#transportprotocoltype)
+- [UshortExtensions](Atc.Network.md#ushortextensions)
+  -  Static Methods
+     - IsPortForIPService(this ushort portNumber, ServiceProtocolType serviceProtocolType, IPServicePortExaminationLevel matchLevel)
+     - IsWellKnownIPServicePort(this ushort portNumber, ServiceProtocolType serviceProtocolType)
+     - IsWellKnownOrCommonIPServicePort(this ushort portNumber, ServiceProtocolType serviceProtocolType)
 
 ## [Atc.Network.Helpers](Atc.Network.Helpers.md)
 
@@ -58,17 +65,13 @@
 - [DnsLookupHelper](Atc.Network.Helpers.md#dnslookuphelper)
   -  Static Methods
      - GetHostname(IPAddress ipAddress, CancellationToken cancellationToken)
-- [IPAddressV4Helper](Atc.Network.Helpers.md#ipaddressv4helper)
+- [IPv4AddressHelper](Atc.Network.Helpers.md#ipv4addresshelper)
   -  Static Methods
      - GetAddressesInRange(IPAddress ipAddress, int cidrLength)
      - GetAddressesInRange(IPAddress startIpAddress, IPAddress endIpAddress)
+     - GetFirstAndLastAddressInRange(IPAddress ipAddress, int cidrLength)
      - GetLocalAddress()
-     - GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrLength)
-     - IsAddressInRange(IPAddress ipAddress, string cidrNotation)
      - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
-- [KnowTcpUdpPortsLookupHelper](Atc.Network.Helpers.md#knowtcpudpportslookuphelper)
-  -  Static Methods
-     - IsKnow(ServiceProtocolType serviceProtocolType, int portNumber)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
@@ -90,21 +93,20 @@
   -  Methods
      - Dispose()
      - Scan(IPAddress ipAddress, CancellationToken cancellationToken = null)
-     - ScanCidrRange(IPAddress ipAddress, int cidrMaskLength, CancellationToken cancellationToken = null)
+     - ScanCidrRange(IPAddress ipAddress, byte cidrLength, CancellationToken cancellationToken = null)
      - ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
 - [IPScannerConfig](Atc.Network.Internet.md#ipscannerconfig)
   -  Properties
+     - IcmpPing
      - PortNumbers
      - ResolveHostName
      - ResolveMacAddress
-     - ResolveOnlyKnowTcpUdpPorts
-     - ResolvePing
-     - ResolveServiceProtocolHttp
      - ResolveVendorFromMacAddress
      - Timeout
      - TimeoutHttp
      - TimeoutPing
      - TimeoutTcp
+     - TreatOpenPortsAsWebServices
 - [IPScannerConstants](Atc.Network.Internet.md#ipscannerconstants)
   -  Static Fields
      - int TimeoutHttpInMs

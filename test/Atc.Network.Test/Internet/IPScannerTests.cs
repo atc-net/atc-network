@@ -6,7 +6,7 @@ namespace Atc.Network.Test.Internet;
 [Trait(Traits.Category, Traits.Categories.SkipWhenLiveUnitTesting)]
 public class IPScannerTests
 {
-    private static readonly List<int> TestPortNumbers = new()
+    private static readonly List<ushort> TestPortNumbers = new()
     {
         80,
     };
@@ -86,7 +86,7 @@ public class IPScannerTests
 
     private static IPAddress GetTestIpAddress()
     {
-        var localAddress = IPAddressV4Helper.GetLocalAddress();
+        var localAddress = IPv4AddressHelper.GetLocalAddress();
         return localAddress ?? IPAddress.Parse("8.8.8.8");
     }
 

@@ -6,7 +6,7 @@ public class DnsLookupHelperTests
     public async Task GetHostname()
     {
         // Arrange
-        var localAddress = IPAddressV4Helper.GetLocalAddress();
+        var localAddress = IPv4AddressHelper.GetLocalAddress();
         if (localAddress is null)
         {
             return;

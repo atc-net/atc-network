@@ -9,7 +9,7 @@ public static class IPScannerConfigExtensions
         ArgumentNullException.ThrowIfNull(ipScannerConfig);
 
         var count = 0;
-        if (ipScannerConfig.ResolvePing)
+        if (ipScannerConfig.IcmpPing)
         {
             count++;
         }
@@ -32,7 +32,7 @@ public static class IPScannerConfigExtensions
 
         count += ipScannerConfig.PortNumbers.Count;
 
-        if (ipScannerConfig.ResolveServiceProtocolHttp)
+        if (ipScannerConfig.TreatOpenPortsAsWebServices != IPServicePortExaminationLevel.None)
         {
             count += ipScannerConfig.PortNumbers.Count;
         }

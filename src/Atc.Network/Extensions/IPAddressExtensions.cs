@@ -70,4 +70,26 @@ public static class IPAddressExtensions
         Array.Reverse(b);
         return BitConverter.ToUInt32(b);
     }
+
+    public static bool IsInRange(
+        this IPAddress ipAddress,
+        string cidrNotation)
+    {
+        ArgumentNullException.ThrowIfNull(ipAddress);
+        ArgumentNullException.ThrowIfNull(cidrNotation);
+
+        var sa = cidrNotation.Split('/');
+        if (sa.Length != 2)
+        {
+            throw new ArgumentException("Invalid CIDR notation", nameof(cidrNotation));
+        }
+
+        var network = IPAddress.Parse(sa[0]);
+        var cidr = byte.Parse(sa[1], GlobalizationConstants.EnglishCultureInfo);
+        var ipAddressAsBytes = BitConverter.ToInt32(ipAddress.GetAddressBytes());
+        var networkAsBytes = BitConverter.ToInt32(network.GetAddressBytes());
+        var calc = IPAddress.HostToNetworkOrder(-1 << (32 - cidr));
+
+        return (ipAddressAsBytes & calc) == (networkAsBytes & calc);
+    }
 }
