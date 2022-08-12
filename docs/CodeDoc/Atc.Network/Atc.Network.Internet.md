@@ -72,6 +72,10 @@ IPScanner LoggerMessages.
 
 ### Properties
 
+#### LimitResolveIPProtocolsToKnowIPPorts
+>```csharp
+>LimitResolveIPProtocolsToKnowIPPorts
+>```
 #### Ping
 >```csharp
 >Ping
@@ -137,7 +141,9 @@ IPScanner LoggerMessages.
 >```csharp
 >int TimeoutPingInMs
 >```
-><b>Summary:</b> The connect time-out for ping (ICMP) value, in milliseconds. The default is 60000 (1 min);
+><b>Summary:</b> The connect time-out for ping (ICMP) value, in milliseconds. The default is 4000 (4 sec);
+>
+><b>Remarks:</b> See: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/ping With parameter "/w".
 #### TimeoutTcpInMs
 >```csharp
 >int TimeoutTcpInMs
@@ -169,6 +175,10 @@ IPScanner LoggerMessages.
 #### TasksToProcessCount
 >```csharp
 >TasksToProcessCount
+>```
+#### Type
+>```csharp
+>Type
 >```
 ### Methods
 

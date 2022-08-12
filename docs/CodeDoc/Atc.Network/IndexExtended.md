@@ -18,11 +18,11 @@
   -  Static Methods
      - IsKnownExceptionForConsumerDisposed(this Exception exception)
      - IsKnownExceptionForNetworkCableUnplugged(this Exception exception)
-- [IpAddressExtensions](Atc.Network.md#ipaddressextensions)
 - [IPProtocolType](Atc.Network.md#ipprotocoltype)
 - [IPScannerConfigExtensions](Atc.Network.md#ipscannerconfigextensions)
   -  Static Methods
      - GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
+- [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
   -  Static Fields
      - int ClientNotConnected
@@ -60,6 +60,9 @@
      - GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrMaskLength)
      - IsInRange(IPAddress ipAddress, string cidrMask)
      - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
+- [KnowIPPortsLookupHelper](Atc.Network.Helpers.md#knowipportslookuphelper)
+  -  Static Methods
+     - IsKnow(IPProtocolType protocolType, int portNumber)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
@@ -84,6 +87,7 @@
      - ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
 - [IPScannerConfig](Atc.Network.Internet.md#ipscannerconfig)
   -  Properties
+     - LimitResolveIPProtocolsToKnowIPPorts
      - Ping
      - PortNumbers
      - ResolveHostName
@@ -106,6 +110,7 @@
      - PercentageCompleted
      - TasksProcessedCount
      - TasksToProcessCount
+     - Type
   -  Methods
      - ToString()
 

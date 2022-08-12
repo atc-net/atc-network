@@ -87,15 +87,6 @@ ConnectionStateEventArgs.
 
 <br />
 
-## IpAddressExtensions
-
->```csharp
->public static class IpAddressExtensions
->```
-
-
-<br />
-
 ## IPProtocolType
 
 >```csharp
@@ -111,6 +102,8 @@ ConnectionStateEventArgs.
 | 3 | Http | Http |  | 
 | 4 | Ftps | Ftps |  | 
 | 5 | Ftp | Ftp |  | 
+| 6 | Ssh | Ssh |  | 
+| 7 | Telnet | Telnet |  | 
 
 
 
@@ -128,6 +121,30 @@ ConnectionStateEventArgs.
 >```csharp
 >int GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
 >```
+
+<br />
+
+## IPScannerProgressReportingType
+
+>```csharp
+>public enum IPScannerProgressReportingType
+>```
+
+
+| Value | Name | Description | Summary | 
+| --- | --- | --- | --- | 
+| 0 | None | None |  | 
+| 1 | IpAddressStart | Ip Address Start |  | 
+| 2 | IpAddressDone | Ip Address Done |  | 
+| 3 | Counters | Counters |  | 
+| 4 | Ping | Ping |  | 
+| 5 | HostName | Host Name |  | 
+| 6 | MacAddress | Mac Address |  | 
+| 7 | MacVendor | Mac Vendor |  | 
+| 8 | Tcp | Tcp |  | 
+| 9 | ServiceHttp | Service Http |  | 
+
+
 
 <br />
 
@@ -205,11 +222,11 @@ Enumeration: NetworkQualityCategoryType.
 | Value | Name | Description | Summary | 
 | --- | --- | --- | --- | 
 | 0 | None | None |  | 
-| 1 | VeryPoor | Very Poor | The very poor | 
+| 1 | VeryPoor | Very poor | The very poor | 
 | 2 | Poor | Poor | The poor | 
 | 3 | Fair | Fair | The fair | 
 | 4 | Good | Good | The good | 
-| 5 | VeryGood | Very Good | The very good | 
+| 5 | VeryGood | Good | The very good | 
 | 6 | Excellent | Excellent | The excellent | 
 | 7 | Perfect | Perfect | The perfect | 
 
