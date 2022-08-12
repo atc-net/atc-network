@@ -82,7 +82,10 @@ public partial class IPScanner : IDisposable
         {
             await SyncLock.WaitAsync(cancellationToken);
 
-            arpEntities = ArpHelper.GetArpResult();
+            if (scannerConfig.ResolveMacAddress)
+            {
+                arpEntities = ArpHelper.GetArpResult();
+            }
 
             tasksToProcessCount = ipAddresses.Length * scannerConfig.GetTasksToProcessCount();
             tasksProcessedCount = 0;
@@ -185,7 +188,7 @@ public partial class IPScanner : IDisposable
                 await HandleTcpPort(ipScanResult, ipAddress, portNumber, cancellationToken);
             }
 
-            if (scannerConfig.ResolveIPProtocolHttp)
+            if (scannerConfig.ResolveServiceProtocolHttp)
             {
                 await HandleHttpPort(ipScanResult, ipAddress, cancellationToken);
             }

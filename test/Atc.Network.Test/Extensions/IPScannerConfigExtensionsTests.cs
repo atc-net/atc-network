@@ -31,7 +31,7 @@ public class IPScannerConfigExtensionsTests
             ResolveHostName = resolveHostName,
             ResolveMacAddress = resolveMacAddress,
             ResolveVendorFromMacAddress = resolveVendorFromMacAddress,
-            ResolveIPProtocolHttp = resolveIPProtocolHttp,
+            ResolveServiceProtocolHttp = resolveIPProtocolHttp,
         };
 
         for (var i = 0; i < numberOfPorts; i++)

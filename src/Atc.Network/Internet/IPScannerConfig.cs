@@ -22,5 +22,5 @@ public class IPScannerConfig
 
     public bool ResolveOnlyKnowTcpUdpPorts { get; set; } = true;
 
-    public bool ResolveIPProtocolHttp { get; set; } = true;
+    public bool ResolveServiceProtocolHttp { get; set; } = true;
 }

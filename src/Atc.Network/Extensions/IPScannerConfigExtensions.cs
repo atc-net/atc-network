@@ -32,7 +32,7 @@ public static class IPScannerConfigExtensions
 
         count += ipScannerConfig.PortNumbers.Count;
 
-        if (ipScannerConfig.ResolveIPProtocolHttp)
+        if (ipScannerConfig.ResolveServiceProtocolHttp)
         {
             count += ipScannerConfig.PortNumbers.Count;
         }
