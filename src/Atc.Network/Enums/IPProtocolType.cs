@@ -9,4 +9,6 @@ public enum IPProtocolType
     Http,
     Ftps,
     Ftp,
+    Ssh,
+    Telnet,
 }

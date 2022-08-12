@@ -1,3 +1,4 @@
+// ReSharper disable RedundantCast
 namespace Atc.Network.Test.Internet;
 
 [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "OK.")]
@@ -62,8 +63,8 @@ public class IPScannerTests
     public async Task ScanRange()
     {
         // Arrange
-        var testIpAddressStart = GetTestIpAddress(1);
-        var testIpAddressEnd = GetTestIpAddress(-1);
+        var testIpAddressStart = GetTestIpAddress(-1);
+        var testIpAddressEnd = GetTestIpAddress(1);
         var ipScannerConfig = new IPScannerConfig
         {
             PortNumbers = TestPortNumbers,
@@ -92,7 +93,7 @@ public class IPScannerTests
     private static IPAddress GetTestIpAddress(int i)
     {
         var bytes = GetTestIpAddress().GetAddressBytes();
-        return IPAddress.Parse($"{bytes[0]}.{bytes[1]}{bytes[2]}{bytes[3] + i}");
+        return IPAddress.Parse($"{(int)bytes[0]}.{(int)bytes[1]}.{(int)bytes[2]}.{(int)bytes[3] + i}");
     }
 
     private static void IpScannerOnProgressReporting(object? sender, IPScannerProgressReport args)

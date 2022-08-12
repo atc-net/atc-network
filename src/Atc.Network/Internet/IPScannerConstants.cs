@@ -9,9 +9,13 @@ public static class IPScannerConstants
     public const int TimeoutInMs = 180000;
 
     /// <summary>
-    /// The connect time-out for ping (ICMP) value, in milliseconds. The default is 60000 (1 min);
+    /// The connect time-out for ping (ICMP) value, in milliseconds. The default is 4000 (4 sec);
     /// </summary>
-    public const int TimeoutPingInMs = 60000;
+    /// <remarks>
+    /// See: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/ping
+    /// With parameter "/w".
+    /// </remarks>
+    public const int TimeoutPingInMs = 4000;
 
     /// <summary>
     /// The connect time-out for tpc value, in milliseconds. The default is 100 (100 msec);

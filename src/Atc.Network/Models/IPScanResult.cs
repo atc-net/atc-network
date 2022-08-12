@@ -41,20 +41,31 @@ public class IPScanResult
             .OrderBy(x => x);
 
     public bool HasConnection
-        => !string.IsNullOrEmpty(Hostname) ||
+        => PingStatus?.Status != IPStatus.Success ||
+           !string.IsNullOrEmpty(Hostname) ||
            !string.IsNullOrEmpty(MacAddress) ||
            OpenPort.Any();
 
     public override string ToString()
     {
-        var openPorts = Ports.Count(x => x.Protocol != IPProtocolType.None && x.CanConnect);
-        var totalPorts = Ports.Count;
-        var completedPart = IsCompleted
-            ? $"Time={TimeDiff}"
-            : "Not completed";
+        var sb = new StringBuilder();
 
-        return HasConnection
-            ? $"{IPAddress} # OpenPorts {openPorts} of {totalPorts} # {completedPart}"
-            : $"{IPAddress} # No connections - Time={TimeDiff}";
+        var totalPortCount = Ports.Count;
+        if (totalPortCount > 0)
+        {
+            var openPorts = Ports.Count(x => x.Protocol != IPProtocolType.None && x.CanConnect);
+            sb.Append(GlobalizationConstants.EnglishCultureInfo, $"OpenPorts {openPorts} of {totalPortCount} # ");
+        }
+
+        if (IsCompleted)
+        {
+            sb.Append(GlobalizationConstants.EnglishCultureInfo, $"TimeDiff={TimeDiff}");
+        }
+        else
+        {
+            sb.Append("Not completed");
+        }
+
+        return sb.ToString();
     }
 }

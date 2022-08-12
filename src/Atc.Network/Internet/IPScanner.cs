@@ -136,8 +136,10 @@ public partial class IPScanner : IDisposable
     }
 
     private void RaiseProgressReporting(
+        IPScannerProgressReportingType reportingType,
         IPScanResult? ipScanResult)
     {
+        progressReporting.Type = reportingType;
         progressReporting.TasksToProcessCount = tasksToProcessCount;
         progressReporting.TasksProcessedCount = tasksProcessedCount;
         progressReporting.LatestUpdate = ipScanResult;
@@ -150,6 +152,7 @@ public partial class IPScanner : IDisposable
     {
         var ipScanResult = new IPScanResult(ipAddress);
         processedScanResults.Add(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.IpAddressStart, ipScanResult);
 
         if (scannerConfig.Ping)
         {
@@ -186,7 +189,7 @@ public partial class IPScanner : IDisposable
         }
 
         ipScanResult.End = DateTime.Now;
-        RaiseProgressReporting(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.IpAddressDone, ipScanResult);
     }
 
     private void HandlePing(
@@ -195,7 +198,7 @@ public partial class IPScanner : IDisposable
     {
         ipScanResult.PingStatus = PingHelper.GetStatus(ipAddress, (int)scannerConfig.TimeoutPing.TotalMilliseconds);
         Interlocked.Increment(ref tasksProcessedCount);
-        RaiseProgressReporting(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.Ping, ipScanResult);
     }
 
     private async Task HandleResolveHostName(
@@ -205,7 +208,7 @@ public partial class IPScanner : IDisposable
     {
         ipScanResult.Hostname = await DnsLookupHelper.GetHostname(ipAddress, cancellationToken);
         Interlocked.Increment(ref tasksProcessedCount);
-        RaiseProgressReporting(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.HostName, ipScanResult);
     }
 
     private void HandleResolveMacAddress(
@@ -223,7 +226,7 @@ public partial class IPScanner : IDisposable
         }
 
         Interlocked.Increment(ref tasksProcessedCount);
-        RaiseProgressReporting(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.MacAddress, ipScanResult);
     }
 
     private async Task HandleResolveVendorFromMacAddress(
@@ -243,7 +246,7 @@ public partial class IPScanner : IDisposable
         }
 
         Interlocked.Increment(ref tasksProcessedCount);
-        RaiseProgressReporting(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.MacVendor, ipScanResult);
     }
 
     private async Task HandleTcpPort(
@@ -268,7 +271,7 @@ public partial class IPScanner : IDisposable
         ipScanResult.Ports.Add(result);
 
         Interlocked.Increment(ref tasksProcessedCount);
-        RaiseProgressReporting(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.Tcp, ipScanResult);
     }
 
     private async Task HandleHttpPort(
@@ -279,27 +282,34 @@ public partial class IPScanner : IDisposable
         var handledCount = 0;
         foreach (var portNumber in ipScanResult.OpenPort)
         {
+            if (scannerConfig.LimitResolveIPProtocolsToKnowIPPorts &&
+                !KnowIPPortsLookupHelper.IsKnow(IPProtocolType.Http, portNumber) &&
+                !KnowIPPortsLookupHelper.IsKnow(IPProtocolType.Http, portNumber))
+            {
+                continue;
+            }
+
             await HandleHttpPort(ipScanResult, ipAddress, portNumber, cancellationToken);
-            RaiseProgressReporting(ipScanResult);
+            RaiseProgressReporting(IPScannerProgressReportingType.ServiceHttp, ipScanResult);
             handledCount++;
             if (!ipScanResult.Ports.Any(x => x.Protocol is IPProtocolType.Http or IPProtocolType.Https))
             {
                 continue;
             }
 
-            var sendLastReport = false;
-            for (var i = 0; i < ipScanResult.OpenPort.Count() - handledCount; i++)
-            {
-                Interlocked.Increment(ref tasksProcessedCount);
-                sendLastReport = true;
-            }
-
-            if (sendLastReport)
-            {
-                RaiseProgressReporting(ipScanResult);
-            }
-
             break;
+        }
+
+        var sendLastReport = false;
+        for (var i = 0; i < ipScanResult.Ports.Count - handledCount; i++)
+        {
+            Interlocked.Increment(ref tasksProcessedCount);
+            sendLastReport = true;
+        }
+
+        if (sendLastReport)
+        {
+            RaiseProgressReporting(IPScannerProgressReportingType.Counters, ipScanResult);
         }
     }
 
@@ -316,7 +326,7 @@ public partial class IPScanner : IDisposable
         if (workOnItem is null)
         {
             Interlocked.Increment(ref tasksProcessedCount);
-            RaiseProgressReporting(ipScanResult);
+            RaiseProgressReporting(IPScannerProgressReportingType.Counters, ipScanResult);
             return;
         }
 
@@ -342,6 +352,6 @@ public partial class IPScanner : IDisposable
         }
 
         Interlocked.Increment(ref tasksProcessedCount);
-        RaiseProgressReporting(ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.ServiceHttp, ipScanResult);
     }
 }

@@ -20,5 +20,7 @@ public class IPScannerConfig
 
     public ICollection<int> PortNumbers { get; set; } = new List<int>();
 
+    public bool LimitResolveIPProtocolsToKnowIPPorts { get; set; } = true;
+
     public bool ResolveIPProtocolHttp { get; set; } = true;
 }
