@@ -1,5 +1,6 @@
-// ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable AccessToDisposedClosure
+// ReSharper disable LoopCanBeConvertedToQuery
+// ReSharper disable PossibleMultipleEnumeration
 namespace Atc.Network.Test.Tcp;
 
 [Trait(Traits.Category, Traits.Categories.Integration)]
