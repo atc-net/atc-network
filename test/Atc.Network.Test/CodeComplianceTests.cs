@@ -18,7 +18,7 @@ public class CodeComplianceTests
         typeof(IPPortScan),
         typeof(IPScanner),
         typeof(DnsLookupHelper),
-        typeof(KnowIPPortsLookupHelper),
+        typeof(KnowTcpUdpPortsLookupHelper),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

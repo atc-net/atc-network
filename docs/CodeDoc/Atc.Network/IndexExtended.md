@@ -18,7 +18,6 @@
   -  Static Methods
      - IsKnownExceptionForConsumerDisposed(this Exception exception)
      - IsKnownExceptionForNetworkCableUnplugged(this Exception exception)
-- [IPProtocolType](Atc.Network.md#ipprotocoltype)
 - [IPScannerConfigExtensions](Atc.Network.md#ipscannerconfigextensions)
   -  Static Methods
      - GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
@@ -39,10 +38,12 @@
      - int Reconnected
      - int Reconnecting
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
+- [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
   -  Static Methods
      - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
+- [TransportProtocolType](Atc.Network.md#transportprotocoltype)
 
 ## [Atc.Network.Helpers](Atc.Network.Helpers.md)
 
@@ -54,21 +55,22 @@
      - GetHostname(IPAddress ipAddress, CancellationToken cancellationToken)
 - [IPAddressV4Helper](Atc.Network.Helpers.md#ipaddressv4helper)
   -  Static Methods
-     - GetAddressesInRange(IPAddress ipAddress, int cidrMaskLength)
+     - GetAddressesInRange(IPAddress ipAddress, int cidrLength)
      - GetAddressesInRange(IPAddress startIpAddress, IPAddress endIpAddress)
      - GetLocalAddress()
-     - GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrMaskLength)
-     - IsInRange(IPAddress ipAddress, string cidrMask)
+     - GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrLength)
+     - IsInRange(IPAddress ipAddress, string cidrNotation)
      - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
-- [KnowIPPortsLookupHelper](Atc.Network.Helpers.md#knowipportslookuphelper)
+- [KnowTcpUdpPortsLookupHelper](Atc.Network.Helpers.md#knowtcpudpportslookuphelper)
   -  Static Methods
-     - IsKnow(IPProtocolType protocolType, int portNumber)
+     - IsKnow(ServiceProtocolType serviceProtocolType, int portNumber)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
   -  Static Methods
      - GetStatus(IPAddress ipAddress, int timeoutInMs = 1000)
+     - GetStatus(IPAddress ipAddress, TimeSpan timeout)
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
 
@@ -87,12 +89,12 @@
      - ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
 - [IPScannerConfig](Atc.Network.Internet.md#ipscannerconfig)
   -  Properties
-     - LimitResolveIPProtocolsToKnowIPPorts
-     - Ping
      - PortNumbers
      - ResolveHostName
      - ResolveIPProtocolHttp
      - ResolveMacAddress
+     - ResolveOnlyKnowTcpUdpPorts
+     - ResolvePing
      - ResolveVendorFromMacAddress
      - Timeout
      - TimeoutHttp
@@ -128,7 +130,8 @@
      - CanConnect
      - IPAddress
      - Port
-     - Protocol
+     - ServiceProtocol
+     - TransportProtocol
   -  Methods
      - ToString()
 - [IPScanResult](Atc.Network.Models.md#ipscanresult)

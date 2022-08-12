@@ -2,6 +2,11 @@ namespace Atc.Network.Helpers;
 
 public static class PingHelper
 {
+    public static Task<PingStatusResult> GetStatus(
+        IPAddress ipAddress,
+        TimeSpan timeout)
+        => GetStatus(ipAddress, (int)timeout.TotalMilliseconds);
+
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
     public static async Task<PingStatusResult> GetStatus(
         IPAddress ipAddress,

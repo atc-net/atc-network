@@ -10,7 +10,7 @@ public class IPScannerConfig
 
     public TimeSpan TimeoutHttp { get; set; } = TimeSpan.FromMilliseconds(IPScannerConstants.TimeoutHttpInMs);
 
-    public bool Ping { get; set; } = true;
+    public bool ResolvePing { get; set; } = true;
 
     public bool ResolveHostName { get; set; } = true;
 
@@ -20,7 +20,7 @@ public class IPScannerConfig
 
     public ICollection<int> PortNumbers { get; set; } = new List<int>();
 
-    public bool LimitResolveIPProtocolsToKnowIPPorts { get; set; } = true;
+    public bool ResolveOnlyKnowTcpUdpPorts { get; set; } = true;
 
     public bool ResolveIPProtocolHttp { get; set; } = true;
 }

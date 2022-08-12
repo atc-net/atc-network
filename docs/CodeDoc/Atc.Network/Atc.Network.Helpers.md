@@ -51,7 +51,7 @@
 >```
 #### GetAddressesInRange
 >```csharp
->IPAddress[] GetAddressesInRange(IPAddress ipAddress, int cidrMaskLength)
+>IPAddress[] GetAddressesInRange(IPAddress ipAddress, int cidrLength)
 >```
 #### GetLocalAddress
 >```csharp
@@ -59,11 +59,11 @@
 >```
 #### GetStartAndEndAddressesInRange
 >```csharp
->ValueTuple<IPAddress, IPAddress> GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrMaskLength)
+>ValueTuple<IPAddress, IPAddress> GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrLength)
 >```
 #### IsInRange
 >```csharp
->bool IsInRange(IPAddress ipAddress, string cidrMask)
+>bool IsInRange(IPAddress ipAddress, string cidrNotation)
 >```
 #### ValidateAddresses
 >```csharp
@@ -72,19 +72,19 @@
 
 <br />
 
-## KnowIPPortsLookupHelper
+## KnowTcpUdpPortsLookupHelper
 KnowIPPortsLookupHelper.
 ><b>Remarks:</b> https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
 
 >```csharp
->public static class KnowIPPortsLookupHelper
+>public static class KnowTcpUdpPortsLookupHelper
 >```
 
 ### Static Methods
 
 #### IsKnow
 >```csharp
->bool IsKnow(IPProtocolType protocolType, int portNumber)
+>bool IsKnow(ServiceProtocolType serviceProtocolType, int portNumber)
 >```
 
 <br />
@@ -112,6 +112,10 @@ KnowIPPortsLookupHelper.
 
 ### Static Methods
 
+#### GetStatus
+>```csharp
+>Task<PingStatusResult> GetStatus(IPAddress ipAddress, TimeSpan timeout)
+>```
 #### GetStatus
 >```csharp
 >Task<PingStatusResult> GetStatus(IPAddress ipAddress, int timeoutInMs = 1000)

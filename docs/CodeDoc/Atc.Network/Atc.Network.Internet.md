@@ -72,14 +72,6 @@ IPScanner LoggerMessages.
 
 ### Properties
 
-#### LimitResolveIPProtocolsToKnowIPPorts
->```csharp
->LimitResolveIPProtocolsToKnowIPPorts
->```
-#### Ping
->```csharp
->Ping
->```
 #### PortNumbers
 >```csharp
 >PortNumbers
@@ -95,6 +87,14 @@ IPScanner LoggerMessages.
 #### ResolveMacAddress
 >```csharp
 >ResolveMacAddress
+>```
+#### ResolveOnlyKnowTcpUdpPorts
+>```csharp
+>ResolveOnlyKnowTcpUdpPorts
+>```
+#### ResolvePing
+>```csharp
+>ResolvePing
 >```
 #### ResolveVendorFromMacAddress
 >```csharp

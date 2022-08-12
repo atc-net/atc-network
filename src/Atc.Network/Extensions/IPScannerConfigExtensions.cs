@@ -9,7 +9,7 @@ public static class IPScannerConfigExtensions
         ArgumentNullException.ThrowIfNull(ipScannerConfig);
 
         var count = 0;
-        if (ipScannerConfig.Ping)
+        if (ipScannerConfig.ResolvePing)
         {
             count++;
         }

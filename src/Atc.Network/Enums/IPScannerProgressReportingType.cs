@@ -4,8 +4,8 @@ namespace Atc.Network;
 public enum IPScannerProgressReportingType
 {
     None,
-    IpAddressStart,
-    IpAddressDone,
+    IPAddressStart,
+    IPAddressDone,
     Counters,
     Ping,
     HostName,

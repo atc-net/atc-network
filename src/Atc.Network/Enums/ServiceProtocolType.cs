@@ -1,10 +1,10 @@
 // ReSharper disable once CheckNamespace
 namespace Atc.Network;
 
-public enum IPProtocolType
+public enum ServiceProtocolType
 {
     None,
-    Tcp,
+    Unknown,
     Https,
     Http,
     Ftps,

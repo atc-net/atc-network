@@ -56,9 +56,13 @@
 >```csharp
 >Port
 >```
-#### Protocol
+#### ServiceProtocol
 >```csharp
->Protocol
+>ServiceProtocol
+>```
+#### TransportProtocol
+>```csharp
+>TransportProtocol
 >```
 ### Methods
 

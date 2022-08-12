@@ -6,10 +6,12 @@ public class IPScanPortResult
 
     public int Port { get; set; }
 
-    public IPProtocolType Protocol { get; set; }
+    public TransportProtocolType TransportProtocol { get; set; }
+
+    public ServiceProtocolType ServiceProtocol { get; set; }
 
     public bool CanConnect { get; set; }
 
     public override string ToString()
-        => $"{nameof(IPAddress)}: {IPAddress}, {nameof(Port)}: {Port}, {nameof(Protocol)}: {Protocol}, {nameof(CanConnect)}: {CanConnect}";
+        => $"{nameof(IPAddress)}: {IPAddress}, {nameof(Port)}: {Port}, {nameof(TransportProtocol)}: {TransportProtocol}, {nameof(ServiceProtocol)}: {ServiceProtocol}, {nameof(CanConnect)}: {CanConnect}";
 }

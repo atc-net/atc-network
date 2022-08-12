@@ -13,25 +13,19 @@ public static class IPAddressV4Helper
 
         if (startIpAddress.AddressFamily != AddressFamily.InterNetwork)
         {
-            return (false, "Start-IP-address is not v4");
+            return (false, $"{nameof(startIpAddress)} is not IPv4");
         }
 
         if (endIpAddress.AddressFamily != AddressFamily.InterNetwork)
         {
-            return (false, "End-IP-address is not v4");
+            return (false, $"{nameof(endIpAddress)} is not IPv4");
         }
 
-        var startIpAddressAsBytes = startIpAddress.GetAddressBytes();
-        var endIpAddressAsBytes = endIpAddress.GetAddressBytes();
+        var a = BitConverter.ToUInt32(startIpAddress.GetAddressBytes());
+        var b = BitConverter.ToUInt32(endIpAddress.GetAddressBytes());
 
-        Array.Reverse(startIpAddressAsBytes);
-        Array.Reverse(endIpAddressAsBytes);
-
-        var ipS = BitConverter.ToUInt32(startIpAddressAsBytes);
-        var ipE = BitConverter.ToUInt32(endIpAddressAsBytes);
-
-        return ipS > ipE
-            ? (false, "Expect Start-IP-address is greater then End-IP-address")
+        return a > b
+            ? (false, $"{nameof(startIpAddress)} is higher than {nameof(endIpAddress)}")
             : (true, null);
     }
 
@@ -74,32 +68,32 @@ public static class IPAddressV4Helper
 
     public static IPAddress[] GetAddressesInRange(
         IPAddress ipAddress,
-        int cidrMaskLength)
+        int cidrLength)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
-        var (startIpAddress, endIpAddress) = GetStartAndEndAddressesInRange(ipAddress, cidrMaskLength);
+        var (startIpAddress, endIpAddress) = GetStartAndEndAddressesInRange(ipAddress, cidrLength);
         return GetAddressesInRange(startIpAddress, endIpAddress);
     }
 
     public static (IPAddress StartIpAddress, IPAddress EndIpAddress) GetStartAndEndAddressesInRange(
         IPAddress ipAddress,
-        int cidrMaskLength)
+        int cidrLength)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
-        if (cidrMaskLength is < 0 or > 32)
+        if (cidrLength is < 0 or > 32)
         {
-            throw new ArgumentOutOfRangeException(nameof(cidrMaskLength));
+            throw new ArgumentOutOfRangeException(nameof(cidrLength));
         }
 
         var ipAddressAsBytes = ipAddress.GetAddressBytes();
-        if (ipAddressAsBytes.Length * 8 < cidrMaskLength)
+        if (ipAddressAsBytes.Length * 8 < cidrLength)
         {
             throw new FormatException();
         }
 
-        var maskBytes = GetBitMask(ipAddressAsBytes.Length, cidrMaskLength);
+        var maskBytes = GetBitMask(ipAddressAsBytes.Length, cidrLength);
         ipAddressAsBytes = DoBitOperation(BooleanOperatorType.AND, ipAddressAsBytes, maskBytes);
 
         var startIpAddress = new IPAddress(ipAddressAsBytes);
@@ -117,29 +111,24 @@ public static class IPAddressV4Helper
 
     public static bool IsInRange(
         IPAddress ipAddress,
-        string cidrMask)
+        string cidrNotation)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
-        ArgumentNullException.ThrowIfNull(cidrMask);
+        ArgumentNullException.ThrowIfNull(cidrNotation);
 
-        var sa = cidrMask.Split('/');
+        var sa = cidrNotation.Split('/');
         if (sa.Length != 2)
         {
-            throw new ArgumentException("Invalid CIDR-mask", nameof(cidrMask));
+            throw new ArgumentException("Invalid CIDR notation", nameof(cidrNotation));
         }
 
-        var cidrMaskIp = IPAddress.Parse(sa[0]);
-        var cidrMaskLength = int.Parse(sa[1], GlobalizationConstants.EnglishCultureInfo);
-        if (cidrMaskLength is < 0 or > 32)
-        {
-            throw new ArgumentOutOfRangeException(nameof(cidrMask), "Invalid CIDR-mask");
-        }
+        var network = IPAddress.Parse(sa[0]);
+        var cidr = byte.Parse(sa[1], GlobalizationConstants.EnglishCultureInfo);
+        var ipAddressAsBytes = BitConverter.ToInt32(ipAddress.GetAddressBytes());
+        var networkAsBytes = BitConverter.ToInt32(network.GetAddressBytes());
+        var calc = IPAddress.HostToNetworkOrder(-1 << (32 - cidr));
 
-        var ip = BitConverter.ToInt32(ipAddress.GetAddressBytes());
-        var cidrM1 = BitConverter.ToInt32(cidrMaskIp.GetAddressBytes());
-        var calcM2 = IPAddress.HostToNetworkOrder(-1 << (32 - cidrMaskLength));
-
-        return (ip & calcM2) == (cidrM1 & calcM2);
+        return (ipAddressAsBytes & calc) == (networkAsBytes & calc);
     }
 
     private static byte[] GetBitMask(

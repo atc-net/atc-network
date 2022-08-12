@@ -10,19 +10,20 @@
 - [ConnectionState](Atc.Network.md#connectionstate)
 - [ConnectionStateEventArgs](Atc.Network.md#connectionstateeventargs)
 - [ExceptionExtensions](Atc.Network.md#exceptionextensions)
-- [IPProtocolType](Atc.Network.md#ipprotocoltype)
 - [IPScannerConfigExtensions](Atc.Network.md#ipscannerconfigextensions)
 - [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
+- [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
+- [TransportProtocolType](Atc.Network.md#transportprotocoltype)
 
 ## [Atc.Network.Helpers](Atc.Network.Helpers.md)
 
 - [ArpHelper](Atc.Network.Helpers.md#arphelper)
 - [DnsLookupHelper](Atc.Network.Helpers.md#dnslookuphelper)
 - [IPAddressV4Helper](Atc.Network.Helpers.md#ipaddressv4helper)
-- [KnowIPPortsLookupHelper](Atc.Network.Helpers.md#knowipportslookuphelper)
+- [KnowTcpUdpPortsLookupHelper](Atc.Network.Helpers.md#knowtcpudpportslookuphelper)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
 

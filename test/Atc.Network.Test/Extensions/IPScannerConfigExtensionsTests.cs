@@ -17,7 +17,7 @@ public class IPScannerConfigExtensionsTests
     [InlineData(7, false, false, true, false, 3, true)]
     public void GetTasksToProcessCount(
         int expected,
-        bool ping,
+        bool resolvePing,
         bool resolveHostName,
         bool resolveMacAddress,
         bool resolveVendorFromMacAddress,
@@ -27,7 +27,7 @@ public class IPScannerConfigExtensionsTests
         // Arrange
         var ipScannerConfig = new IPScannerConfig
         {
-            Ping = ping,
+            ResolvePing = resolvePing,
             ResolveHostName = resolveHostName,
             ResolveMacAddress = resolveMacAddress,
             ResolveVendorFromMacAddress = resolveVendorFromMacAddress,

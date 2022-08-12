@@ -8,20 +8,20 @@ namespace Atc.Network.Helpers;
 /// <remarks>
 /// https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
 /// </remarks>
-public static class KnowIPPortsLookupHelper
+public static class KnowTcpUdpPortsLookupHelper
 {
     public static bool IsKnow(
-        IPProtocolType protocolType,
+        ServiceProtocolType serviceProtocolType,
         int portNumber)
     {
-        return protocolType switch
+        return serviceProtocolType switch
         {
-            IPProtocolType.Https => Https.Contains(portNumber),
-            IPProtocolType.Http => Http.Contains(portNumber),
-            IPProtocolType.Ftps => Ftps.Contains(portNumber),
-            IPProtocolType.Ftp => Ftp.Contains(portNumber),
-            IPProtocolType.Telnet => Telnet.Contains(portNumber),
-            IPProtocolType.Ssh => Ssh.Contains(portNumber),
+            ServiceProtocolType.Https => Https.Contains(portNumber),
+            ServiceProtocolType.Http => Http.Contains(portNumber),
+            ServiceProtocolType.Ftps => Ftps.Contains(portNumber),
+            ServiceProtocolType.Ftp => Ftp.Contains(portNumber),
+            ServiceProtocolType.Telnet => Telnet.Contains(portNumber),
+            ServiceProtocolType.Ssh => Ssh.Contains(portNumber),
             _ => false,
         };
     }

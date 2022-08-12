@@ -155,9 +155,9 @@ public partial class IPScanner : IDisposable
     {
         var ipScanResult = new IPScanResult(ipAddress);
         processedScanResults.Add(ipScanResult);
-        RaiseProgressReporting(IPScannerProgressReportingType.IpAddressStart, ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.IPAddressStart, ipScanResult);
 
-        if (scannerConfig.Ping)
+        if (scannerConfig.ResolvePing)
         {
             await HandlePing(ipScanResult, ipAddress);
         }
@@ -192,14 +192,14 @@ public partial class IPScanner : IDisposable
         }
 
         ipScanResult.End = DateTime.Now;
-        RaiseProgressReporting(IPScannerProgressReportingType.IpAddressDone, ipScanResult);
+        RaiseProgressReporting(IPScannerProgressReportingType.IPAddressDone, ipScanResult);
     }
 
     private async Task HandlePing(
         IPScanResult ipScanResult,
         IPAddress ipAddress)
     {
-        ipScanResult.PingStatus = await PingHelper.GetStatus(ipAddress, (int)scannerConfig.TimeoutPing.TotalMilliseconds);
+        ipScanResult.PingStatus = await PingHelper.GetStatus(ipAddress, scannerConfig.TimeoutPing);
         Interlocked.Increment(ref tasksProcessedCount);
         RaiseProgressReporting(IPScannerProgressReportingType.Ping, ipScanResult);
     }
@@ -267,7 +267,7 @@ public partial class IPScanner : IDisposable
         {
             IPAddress = ipAddress,
             Port = portNumber,
-            Protocol = IPProtocolType.Tcp,
+            TransportProtocol = TransportProtocolType.Tcp,
             CanConnect = canConnect,
         };
 
@@ -285,9 +285,9 @@ public partial class IPScanner : IDisposable
         var handledCount = 0;
         foreach (var portNumber in ipScanResult.OpenPort)
         {
-            if (scannerConfig.LimitResolveIPProtocolsToKnowIPPorts &&
-                !KnowIPPortsLookupHelper.IsKnow(IPProtocolType.Http, portNumber) &&
-                !KnowIPPortsLookupHelper.IsKnow(IPProtocolType.Http, portNumber))
+            if (scannerConfig.ResolveOnlyKnowTcpUdpPorts &&
+                !KnowTcpUdpPortsLookupHelper.IsKnow(ServiceProtocolType.Http, portNumber) &&
+                !KnowTcpUdpPortsLookupHelper.IsKnow(ServiceProtocolType.Http, portNumber))
             {
                 continue;
             }
@@ -295,7 +295,7 @@ public partial class IPScanner : IDisposable
             await HandleHttpPort(ipScanResult, ipAddress, portNumber, cancellationToken);
             RaiseProgressReporting(IPScannerProgressReportingType.ServiceHttp, ipScanResult);
             handledCount++;
-            if (!ipScanResult.Ports.Any(x => x.Protocol is IPProtocolType.Http or IPProtocolType.Https))
+            if (!ipScanResult.Ports.Any(x => x.ServiceProtocol is ServiceProtocolType.Http or ServiceProtocolType.Https))
             {
                 continue;
             }
@@ -340,7 +340,7 @@ public partial class IPScanner : IDisposable
 
         if (canConnectHttp)
         {
-            workOnItem.Protocol = IPProtocolType.Http;
+            workOnItem.ServiceProtocol = ServiceProtocolType.Http;
         }
         else
         {
@@ -350,7 +350,7 @@ public partial class IPScanner : IDisposable
 
             if (canConnectHttps)
             {
-                workOnItem.Protocol = IPProtocolType.Https;
+                workOnItem.ServiceProtocol = ServiceProtocolType.Https;
             }
         }
 

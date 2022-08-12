@@ -36,7 +36,7 @@ public class IPScanResult
 
     public IEnumerable<int> OpenPort
         => Ports
-            .Where(x => x.Protocol != IPProtocolType.None && x.CanConnect)
+            .Where(x => x.TransportProtocol != TransportProtocolType.None && x.CanConnect)
             .Select(x => x.Port)
             .OrderBy(x => x);
 
@@ -53,7 +53,7 @@ public class IPScanResult
         var totalPortCount = Ports.Count;
         if (totalPortCount > 0)
         {
-            var openPorts = Ports.Count(x => x.Protocol != IPProtocolType.None && x.CanConnect);
+            var openPorts = Ports.Count(x => x.TransportProtocol != TransportProtocolType.None && x.CanConnect);
             sb.Append(GlobalizationConstants.EnglishCultureInfo, $"OpenPorts {openPorts} of {totalPortCount} # ");
         }
 
