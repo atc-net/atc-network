@@ -11,6 +11,7 @@ public partial class IPScanner : IDisposable
     private readonly IPScannerConfig scannerConfig;
     private readonly ConcurrentBag<IPScanResult> processedScanResults = new();
     private readonly IPScannerProgressReport progressReporting = new();
+    private ArpEntity[]? arpEntities;
     private int tasksToProcessCount;
     private int tasksProcessedCount;
 
@@ -80,6 +81,8 @@ public partial class IPScanner : IDisposable
         try
         {
             await SyncLock.WaitAsync(cancellationToken);
+
+            arpEntities = ArpHelper.GetArpResult();
 
             tasksToProcessCount = ipAddresses.Length * scannerConfig.GetTasksToProcessCount();
             tasksProcessedCount = 0;
@@ -215,7 +218,7 @@ public partial class IPScanner : IDisposable
         IPScanResult ipScanResult,
         IPAddress ipAddress)
     {
-        var arpEntities = ArpHelper.GetArpResult();
+        arpEntities ??= ArpHelper.GetArpResult();
         if (arpEntities.Any())
         {
             var arpEntity = arpEntities.FirstOrDefault(x => x.IPAddress.Equals(ipAddress));
