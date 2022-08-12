@@ -21,10 +21,7 @@ public static class IPAddressV4Helper
             return (false, $"{nameof(endIpAddress)} is not IPv4");
         }
 
-        var a = BitConverter.ToUInt32(startIpAddress.GetAddressBytes());
-        var b = BitConverter.ToUInt32(endIpAddress.GetAddressBytes());
-
-        return a > b
+        return startIpAddress.ToUnsignedInt() > endIpAddress.ToUnsignedInt()
             ? (false, $"{nameof(startIpAddress)} is higher than {nameof(endIpAddress)}")
             : (true, null);
     }
@@ -46,17 +43,8 @@ public static class IPAddressV4Helper
             throw new ValidationException(validationResult.ErrorMessage);
         }
 
-        var startIpAddressAsBytes = startIpAddress.GetAddressBytes();
-        var endIpAddressAsBytes = endIpAddress.GetAddressBytes();
-
-        Array.Reverse(startIpAddressAsBytes);
-        Array.Reverse(endIpAddressAsBytes);
-
-        var startIpAddressAsUnsignedInt = BitConverter.ToUInt32(startIpAddressAsBytes);
-        var endIpAddressAsUnsignedInt = BitConverter.ToUInt32(endIpAddressAsBytes);
-
         var list = new List<IPAddress>();
-        for (var i = startIpAddressAsUnsignedInt; i <= endIpAddressAsUnsignedInt; i++)
+        for (var i = startIpAddress.ToUnsignedInt(); i <= endIpAddress.ToUnsignedInt(); i++)
         {
             var bytes = BitConverter.GetBytes(i);
             Array.Reverse(bytes);
