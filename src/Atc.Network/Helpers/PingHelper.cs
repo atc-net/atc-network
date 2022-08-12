@@ -3,7 +3,7 @@ namespace Atc.Network.Helpers;
 public static class PingHelper
 {
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
-    public static PingStatusResult GetStatus(
+    public static async Task<PingStatusResult> GetStatus(
         IPAddress ipAddress,
         int timeoutInMs = 1000)
     {
@@ -11,10 +11,11 @@ public static class PingHelper
         try
         {
             using var ping = new Ping();
-            var ipStatus = ping.Send(ipAddress, timeoutInMs).Status;
+
+            var pingReply = await ping.SendPingAsync(ipAddress, timeoutInMs);
             sw.Stop();
 
-            return new PingStatusResult(ipAddress, ipStatus, sw.ElapsedMilliseconds);
+            return new PingStatusResult(ipAddress, pingReply.Status, sw.ElapsedMilliseconds);
         }
         catch (Exception ex)
         {

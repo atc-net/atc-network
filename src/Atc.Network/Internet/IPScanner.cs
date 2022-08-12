@@ -156,7 +156,7 @@ public partial class IPScanner : IDisposable
 
         if (scannerConfig.Ping)
         {
-            HandlePing(ipScanResult, ipAddress);
+            await HandlePing(ipScanResult, ipAddress);
         }
 
         if (scannerConfig.ResolveHostName)
@@ -192,11 +192,11 @@ public partial class IPScanner : IDisposable
         RaiseProgressReporting(IPScannerProgressReportingType.IpAddressDone, ipScanResult);
     }
 
-    private void HandlePing(
+    private async Task HandlePing(
         IPScanResult ipScanResult,
         IPAddress ipAddress)
     {
-        ipScanResult.PingStatus = PingHelper.GetStatus(ipAddress, (int)scannerConfig.TimeoutPing.TotalMilliseconds);
+        ipScanResult.PingStatus = await PingHelper.GetStatus(ipAddress, (int)scannerConfig.TimeoutPing.TotalMilliseconds);
         Interlocked.Increment(ref tasksProcessedCount);
         RaiseProgressReporting(IPScannerProgressReportingType.Ping, ipScanResult);
     }
