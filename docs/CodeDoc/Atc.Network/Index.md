@@ -10,6 +10,7 @@
 - [ConnectionState](Atc.Network.md#connectionstate)
 - [ConnectionStateEventArgs](Atc.Network.md#connectionstateeventargs)
 - [ExceptionExtensions](Atc.Network.md#exceptionextensions)
+- [IPAddressExtensions](Atc.Network.md#ipaddressextensions)
 - [IPScannerConfigExtensions](Atc.Network.md#ipscannerconfigextensions)
 - [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)

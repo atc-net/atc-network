@@ -80,10 +80,6 @@ IPScanner LoggerMessages.
 >```csharp
 >ResolveHostName
 >```
-#### ResolveIPProtocolHttp
->```csharp
->ResolveIPProtocolHttp
->```
 #### ResolveMacAddress
 >```csharp
 >ResolveMacAddress
@@ -95,6 +91,10 @@ IPScanner LoggerMessages.
 #### ResolvePing
 >```csharp
 >ResolvePing
+>```
+#### ResolveServiceProtocolHttp
+>```csharp
+>ResolveServiceProtocolHttp
 >```
 #### ResolveVendorFromMacAddress
 >```csharp

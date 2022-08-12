@@ -18,6 +18,11 @@
   -  Static Methods
      - IsKnownExceptionForConsumerDisposed(this Exception exception)
      - IsKnownExceptionForNetworkCableUnplugged(this Exception exception)
+- [IPAddressExtensions](Atc.Network.md#ipaddressextensions)
+  -  Static Methods
+     - IsPrivate(this IPAddress ipAddress)
+     - IsPublic(this IPAddress ipAddress)
+     - ToUnsignedInt(this IPAddress ipAddress)
 - [IPScannerConfigExtensions](Atc.Network.md#ipscannerconfigextensions)
   -  Static Methods
      - GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
@@ -59,7 +64,7 @@
      - GetAddressesInRange(IPAddress startIpAddress, IPAddress endIpAddress)
      - GetLocalAddress()
      - GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrLength)
-     - IsInRange(IPAddress ipAddress, string cidrNotation)
+     - IsAddressInRange(IPAddress ipAddress, string cidrNotation)
      - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
 - [KnowTcpUdpPortsLookupHelper](Atc.Network.Helpers.md#knowtcpudpportslookuphelper)
   -  Static Methods
@@ -91,10 +96,10 @@
   -  Properties
      - PortNumbers
      - ResolveHostName
-     - ResolveIPProtocolHttp
      - ResolveMacAddress
      - ResolveOnlyKnowTcpUdpPorts
      - ResolvePing
+     - ResolveServiceProtocolHttp
      - ResolveVendorFromMacAddress
      - Timeout
      - TimeoutHttp

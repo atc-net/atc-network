@@ -87,6 +87,29 @@ ConnectionStateEventArgs.
 
 <br />
 
+## IPAddressExtensions
+
+>```csharp
+>public static class IPAddressExtensions
+>```
+
+### Static Methods
+
+#### IsPrivate
+>```csharp
+>bool IsPrivate(this IPAddress ipAddress)
+>```
+#### IsPublic
+>```csharp
+>bool IsPublic(this IPAddress ipAddress)
+>```
+#### ToUnsignedInt
+>```csharp
+>uint ToUnsignedInt(this IPAddress ipAddress)
+>```
+
+<br />
+
 ## IPScannerConfigExtensions
 
 >```csharp

@@ -61,9 +61,9 @@
 >```csharp
 >ValueTuple<IPAddress, IPAddress> GetStartAndEndAddressesInRange(IPAddress ipAddress, int cidrLength)
 >```
-#### IsInRange
+#### IsAddressInRange
 >```csharp
->bool IsInRange(IPAddress ipAddress, string cidrNotation)
+>bool IsAddressInRange(IPAddress ipAddress, string cidrNotation)
 >```
 #### ValidateAddresses
 >```csharp
