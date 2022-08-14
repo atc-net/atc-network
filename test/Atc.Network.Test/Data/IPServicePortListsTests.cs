@@ -10,7 +10,7 @@ public class IPServicePortListsTests
 
         // Assert
         Assert.NotNull(actual);
-        Assert.Equal(8, actual.Count);
+        Assert.Equal(9, actual.Count);
     }
 
     [Theory]
@@ -40,7 +40,7 @@ public class IPServicePortListsTests
 
         // Assert
         Assert.NotNull(actual);
-        Assert.Equal(58, actual.Count);
+        Assert.Equal(60, actual.Count);
     }
 
     [Theory]

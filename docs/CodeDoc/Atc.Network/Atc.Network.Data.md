@@ -31,6 +31,10 @@
 >```csharp
 >IReadOnlyCollection<ushort> WellKnownForHttps
 >```
+#### WellKnownForRtsp
+>```csharp
+>IReadOnlyCollection<ushort> WellKnownForRtsp
+>```
 #### WellKnownForSsh
 >```csharp
 >IReadOnlyCollection<ushort> WellKnownForSsh
@@ -54,6 +58,10 @@
 #### WellKnownOrCommonForHttps
 >```csharp
 >IReadOnlyCollection<ushort> WellKnownOrCommonForHttps
+>```
+#### WellKnownOrCommonForRtsp
+>```csharp
+>IReadOnlyCollection<ushort> WellKnownOrCommonForRtsp
 >```
 #### WellKnownOrCommonForSsh
 >```csharp

@@ -4,8 +4,8 @@ public class IPScannerConfigTests
 {
     [Theory]
     [InlineData(0, IPServicePortExaminationLevel.None)]
-    [InlineData(8, IPServicePortExaminationLevel.WellKnown)]
-    [InlineData(58, IPServicePortExaminationLevel.WellKnownAndCommon)]
+    [InlineData(9, IPServicePortExaminationLevel.WellKnown)]
+    [InlineData(60, IPServicePortExaminationLevel.WellKnownAndCommon)]
     [InlineData(65535, IPServicePortExaminationLevel.All)]
     public void Construct1_PortNumbers(int expected, IPServicePortExaminationLevel ipServicePortExaminationLevel)
     {

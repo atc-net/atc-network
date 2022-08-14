@@ -7,13 +7,21 @@ public static class IPAddressExtensions
         this IPAddress ipAddress)
         => !IsPrivate(ipAddress);
 
+    /// <summary>
+    /// Is IP address in private network scope.
+    /// </summary>
+    /// <param name="ipAddress">The ip address.</param>
+    /// <remarks>
+    /// https://en.wikipedia.org/wiki/Reserved_IP_addresses
+    /// </remarks>
+    [SuppressMessage("Design", "MA0051:Method is too long", Justification = "OK.")]
     public static bool IsPrivate(
         this IPAddress ipAddress)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
         var ipAddressAsBytes = ipAddress.GetAddressBytes();
-        if (ipAddressAsBytes[0] is not (10 or 172 or 192))
+        if (ipAddressAsBytes[0] is not (10 or 100 or 172 or 192 or 198))
         {
             return false;
         }
@@ -23,9 +31,19 @@ public static class IPAddressExtensions
         {
             case 10:
             {
-                var a = ToUnsignedInt(IPAddress.Parse("10.0.0.0"));
-                var b = ToUnsignedInt(IPAddress.Parse("10.255.255.255"));
-                if (ipAddressAsUnsignedInt >= a && ipAddressAsUnsignedInt <= b)
+                if (ipAddressAsUnsignedInt >= ToUnsignedInt(IPAddress.Parse("10.0.0.0")) &&
+                    ipAddressAsUnsignedInt <= ToUnsignedInt(IPAddress.Parse("10.255.255.255")))
+                {
+                    return true;
+                }
+
+                break;
+            }
+
+            case 100:
+            {
+                if (ipAddressAsUnsignedInt >= ToUnsignedInt(IPAddress.Parse("100.64.0.0")) &&
+                    ipAddressAsUnsignedInt <= ToUnsignedInt(IPAddress.Parse("100.127.255.255")))
                 {
                     return true;
                 }
@@ -35,9 +53,8 @@ public static class IPAddressExtensions
 
             case 172:
             {
-                var a = ToUnsignedInt(IPAddress.Parse("172.16.0.0"));
-                var b = ToUnsignedInt(IPAddress.Parse("172.31.255.255"));
-                if (ipAddressAsUnsignedInt >= a && ipAddressAsUnsignedInt <= b)
+                if (ipAddressAsUnsignedInt >= ToUnsignedInt(IPAddress.Parse("172.16.0.0")) &&
+                    ipAddressAsUnsignedInt <= ToUnsignedInt(IPAddress.Parse("172.31.255.255")))
                 {
                     return true;
                 }
@@ -47,9 +64,38 @@ public static class IPAddressExtensions
 
             case 192:
             {
-                var a = ToUnsignedInt(IPAddress.Parse("192.168.0.0"));
-                var b = ToUnsignedInt(IPAddress.Parse("192.168.255.255"));
-                if (ipAddressAsUnsignedInt >= a && ipAddressAsUnsignedInt <= b)
+                switch (ipAddressAsBytes[1])
+                {
+                    case 0:
+                    {
+                        if (ipAddressAsUnsignedInt >= ToUnsignedInt(IPAddress.Parse("192.0.0.0")) &&
+                            ipAddressAsUnsignedInt <= ToUnsignedInt(IPAddress.Parse("192.0.0.255")))
+                        {
+                            return true;
+                        }
+
+                        break;
+                    }
+
+                    case 168:
+                    {
+                        if (ipAddressAsUnsignedInt >= ToUnsignedInt(IPAddress.Parse("192.168.0.0")) &&
+                            ipAddressAsUnsignedInt <= ToUnsignedInt(IPAddress.Parse("192.168.255.255")))
+                        {
+                            return true;
+                        }
+
+                        break;
+                    }
+                }
+
+                break;
+            }
+
+            case 198:
+            {
+                if (ipAddressAsUnsignedInt >= ToUnsignedInt(IPAddress.Parse("198.18.0.0")) &&
+                    ipAddressAsUnsignedInt <= ToUnsignedInt(IPAddress.Parse("198.19.255.255")))
                 {
                     return true;
                 }

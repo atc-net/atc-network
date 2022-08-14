@@ -65,12 +65,14 @@
      - IReadOnlyCollection&lt;ushort&gt; WellKnownForFtps
      - IReadOnlyCollection&lt;ushort&gt; WellKnownForHttp
      - IReadOnlyCollection&lt;ushort&gt; WellKnownForHttps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForRtsp
      - IReadOnlyCollection&lt;ushort&gt; WellKnownForSsh
      - IReadOnlyCollection&lt;ushort&gt; WellKnownForTelnet
      - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForFtp
      - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForFtps
      - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForHttp
      - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForHttps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForRtsp
      - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForSsh
      - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForTelnet
   -  Static Methods
@@ -107,7 +109,7 @@
 - [IPPortScan](Atc.Network.Internet.md#ipportscan)
   -  Methods
      - CanConnectWithHttp(int portNumber = 80, CancellationToken cancellationToken = null)
-     - CanConnectWithHttps(int portNumber = 80, CancellationToken cancellationToken = null)
+     - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
      - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
 - [IPScanner](Atc.Network.Internet.md#ipscanner)
   -  Events
@@ -185,6 +187,7 @@
 - [IPScanResults](Atc.Network.Models.md#ipscanresults)
   -  Properties
      - CollectedResults
+     - CollectedWithConnectionResults
      - End
      - ErrorMessage
      - IsCompleted

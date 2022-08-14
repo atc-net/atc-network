@@ -29,10 +29,11 @@ public static class IPServicePortLists
         {
             ServiceProtocolType.None => new List<ushort>(),
             ServiceProtocolType.Unknown => new List<ushort>(),
-            ServiceProtocolType.Https => WellKnownForHttps,
-            ServiceProtocolType.Http => WellKnownForHttp,
-            ServiceProtocolType.Ftps => WellKnownForFtps,
             ServiceProtocolType.Ftp => WellKnownForFtp,
+            ServiceProtocolType.Ftps => WellKnownForFtps,
+            ServiceProtocolType.Http => WellKnownForHttp,
+            ServiceProtocolType.Https => WellKnownForHttps,
+            ServiceProtocolType.Rtsp => WellKnownForRtsp,
             ServiceProtocolType.Ssh => WellKnownForSsh,
             ServiceProtocolType.Telnet => WellKnownForTelnet,
             _ => throw new SwitchCaseDefaultException(serviceProtocolType),
@@ -66,43 +67,40 @@ public static class IPServicePortLists
         {
             ServiceProtocolType.None => new List<ushort>(),
             ServiceProtocolType.Unknown => new List<ushort>(),
-            ServiceProtocolType.Https => WellKnownOrCommonForHttps,
-            ServiceProtocolType.Http => WellKnownOrCommonForHttp,
-            ServiceProtocolType.Ftps => WellKnownOrCommonForFtps,
             ServiceProtocolType.Ftp => WellKnownOrCommonForFtp,
+            ServiceProtocolType.Ftps => WellKnownOrCommonForFtps,
+            ServiceProtocolType.Http => WellKnownOrCommonForHttp,
+            ServiceProtocolType.Https => WellKnownOrCommonForHttps,
+            ServiceProtocolType.Rtsp => WellKnownOrCommonForRtsp,
             ServiceProtocolType.Ssh => WellKnownOrCommonForSsh,
             ServiceProtocolType.Telnet => WellKnownOrCommonForTelnet,
             _ => throw new SwitchCaseDefaultException(serviceProtocolType),
         };
     }
 
-    public static readonly IReadOnlyCollection<ushort> WellKnownForHttps = new List<ushort>
+    public static readonly IReadOnlyCollection<ushort> WellKnownForFtp = new List<ushort>
     {
-        443,
+        20,
+        21,
     };
 
-    public static readonly IReadOnlyCollection<ushort> WellKnownOrCommonForHttps = new List<ushort>
+    public static readonly IReadOnlyCollection<ushort> WellKnownOrCommonForFtp = new List<ushort>
     {
-        443,
-        832,
-        981,
-        1311,
-        4444,
-        4445,
-        5001,
-        5986,
-        7000,
-        7002,
-        8243,
-        8333,
-        8403,
-        8448,
-        8531,
-        8888,
-        9443,
-        12043,
-        18091,
-        18092,
+        20,
+        21,
+    };
+
+    public static readonly IReadOnlyCollection<ushort> WellKnownForFtps = new List<ushort>
+    {
+        989,
+        990,
+    };
+
+    public static readonly IReadOnlyCollection<ushort> WellKnownOrCommonForFtps = new List<ushort>
+    {
+        989,
+        990,
+        6619,
     };
 
     public static readonly IReadOnlyCollection<ushort> WellKnownForHttp = new List<ushort>
@@ -145,29 +143,44 @@ public static class IPServicePortLists
         16080,
     };
 
-    public static readonly IReadOnlyCollection<ushort> WellKnownForFtps = new List<ushort>
+    public static readonly IReadOnlyCollection<ushort> WellKnownForHttps = new List<ushort>
     {
-        989,
-        990,
+        443,
     };
 
-    public static readonly IReadOnlyCollection<ushort> WellKnownOrCommonForFtps = new List<ushort>
+    public static readonly IReadOnlyCollection<ushort> WellKnownOrCommonForHttps = new List<ushort>
     {
-        989,
-        990,
-        6619,
+        443,
+        832,
+        981,
+        1311,
+        4444,
+        4445,
+        5001,
+        5986,
+        7000,
+        7002,
+        8243,
+        8333,
+        8403,
+        8448,
+        8531,
+        8888,
+        9443,
+        12043,
+        18091,
+        18092,
     };
 
-    public static readonly IReadOnlyCollection<ushort> WellKnownForFtp = new List<ushort>
+    public static readonly IReadOnlyCollection<ushort> WellKnownForRtsp = new List<ushort>
     {
-        20,
-        21,
+        554,
     };
 
-    public static readonly IReadOnlyCollection<ushort> WellKnownOrCommonForFtp = new List<ushort>
+    public static readonly IReadOnlyCollection<ushort> WellKnownOrCommonForRtsp = new List<ushort>
     {
-        20,
-        21,
+        554,
+        7070,
     };
 
     public static readonly IReadOnlyCollection<ushort> WellKnownForSsh = new List<ushort>

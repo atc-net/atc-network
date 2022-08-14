@@ -103,6 +103,12 @@ ConnectionStateEventArgs.
 >```csharp
 >bool IsPrivate(this IPAddress ipAddress)
 >```
+><b>Summary:</b> Is IP address in private network scope.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ipAddress`&nbsp;&nbsp;-&nbsp;&nbsp;The ip address.<br />
+>
+><b>Remarks:</b> https://en.wikipedia.org/wiki/Reserved_IP_addresses
 #### IsPublic
 >```csharp
 >bool IsPublic(this IPAddress ipAddress)
@@ -268,12 +274,13 @@ Enumeration: NetworkQualityCategoryType.
 | --- | --- | --- | --- | 
 | 0 | None | None |  | 
 | 1 | Unknown | Unknown |  | 
-| 2 | Https | Https |  | 
-| 3 | Http | Http |  | 
-| 4 | Ftps | Ftps |  | 
-| 5 | Ftp | Ftp |  | 
-| 6 | Ssh | Ssh |  | 
-| 7 | Telnet | Telnet |  | 
+| 2 | Ftp | Ftp |  | 
+| 3 | Ftps | Ftps |  | 
+| 4 | Http | Http |  | 
+| 5 | Https | Https |  | 
+| 6 | Rtsp | Rtsp |  | 
+| 7 | Ssh | Ssh |  | 
+| 8 | Telnet | Telnet |  | 
 
 
 

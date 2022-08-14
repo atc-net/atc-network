@@ -5,10 +5,11 @@ public enum ServiceProtocolType
 {
     None,
     Unknown,
-    Https,
-    Http,
-    Ftps,
     Ftp,
+    Ftps,
+    Http,
+    Https,
+    Rtsp,
     Ssh,
     Telnet,
 }

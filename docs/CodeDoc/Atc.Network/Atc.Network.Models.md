@@ -154,6 +154,10 @@
 >```csharp
 >CollectedResults
 >```
+#### CollectedWithConnectionResults
+>```csharp
+>CollectedWithConnectionResults
+>```
 #### End
 >```csharp
 >End

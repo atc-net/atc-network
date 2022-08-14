@@ -21,7 +21,7 @@
 >```
 #### CanConnectWithHttps
 >```csharp
->Task<bool> CanConnectWithHttps(int portNumber = 80, CancellationToken cancellationToken = null)
+>Task<bool> CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
 >```
 #### CanConnectWithTcp
 >```csharp
