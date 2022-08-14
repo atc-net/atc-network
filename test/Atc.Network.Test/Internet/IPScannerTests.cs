@@ -68,7 +68,6 @@ public class IPScannerTests
         // Assert
         Assert.NotNull(actual);
         Trace.TraceInformation(actual.ToString());
-        var ipScanResults = actual.CollectedWithConnectionResults.ToList();
     }
 
     private static IPAddress GetTestIpAddress()
