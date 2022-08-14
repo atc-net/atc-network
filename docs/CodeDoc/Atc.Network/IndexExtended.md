@@ -57,6 +57,28 @@
      - IsWellKnownIPServicePort(this ushort portNumber, ServiceProtocolType serviceProtocolType)
      - IsWellKnownOrCommonIPServicePort(this ushort portNumber, ServiceProtocolType serviceProtocolType)
 
+## [Atc.Network.Data](Atc.Network.Data.md)
+
+- [IPServicePortLists](Atc.Network.Data.md#ipserviceportlists)
+  -  Static Fields
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForFtp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForFtps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForHttp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForHttps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForSsh
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForTelnet
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForFtp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForFtps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForHttp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForHttps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForSsh
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForTelnet
+  -  Static Methods
+     - GetWellKnown()
+     - GetWellKnown(ServiceProtocolType serviceProtocolType)
+     - GetWellKnownOrCommon()
+     - GetWellKnownOrCommon(ServiceProtocolType serviceProtocolType)
+
 ## [Atc.Network.Helpers](Atc.Network.Helpers.md)
 
 - [ArpHelper](Atc.Network.Helpers.md#arphelper)
@@ -107,6 +129,8 @@
      - TimeoutPing
      - TimeoutTcp
      - TreatOpenPortsAsWebServices
+  -  Methods
+     - ToString()
 - [IPScannerConstants](Atc.Network.Internet.md#ipscannerconstants)
   -  Static Fields
      - int TimeoutHttpInMs

@@ -112,6 +112,12 @@ IPScanner LoggerMessages.
 >```csharp
 >TreatOpenPortsAsWebServices
 >```
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
 
 <br />
 
