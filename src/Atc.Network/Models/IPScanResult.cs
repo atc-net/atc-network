@@ -41,7 +41,7 @@ public class IPScanResult
             .OrderBy(x => x);
 
     public bool HasConnection
-        => PingStatus?.Status != IPStatus.Success ||
+        => PingStatus?.Status == IPStatus.Success ||
            !string.IsNullOrEmpty(Hostname) ||
            !string.IsNullOrEmpty(MacAddress) ||
            OpenPort.Any();
@@ -50,16 +50,36 @@ public class IPScanResult
     {
         var sb = new StringBuilder();
 
-        var totalPortCount = Ports.Count;
-        if (totalPortCount > 0)
+        sb.Append(IPAddress);
+        sb.Append(" # ");
+
+        if (HasConnection)
         {
-            var openPorts = Ports.Count(x => x.TransportProtocol != TransportProtocolType.None && x.CanConnect);
-            sb.Append(GlobalizationConstants.EnglishCultureInfo, $"OpenPorts {openPorts} of {totalPortCount} # ");
+            if (!string.IsNullOrEmpty(Hostname))
+            {
+                sb.Append(Hostname);
+                sb.Append(" # ");
+            }
+
+            var totalPortCount = Ports.Count;
+            if (totalPortCount > 0)
+            {
+                sb.Append("OpenPorts ");
+                sb.Append(OpenPort.Count());
+                sb.Append(" of ");
+                sb.Append(totalPortCount);
+                sb.Append(" # ");
+            }
+        }
+        else
+        {
+            sb.Append("No connection # ");
         }
 
         if (IsCompleted)
         {
-            sb.Append(GlobalizationConstants.EnglishCultureInfo, $"TimeDiff={TimeDiff}");
+            sb.Append("Execution time ");
+            sb.Append(TimeDiff);
         }
         else
         {

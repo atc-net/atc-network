@@ -166,6 +166,10 @@
 >```csharp
 >IsCompleted
 >```
+#### PercentageCompleted
+>```csharp
+>PercentageCompleted
+>```
 #### Start
 >```csharp
 >Start

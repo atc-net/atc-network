@@ -13,5 +13,5 @@ public class IPScanPortResult
     public bool CanConnect { get; set; }
 
     public override string ToString()
-        => $"{nameof(IPAddress)}: {IPAddress}, {nameof(Port)}: {Port}, {nameof(TransportProtocol)}: {TransportProtocol}, {nameof(ServiceProtocol)}: {ServiceProtocol}, {nameof(CanConnect)}: {CanConnect}";
+        => $"IPAddress: {IPAddress}, Port: {Port}, Protocol: {TransportProtocol}, Service: {ServiceProtocol}, CanConnect: {CanConnect}";
 }

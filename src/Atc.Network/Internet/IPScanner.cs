@@ -110,6 +110,7 @@ public partial class IPScanner : IDisposable
 
             processedScanResults.Clear();
 
+            scanResults.PercentageCompleted = MathHelper.Percentage(tasksToProcessCount, tasksProcessedCount);
             scanResults.End = DateTime.Now;
             return scanResults;
         }

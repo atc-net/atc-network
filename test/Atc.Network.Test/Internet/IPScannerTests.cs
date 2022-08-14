@@ -84,7 +84,6 @@ public class IPScannerTests
 
     private static void IpScannerOnProgressReporting(object? sender, IPScannerProgressReport args)
     {
-        var t = $"{DateTime.Now.Minute}.{DateTime.Now.Second}.{DateTime.Now.Millisecond}";
-        Trace.TraceInformation($"{t} # {args}");
+        Trace.TraceInformation(args.ToString());
     }
 }

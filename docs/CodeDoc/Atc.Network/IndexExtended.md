@@ -188,6 +188,7 @@
      - End
      - ErrorMessage
      - IsCompleted
+     - PercentageCompleted
      - Start
      - TimeDiff
   -  Methods
