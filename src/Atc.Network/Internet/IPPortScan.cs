@@ -58,7 +58,7 @@ public class IPPortScan
         => CanConnectWithHttpOrHttps(portNumber, useHttps: false, cancellationToken);
 
     public Task<bool> CanConnectWithHttps(
-        int portNumber = 80,
+        int portNumber = 443,
         CancellationToken cancellationToken = default)
         => CanConnectWithHttpOrHttps(portNumber, useHttps: true, cancellationToken);
 
