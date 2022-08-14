@@ -6,20 +6,12 @@ namespace Atc.Network.Test.Internet;
 [Trait(Traits.Category, Traits.Categories.SkipWhenLiveUnitTesting)]
 public class IPScannerTests
 {
-    private static readonly List<ushort> TestPortNumbers = new()
-    {
-        80,
-    };
-
     [Fact]
     public async Task Scan()
     {
         // Arrange
         var testIpAddress = GetTestIpAddress();
-        var ipScannerConfig = new IPScannerConfig
-        {
-            PortNumbers = TestPortNumbers,
-        };
+        var ipScannerConfig = new IPScannerConfig(IPServicePortExaminationLevel.WellKnown);
 
         var ipScanner = new IPScanner(ipScannerConfig);
         ipScanner.ProgressReporting += IpScannerOnProgressReporting;
@@ -40,10 +32,7 @@ public class IPScannerTests
         // Arrange
         var testIpAddress = GetTestIpAddress();
         const int cidrMaskLength = 31;
-        var ipScannerConfig = new IPScannerConfig
-        {
-            PortNumbers = TestPortNumbers,
-        };
+        var ipScannerConfig = new IPScannerConfig(IPServicePortExaminationLevel.WellKnown);
 
         var ipScanner = new IPScanner(ipScannerConfig);
         ipScanner.ProgressReporting += IpScannerOnProgressReporting;
@@ -65,10 +54,7 @@ public class IPScannerTests
         // Arrange
         var testIpAddressStart = GetTestIpAddress(-1);
         var testIpAddressEnd = GetTestIpAddress(1);
-        var ipScannerConfig = new IPScannerConfig
-        {
-            PortNumbers = TestPortNumbers,
-        };
+        var ipScannerConfig = new IPScannerConfig(IPServicePortExaminationLevel.WellKnown);
 
         var ipScanner = new IPScanner(ipScannerConfig);
         ipScanner.ProgressReporting += IpScannerOnProgressReporting;
