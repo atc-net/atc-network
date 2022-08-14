@@ -8,8 +8,8 @@ global using System.Net.Sockets;
 global using System.Text;
 global using System.Text.RegularExpressions;
 
-global using Atc.Network.Data;
 global using Atc.Helpers;
+global using Atc.Network.Data;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
 global using Atc.Network.Models;
