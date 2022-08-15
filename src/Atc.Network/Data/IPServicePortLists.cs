@@ -24,8 +24,7 @@ public static class IPServicePortLists
 
     public static IReadOnlyCollection<ushort> GetWellKnown(
         ServiceProtocolType serviceProtocolType)
-    {
-        return serviceProtocolType switch
+        => serviceProtocolType switch
         {
             ServiceProtocolType.None => new List<ushort>(),
             ServiceProtocolType.Unknown => new List<ushort>(),
@@ -38,7 +37,6 @@ public static class IPServicePortLists
             ServiceProtocolType.Telnet => WellKnownForTelnet,
             _ => throw new SwitchCaseDefaultException(serviceProtocolType),
         };
-    }
 
     public static IReadOnlyCollection<ushort> GetWellKnownOrCommon()
     {
@@ -62,8 +60,7 @@ public static class IPServicePortLists
 
     public static IReadOnlyCollection<ushort> GetWellKnownOrCommon(
         ServiceProtocolType serviceProtocolType)
-    {
-        return serviceProtocolType switch
+        => serviceProtocolType switch
         {
             ServiceProtocolType.None => new List<ushort>(),
             ServiceProtocolType.Unknown => new List<ushort>(),
@@ -76,7 +73,6 @@ public static class IPServicePortLists
             ServiceProtocolType.Telnet => WellKnownOrCommonForTelnet,
             _ => throw new SwitchCaseDefaultException(serviceProtocolType),
         };
-    }
 
     public static readonly IReadOnlyCollection<ushort> WellKnownForFtp = new List<ushort>
     {

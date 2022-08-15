@@ -64,7 +64,8 @@ public static class MacAddressVendorLookupHelper
         }
     }
 
-    private static string? GetVendorFromCacheFileLines(string macAddress)
+    private static string? GetVendorFromCacheFileLines(
+        string macAddress)
     {
         if (!cacheFileLines.Any())
         {

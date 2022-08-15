@@ -30,8 +30,7 @@ public static class UshortExtensions
     public static bool IsWellKnownIPServicePort(
         this ushort portNumber,
         ServiceProtocolType serviceProtocolType)
-    {
-        return serviceProtocolType switch
+        => serviceProtocolType switch
         {
             ServiceProtocolType.Https => IPServicePortLists.WellKnownForHttps.Contains(portNumber),
             ServiceProtocolType.Http => IPServicePortLists.WellKnownForHttp.Contains(portNumber),
@@ -41,7 +40,6 @@ public static class UshortExtensions
             ServiceProtocolType.Ssh => IPServicePortLists.WellKnownForSsh.Contains(portNumber),
             _ => false,
         };
-    }
 
     /// <summary>
     /// Returns <see langword="true"/> if the value is a well known port or
@@ -56,8 +54,7 @@ public static class UshortExtensions
     public static bool IsWellKnownOrCommonIPServicePort(
         this ushort portNumber,
         ServiceProtocolType serviceProtocolType)
-    {
-        return serviceProtocolType switch
+        => serviceProtocolType switch
         {
             ServiceProtocolType.Https => IPServicePortLists.WellKnownOrCommonForHttps.Contains(portNumber),
             ServiceProtocolType.Http => IPServicePortLists.WellKnownOrCommonForHttp.Contains(portNumber),
@@ -67,5 +64,4 @@ public static class UshortExtensions
             ServiceProtocolType.Ssh => IPServicePortLists.WellKnownOrCommonForSsh.Contains(portNumber),
             _ => false,
         };
-    }
 }
