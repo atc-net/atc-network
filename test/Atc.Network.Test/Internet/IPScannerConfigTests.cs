@@ -7,7 +7,9 @@ public class IPScannerConfigTests
     [InlineData(9, IPServicePortExaminationLevel.WellKnown)]
     [InlineData(60, IPServicePortExaminationLevel.WellKnownAndCommon)]
     [InlineData(65535, IPServicePortExaminationLevel.All)]
-    public void Construct1_PortNumbers(int expected, IPServicePortExaminationLevel ipServicePortExaminationLevel)
+    public void Construct1_PortNumbers(
+        int expected,
+        IPServicePortExaminationLevel ipServicePortExaminationLevel)
     {
         // Act
         var actual = new IPScannerConfig(ipServicePortExaminationLevel);
@@ -49,7 +51,10 @@ public class IPScannerConfigTests
     [InlineData(65535, IPServicePortExaminationLevel.All, ServiceProtocolType.Ftp)]
     [InlineData(65535, IPServicePortExaminationLevel.All, ServiceProtocolType.Ssh)]
     [InlineData(65535, IPServicePortExaminationLevel.All, ServiceProtocolType.Telnet)]
-    public void Construct2_PortNumbers(int expected, IPServicePortExaminationLevel ipServicePortExaminationLevel, ServiceProtocolType serviceProtocolType)
+    public void Construct2_PortNumbers(
+        int expected,
+        IPServicePortExaminationLevel ipServicePortExaminationLevel,
+        ServiceProtocolType serviceProtocolType)
     {
         // Act
         var actual = new IPScannerConfig(ipServicePortExaminationLevel, serviceProtocolType);
