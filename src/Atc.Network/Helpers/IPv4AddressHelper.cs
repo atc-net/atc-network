@@ -103,17 +103,17 @@ public static class IPv4AddressHelper
         int bitLength)
     {
         var maskBytes = new byte[sizeOfBuffer];
-        var bytesLen = bitLength / 8;
-        var bitsLen = bitLength % 8;
-        for (var i = 0; i < bytesLen; i++)
+        var byteLength = bitLength / 8;
+        var bitsLength = bitLength % 8;
+        for (var i = 0; i < byteLength; i++)
         {
             maskBytes[i] = 0xff;
         }
 
-        if (bitsLen > 0)
+        if (bitsLength > 0)
         {
-            maskBytes[bytesLen] = (byte)~Enumerable
-                .Range(1, 8 - bitsLen)
+            maskBytes[byteLength] = (byte)~Enumerable
+                .Range(1, 8 - bitsLength)
                 .Select(n => 1 << (n - 1))
                 .Aggregate((a, b) => a | b);
         }
