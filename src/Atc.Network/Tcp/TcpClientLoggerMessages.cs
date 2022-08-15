@@ -36,7 +36,7 @@ public partial class TcpClient
     [LoggerMessage(
         EventId = LoggingEventIdConstants.ConnectionError,
         Level = LogLevel.Error,
-        Message = "Could not connected to '{ipAddressOrHostName}' on port '{port}': '{errorMessage}'.")]
+        Message = "Could not connect to '{ipAddressOrHostName}' on port '{port}': '{errorMessage}'.")]
     private partial void LogConnectionError(string ipAddressOrHostName, int port, string errorMessage);
 
     [LoggerMessage(

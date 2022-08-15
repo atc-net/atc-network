@@ -18,6 +18,17 @@
   -  Static Methods
      - IsKnownExceptionForConsumerDisposed(this Exception exception)
      - IsKnownExceptionForNetworkCableUnplugged(this Exception exception)
+- [IPAddressExtensions](Atc.Network.md#ipaddressextensions)
+  -  Static Methods
+     - IsInRange(this IPAddress ipAddress, string cidrNotation)
+     - IsPrivate(this IPAddress ipAddress)
+     - IsPublic(this IPAddress ipAddress)
+     - ToUnsignedInt(this IPAddress ipAddress)
+- [IPScannerConfigExtensions](Atc.Network.md#ipscannerconfigextensions)
+  -  Static Methods
+     - GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
+- [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
+- [IPServicePortExaminationLevel](Atc.Network.md#ipserviceportexaminationlevel)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
   -  Static Fields
      - int ClientNotConnected
@@ -31,10 +42,169 @@
      - int DataSendingByteLength
      - int Disconnected
      - int Disconnecting
+     - int Reconnected
+     - int Reconnecting
+- [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
+- [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
   -  Static Methods
      - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
+- [TransportProtocolType](Atc.Network.md#transportprotocoltype)
+- [UshortExtensions](Atc.Network.md#ushortextensions)
+  -  Static Methods
+     - IsPortForIPService(this ushort portNumber, ServiceProtocolType serviceProtocolType, IPServicePortExaminationLevel matchLevel)
+     - IsWellKnownIPServicePort(this ushort portNumber, ServiceProtocolType serviceProtocolType)
+     - IsWellKnownOrCommonIPServicePort(this ushort portNumber, ServiceProtocolType serviceProtocolType)
+
+## [Atc.Network.Data](Atc.Network.Data.md)
+
+- [IPServicePortLists](Atc.Network.Data.md#ipserviceportlists)
+  -  Static Fields
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForFtp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForFtps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForHttp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForHttps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForRtsp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForSsh
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownForTelnet
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForFtp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForFtps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForHttp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForHttps
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForRtsp
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForSsh
+     - IReadOnlyCollection&lt;ushort&gt; WellKnownOrCommonForTelnet
+  -  Static Methods
+     - GetWellKnown()
+     - GetWellKnown(ServiceProtocolType serviceProtocolType)
+     - GetWellKnownOrCommon()
+     - GetWellKnownOrCommon(ServiceProtocolType serviceProtocolType)
+
+## [Atc.Network.Helpers](Atc.Network.Helpers.md)
+
+- [ArpHelper](Atc.Network.Helpers.md#arphelper)
+  -  Static Methods
+     - GetArpResult()
+- [DnsLookupHelper](Atc.Network.Helpers.md#dnslookuphelper)
+  -  Static Methods
+     - GetHostname(IPAddress ipAddress, CancellationToken cancellationToken)
+- [IPv4AddressHelper](Atc.Network.Helpers.md#ipv4addresshelper)
+  -  Static Methods
+     - GetAddressesInRange(IPAddress ipAddress, int cidrLength)
+     - GetAddressesInRange(IPAddress startIpAddress, IPAddress endIpAddress)
+     - GetFirstAndLastAddressInRange(IPAddress ipAddress, int cidrLength)
+     - GetLocalAddress()
+     - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
+- [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
+  -  Static Methods
+     - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
+- [PingHelper](Atc.Network.Helpers.md#pinghelper)
+  -  Static Methods
+     - GetStatus(IPAddress ipAddress, int timeoutInMs = 1000)
+     - GetStatus(IPAddress ipAddress, TimeSpan timeout)
+
+## [Atc.Network.Internet](Atc.Network.Internet.md)
+
+- [IPPortScan](Atc.Network.Internet.md#ipportscan)
+  -  Methods
+     - CanConnectWithHttp(int portNumber = 80, CancellationToken cancellationToken = null)
+     - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
+     - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
+- [IPScanner](Atc.Network.Internet.md#ipscanner)
+  -  Events
+     - ProgressReporting
+  -  Methods
+     - Dispose()
+     - Scan(IPAddress ipAddress, CancellationToken cancellationToken = null)
+     - ScanCidrRange(IPAddress ipAddress, byte cidrLength, CancellationToken cancellationToken = null)
+     - ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
+- [IPScannerConfig](Atc.Network.Internet.md#ipscannerconfig)
+  -  Properties
+     - IcmpPing
+     - PortNumbers
+     - ResolveHostName
+     - ResolveMacAddress
+     - ResolveVendorFromMacAddress
+     - Timeout
+     - TimeoutHttp
+     - TimeoutPing
+     - TimeoutTcp
+     - TreatOpenPortsAsWebServices
+  -  Methods
+     - ToString()
+- [IPScannerConstants](Atc.Network.Internet.md#ipscannerconstants)
+  -  Static Fields
+     - int TimeoutHttpInMs
+     - int TimeoutInMs
+     - int TimeoutPingInMs
+     - int TimeoutTcpInMs
+- [IPScannerProgressReport](Atc.Network.Internet.md#ipscannerprogressreport)
+  -  Properties
+     - LatestUpdate
+     - PercentageCompleted
+     - TasksProcessedCount
+     - TasksToProcessCount
+     - Type
+  -  Methods
+     - ToString()
+
+## [Atc.Network.Models](Atc.Network.Models.md)
+
+- [ArpEntity](Atc.Network.Models.md#arpentity)
+  -  Properties
+     - IPAddress
+     - MacAddress
+     - Type
+  -  Methods
+     - ToString()
+- [IPScanPortResult](Atc.Network.Models.md#ipscanportresult)
+  -  Properties
+     - CanConnect
+     - IPAddress
+     - Port
+     - ServiceProtocol
+     - TransportProtocol
+  -  Methods
+     - ToString()
+- [IPScanResult](Atc.Network.Models.md#ipscanresult)
+  -  Properties
+     - End
+     - ErrorMessage
+     - HasConnection
+     - Hostname
+     - IPAddress
+     - IsCompleted
+     - MacAddress
+     - MacVendor
+     - OpenPort
+     - PingStatus
+     - Ports
+     - Start
+     - TimeDiff
+  -  Methods
+     - ToString()
+- [IPScanResults](Atc.Network.Models.md#ipscanresults)
+  -  Properties
+     - CollectedResults
+     - CollectedWithConnectionResults
+     - End
+     - ErrorMessage
+     - IsCompleted
+     - PercentageCompleted
+     - Start
+     - TimeDiff
+  -  Methods
+     - ToString()
+- [PingStatusResult](Atc.Network.Models.md#pingstatusresult)
+  -  Properties
+     - Exception
+     - IPAddress
+     - PingInMs
+     - QualityCategory
+     - Status
+  -  Methods
+     - ToString()
 
 ## [Atc.Network.Tcp](Atc.Network.Tcp.md)
 
@@ -46,6 +216,7 @@
      - ConnectionStateChanged
      - DataReceived
      - Disconnected
+     - NoDataReceived
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
@@ -67,6 +238,7 @@
      - KeepAliveInterval
      - KeepAliveRetryCount
      - KeepAliveTime
+     - ReconnectOnSenderSocketClosed
 - [TcpConstants](Atc.Network.Tcp.md#tcpconstants)
   -  Static Fields
      - int DefaultBufferSize

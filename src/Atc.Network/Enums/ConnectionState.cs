@@ -14,48 +14,48 @@ public enum ConnectionState
     /// <summary>
     /// Connecting.
     /// </summary>
-    [LocalizedDescription(nameof(Connecting), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(Connecting), typeof(Communication))]
     Connecting,
 
     /// <summary>
     /// Connected.
     /// </summary>
-    [LocalizedDescription(nameof(Connected), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(Connected), typeof(Communication))]
     Connected,
 
     /// <summary>
     /// Disconnecting.
     /// </summary>
-    [LocalizedDescription(nameof(Disconnecting), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(Disconnecting), typeof(Communication))]
     Disconnecting,
 
     /// <summary>
     /// Disconnected.
     /// </summary>
-    [LocalizedDescription(nameof(Disconnected), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(Disconnected), typeof(Communication))]
     Disconnected,
 
     /// <summary>
     /// The connection failed.
     /// </summary>
-    [LocalizedDescription(nameof(ConnectionFailed), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(ConnectionFailed), typeof(Communication))]
     ConnectionFailed,
 
     /// <summary>
     /// Reconnecting.
     /// </summary>
-    [LocalizedDescription(nameof(Reconnecting), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(Reconnecting), typeof(Communication))]
     Reconnecting,
 
     /// <summary>
     /// Reconnected.
     /// </summary>
-    [LocalizedDescription(nameof(Reconnected), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(Reconnected), typeof(Communication))]
     Reconnected,
 
     /// <summary>
     /// Pulse.
     /// </summary>
-    [LocalizedDescription(nameof(Pulse), typeof(Resource.Communication))]
+    [LocalizedDescription(nameof(Pulse), typeof(Communication))]
     Pulse,
 }

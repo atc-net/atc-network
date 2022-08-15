@@ -12,6 +12,14 @@ public class CodeComplianceTests
         // TODO: Imp. missing test for:
         typeof(TcpClientExtensions),
         typeof(TcpClient),
+        typeof(IPv4AddressHelper),
+        typeof(MacAddressVendorLookupHelper),
+        typeof(PingHelper),
+        typeof(IPPortScan),
+        typeof(IPScanner),
+        typeof(DnsLookupHelper),
+        typeof(IPAddressExtensions),
+        typeof(UshortExtensions),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)
@@ -54,6 +62,7 @@ public class CodeComplianceTests
     {
         // Act & Assert
         CodeComplianceHelper.AssertExportedTypesWithWrongDefinitions(
-            sourceAssembly);
+            sourceAssembly,
+            excludeTypes);
     }
 }

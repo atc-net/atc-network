@@ -8,6 +8,7 @@ namespace Atc.Network.Tcp;
 public partial class TcpClient : IDisposable
 {
     private const int TimeToWaitForDisconnectionInMs = 200;
+    private const int TimeToWaitForDisposeDisconnectionInMs = 50;
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
     private readonly TcpClientConfig clientConfig;
     private readonly TcpClientKeepAliveConfig keepAliveConfig;
@@ -68,9 +69,8 @@ public partial class TcpClient : IDisposable
 
         cancellationTokenRegistration = cancellationTokenSource.Token.Register(CancellationTokenCallback);
 
-        this.receiveListenerTask = Task.Run(
-            async () => await this.DataReceiver(
-                cancellationTokenSource.Token),
+        receiveListenerTask = Task.Run(
+            async () => await DataReceiver(cancellationTokenSource.Token),
             cancellationTokenSource.Token);
     }
 
@@ -87,7 +87,7 @@ public partial class TcpClient : IDisposable
             throw new ArgumentNullException(nameof(hostname));
         }
 
-        this.ipAddressOrHostname = hostname;
+        ipAddressOrHostname = hostname;
         this.port = port;
     }
 
@@ -101,7 +101,7 @@ public partial class TcpClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
-        this.ipAddressOrHostname = ipAddress.ToString();
+        ipAddressOrHostname = ipAddress.ToString();
         this.port = port;
     }
 
@@ -114,8 +114,8 @@ public partial class TcpClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(ipEndpoint);
 
-        this.ipAddressOrHostname = ipEndpoint.Address.ToString();
-        this.port = ipEndpoint.Port;
+        ipAddressOrHostname = ipEndpoint.Address.ToString();
+        port = ipEndpoint.Port;
     }
 
     public TcpClient(
@@ -238,7 +238,7 @@ public partial class TcpClient : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        this.Dispose(disposing: true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
@@ -263,7 +263,7 @@ public partial class TcpClient : IDisposable
 
         if (receiveListenerTask.Status == TaskStatus.Running)
         {
-            receiveListenerTask.Wait(TimeSpan.FromMilliseconds(50));
+            receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
         }
 
         cancellationTokenRegistration.Dispose();
@@ -340,7 +340,7 @@ public partial class TcpClient : IDisposable
         }
 
         DisposeTcpClientAndStream();
-        await SetDisconnected(raiseEvents: false);
+        await SetDisconnected(raiseEvents: raiseEventsAndLog);
 
         if (raiseEventsAndLog)
         {
@@ -608,6 +608,6 @@ public partial class TcpClient : IDisposable
             return;
         }
 
-        this.networkStream.Close();
+        networkStream.Close();
     }
 }

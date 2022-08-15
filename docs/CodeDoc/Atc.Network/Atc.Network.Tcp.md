@@ -43,6 +43,11 @@ The main TcpClient - Handles call execution.
 >Disconnected
 >```
 ><b>Summary:</b> Event to raise when connection is destroyed.
+#### NoDataReceived
+>```csharp
+>NoDataReceived
+>```
+><b>Summary:</b> Event to raise when no data received.
 ### Methods
 
 #### Connect
@@ -182,6 +187,11 @@ TcpClient KeepAlive Config
 >KeepAliveTime
 >```
 ><b>Summary:</b> KeepAliveTime
+#### ReconnectOnSenderSocketClosed
+>```csharp
+>ReconnectOnSenderSocketClosed
+>```
+><b>Summary:</b> ReconnectOnSenderSocketClosed
 
 <br />
 
