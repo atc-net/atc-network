@@ -114,6 +114,18 @@ IPScanner LoggerMessages.
 >```
 ### Methods
 
+#### SetPortNumbers
+>```csharp
+>void SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel)
+>```
+#### SetPortNumbers
+>```csharp
+>void SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel, ServiceProtocolType serviceProtocolType)
+>```
+#### SetPortNumbers
+>```csharp
+>void SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel, ServiceProtocolType[] serviceProtocolTypes)
+>```
 #### ToString
 >```csharp
 >string ToString()

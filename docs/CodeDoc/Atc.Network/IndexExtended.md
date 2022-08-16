@@ -132,6 +132,9 @@
      - TimeoutTcp
      - TreatOpenPortsAsWebServices
   -  Methods
+     - SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel, ServiceProtocolType serviceProtocolType)
+     - SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel, ServiceProtocolType[] serviceProtocolTypes)
+     - SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel)
      - ToString()
 - [IPScannerConstants](Atc.Network.Internet.md#ipscannerconstants)
   -  Static Fields
@@ -177,7 +180,7 @@
      - IsCompleted
      - MacAddress
      - MacVendor
-     - OpenPort
+     - OpenPortNumbers
      - PingStatus
      - Ports
      - Start
@@ -187,7 +190,7 @@
 - [IPScanResults](Atc.Network.Models.md#ipscanresults)
   -  Properties
      - CollectedResults
-     - CollectedWithConnectionResults
+     - CollectedResultsWithConnections
      - End
      - ErrorMessage
      - IsCompleted
@@ -202,6 +205,7 @@
      - IPAddress
      - PingInMs
      - QualityCategory
+     - QualityCategoryDescriptionAndTime
      - Status
   -  Methods
      - ToString()
