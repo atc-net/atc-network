@@ -7,6 +7,41 @@
 
 <br />
 
+## IIPScanner
+
+>```csharp
+>public interface IIPScanner
+>```
+
+### Properties
+
+#### Configuration
+>```csharp
+>Configuration
+>```
+### Events
+
+#### ProgressReporting
+>```csharp
+>ProgressReporting
+>```
+### Methods
+
+#### Scan
+>```csharp
+>Task<IPScanResults> Scan(IPAddress ipAddress, CancellationToken cancellationToken = null)
+>```
+#### ScanCidrRange
+>```csharp
+>Task<IPScanResults> ScanCidrRange(IPAddress ipAddress, byte cidrLength, CancellationToken cancellationToken = null)
+>```
+#### ScanRange
+>```csharp
+>Task<IPScanResults> ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
+>```
+
+<br />
+
 ## IPPortScan
 
 >```csharp
@@ -34,9 +69,15 @@
 IPScanner LoggerMessages.
 
 >```csharp
->public class IPScanner : IDisposable
+>public class IPScanner : IIPScanner, IDisposable
 >```
 
+### Properties
+
+#### Configuration
+>```csharp
+>Configuration
+>```
 ### Events
 
 #### ProgressReporting

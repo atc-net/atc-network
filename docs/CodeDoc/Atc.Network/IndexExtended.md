@@ -106,12 +106,23 @@
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
 
+- [IIPScanner](Atc.Network.Internet.md#iipscanner)
+  -  Properties
+     - Configuration
+  -  Events
+     - ProgressReporting
+  -  Methods
+     - Scan(IPAddress ipAddress, CancellationToken cancellationToken = null)
+     - ScanCidrRange(IPAddress ipAddress, byte cidrLength, CancellationToken cancellationToken = null)
+     - ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
 - [IPPortScan](Atc.Network.Internet.md#ipportscan)
   -  Methods
      - CanConnectWithHttp(int portNumber = 80, CancellationToken cancellationToken = null)
      - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
      - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
 - [IPScanner](Atc.Network.Internet.md#ipscanner)
+  -  Properties
+     - Configuration
   -  Events
      - ProgressReporting
   -  Methods
