@@ -77,6 +77,8 @@ public class IPScannerConfig
     {
         ArgumentNullException.ThrowIfNull(serviceProtocolTypes);
 
+        PortNumbers.Clear();
+
         switch (ipServicePortExaminationLevel)
         {
             case IPServicePortExaminationLevel.None:
