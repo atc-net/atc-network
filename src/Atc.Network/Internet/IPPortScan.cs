@@ -40,6 +40,11 @@ public class IPPortScan
                 }
             }
 
+            if (client.Connected)
+            {
+                client.Close();
+            }
+
             return true;
         }
         catch
