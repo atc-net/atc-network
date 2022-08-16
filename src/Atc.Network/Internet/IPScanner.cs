@@ -287,7 +287,7 @@ public partial class IPScanner : IDisposable
         CancellationToken cancellationToken)
     {
         var handledCount = 0;
-        foreach (var portNumber in ipScanResult.OpenPort)
+        foreach (var portNumber in ipScanResult.OpenPortNumbers)
         {
             if (!portNumber.IsPortForIPService(ServiceProtocolType.Http, scannerConfig.TreatOpenPortsAsWebServices) &&
                 !portNumber.IsPortForIPService(ServiceProtocolType.Https, scannerConfig.TreatOpenPortsAsWebServices))
