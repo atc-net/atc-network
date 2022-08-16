@@ -18,11 +18,23 @@ public partial class IPScanner : IDisposable
     public event EventHandler<IPScannerProgressReport>? ProgressReporting;
 
     public IPScanner(
+        ILogger logger)
+    {
+        this.logger = logger;
+        this.scannerConfig = new IPScannerConfig();
+    }
+
+    public IPScanner(
         ILogger logger,
         IPScannerConfig? ipScannerConfig)
     {
         this.logger = logger;
         this.scannerConfig = ipScannerConfig ?? new IPScannerConfig();
+    }
+
+    public IPScanner()
+        : this(NullLogger.Instance)
+    {
     }
 
     public IPScanner(
