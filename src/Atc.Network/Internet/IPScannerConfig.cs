@@ -9,68 +9,21 @@ public class IPScannerConfig
     public IPScannerConfig(
         IPServicePortExaminationLevel ipServicePortExaminationLevel)
     {
-        switch (ipServicePortExaminationLevel)
-        {
-            case IPServicePortExaminationLevel.None:
-                break;
-            case IPServicePortExaminationLevel.WellKnown:
-                foreach (var port in IPServicePortLists.GetWellKnown())
-                {
-                    PortNumbers.Add(port);
-                }
-
-                break;
-            case IPServicePortExaminationLevel.WellKnownAndCommon:
-                foreach (var port in IPServicePortLists.GetWellKnownOrCommon())
-                {
-                    PortNumbers.Add(port);
-                }
-
-                break;
-            case IPServicePortExaminationLevel.All:
-                for (ushort i = 0; i < ushort.MaxValue; i++)
-                {
-                    PortNumbers.Add((ushort)(i + 1));
-                }
-
-                break;
-            default:
-                throw new SwitchCaseDefaultException(ipServicePortExaminationLevel);
-        }
+        SetPortNumbers(ipServicePortExaminationLevel);
     }
 
     public IPScannerConfig(
         IPServicePortExaminationLevel ipServicePortExaminationLevel,
         ServiceProtocolType serviceProtocolType)
     {
-        switch (ipServicePortExaminationLevel)
-        {
-            case IPServicePortExaminationLevel.None:
-                break;
-            case IPServicePortExaminationLevel.WellKnown:
-                foreach (var port in IPServicePortLists.GetWellKnown(serviceProtocolType))
-                {
-                    PortNumbers.Add(port);
-                }
+        SetPortNumbers(ipServicePortExaminationLevel, serviceProtocolType);
+    }
 
-                break;
-            case IPServicePortExaminationLevel.WellKnownAndCommon:
-                foreach (var port in IPServicePortLists.GetWellKnownOrCommon(serviceProtocolType))
-                {
-                    PortNumbers.Add(port);
-                }
-
-                break;
-            case IPServicePortExaminationLevel.All:
-                for (ushort i = 0; i < ushort.MaxValue; i++)
-                {
-                    PortNumbers.Add((ushort)(i + 1));
-                }
-
-                break;
-            default:
-                throw new SwitchCaseDefaultException(ipServicePortExaminationLevel);
-        }
+    public IPScannerConfig(
+        IPServicePortExaminationLevel ipServicePortExaminationLevel,
+        ServiceProtocolType[] serviceProtocolTypes)
+    {
+        SetPortNumbers(ipServicePortExaminationLevel, serviceProtocolTypes);
     }
 
     public IPScannerConfig(
@@ -100,6 +53,65 @@ public class IPScannerConfig
     public ICollection<ushort> PortNumbers { get; set; } = new List<ushort>();
 
     public IPServicePortExaminationLevel TreatOpenPortsAsWebServices { get; set; } = IPServicePortExaminationLevel.WellKnownAndCommon;
+
+    public void SetPortNumbers(
+        IPServicePortExaminationLevel ipServicePortExaminationLevel)
+    {
+        var serviceProtocolTypes = ((ServiceProtocolType[])Enum.GetValues(typeof(ServiceProtocolType)))
+            .Where(x => x != ServiceProtocolType.None && x != ServiceProtocolType.Unknown)
+            .ToArray();
+
+        SetPortNumbers(ipServicePortExaminationLevel, serviceProtocolTypes);
+    }
+
+    public void SetPortNumbers(
+        IPServicePortExaminationLevel ipServicePortExaminationLevel,
+        ServiceProtocolType serviceProtocolType)
+    {
+        SetPortNumbers(ipServicePortExaminationLevel, new[] { serviceProtocolType });
+    }
+
+    public void SetPortNumbers(
+        IPServicePortExaminationLevel ipServicePortExaminationLevel,
+        ServiceProtocolType[] serviceProtocolTypes)
+    {
+        ArgumentNullException.ThrowIfNull(serviceProtocolTypes);
+
+        switch (ipServicePortExaminationLevel)
+        {
+            case IPServicePortExaminationLevel.None:
+                break;
+            case IPServicePortExaminationLevel.WellKnown:
+                foreach (var serviceProtocolType in serviceProtocolTypes)
+                {
+                    foreach (var port in IPServicePortLists.GetWellKnown(serviceProtocolType))
+                    {
+                        PortNumbers.Add(port);
+                    }
+                }
+
+                break;
+            case IPServicePortExaminationLevel.WellKnownAndCommon:
+                foreach (var serviceProtocolType in serviceProtocolTypes)
+                {
+                    foreach (var port in IPServicePortLists.GetWellKnownOrCommon(serviceProtocolType))
+                    {
+                        PortNumbers.Add(port);
+                    }
+                }
+
+                break;
+            case IPServicePortExaminationLevel.All:
+                for (ushort i = 0; i < ushort.MaxValue; i++)
+                {
+                    PortNumbers.Add((ushort)(i + 1));
+                }
+
+                break;
+            default:
+                throw new SwitchCaseDefaultException(ipServicePortExaminationLevel);
+        }
+    }
 
     public override string ToString()
         => $"{nameof(IcmpPing)}: {IcmpPing}, {nameof(ResolveHostName)}: {ResolveHostName}, {nameof(ResolveMacAddress)}: {ResolveMacAddress}, {nameof(ResolveVendorFromMacAddress)}: {ResolveVendorFromMacAddress}, {nameof(PortNumbers)}: {PortNumbers}, {nameof(TreatOpenPortsAsWebServices)}: {TreatOpenPortsAsWebServices}";
