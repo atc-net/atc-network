@@ -21,7 +21,7 @@ public class IPScanResults
             ? Start.GetPrettyTimeDiff(End.Value)
             : null;
 
-    public IEnumerable<IPScanResult> CollectedWithConnectionResults
+    public IEnumerable<IPScanResult> CollectedResultsFilteredOnHasConnections
         => CollectedResults
             .Where(x => x.HasConnection)
             .OrderBy(x => x.IPAddress.ToString());
@@ -40,7 +40,7 @@ public class IPScanResults
         if (totalPortCount > 0)
         {
             sb.Append("OpenPorts ");
-            sb.Append(CollectedResults.Sum(ipScanResult => ipScanResult.OpenPort.Count()));
+            sb.Append(CollectedResults.Sum(ipScanResult => ipScanResult.OpenPortNumbers.Count()));
             sb.Append(" of ");
             sb.Append(totalPortCount);
             sb.Append(" # ");

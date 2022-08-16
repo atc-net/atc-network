@@ -34,7 +34,7 @@ public class IPScanResult
             ? Start.GetPrettyTimeDiff(End.Value)
             : null;
 
-    public IEnumerable<ushort> OpenPort
+    public IEnumerable<ushort> OpenPortNumbers
         => Ports
             .Where(x => x.TransportProtocol != TransportProtocolType.None && x.CanConnect)
             .Select(x => x.Port)
@@ -44,7 +44,7 @@ public class IPScanResult
         => PingStatus?.Status == IPStatus.Success ||
            !string.IsNullOrEmpty(Hostname) ||
            !string.IsNullOrEmpty(MacAddress) ||
-           OpenPort.Any();
+           OpenPortNumbers.Any();
 
     public override string ToString()
     {
@@ -65,7 +65,7 @@ public class IPScanResult
             if (totalPortCount > 0)
             {
                 sb.Append("OpenPorts ");
-                sb.Append(OpenPort.Count());
+                sb.Append(OpenPortNumbers.Count());
                 sb.Append(" of ");
                 sb.Append(totalPortCount);
                 sb.Append(" # ");

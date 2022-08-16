@@ -1,14 +1,14 @@
 // ReSharper disable EmptyGeneralCatchClause
+// ReSharper disable LocalizableElement
 namespace Atc.Network.Internet;
 
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1601:Partial elements should be documented", Justification = "OK.")]
 [SuppressMessage("Major Code Smell", "S108:Nested blocks of code should not be left empty", Justification = "OK.")]
 [SuppressMessage("Minor Code Smell", "S2486:Generic exceptions should not be ignored", Justification = "OK.")]
-public partial class IPScanner : IDisposable
+public partial class IPScanner : IIPScanner, IDisposable
 {
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
-    private readonly IPScannerConfig scannerConfig;
     private readonly ConcurrentBag<IPScanResult> processedScanResults = new();
     private readonly IPScannerProgressReport progressReporting = new();
     private ArpEntity[]? arpEntities;
@@ -18,11 +18,23 @@ public partial class IPScanner : IDisposable
     public event EventHandler<IPScannerProgressReport>? ProgressReporting;
 
     public IPScanner(
+        ILogger logger)
+    {
+        this.logger = logger;
+        this.Configuration = new IPScannerConfig();
+    }
+
+    public IPScanner(
         ILogger logger,
         IPScannerConfig? ipScannerConfig)
     {
         this.logger = logger;
-        this.scannerConfig = ipScannerConfig ?? new IPScannerConfig();
+        this.Configuration = ipScannerConfig ?? new IPScannerConfig();
+    }
+
+    public IPScanner()
+        : this(NullLogger.Instance)
+    {
     }
 
     public IPScanner(
@@ -30,6 +42,8 @@ public partial class IPScanner : IDisposable
         : this(NullLogger.Instance, ipScannerConfig)
     {
     }
+
+    public IPScannerConfig Configuration { get; set; }
 
     public Task<IPScanResults> Scan(
         IPAddress ipAddress,
@@ -82,12 +96,12 @@ public partial class IPScanner : IDisposable
         {
             await SyncLock.WaitAsync(cancellationToken);
 
-            if (scannerConfig.ResolveMacAddress)
+            if (Configuration.ResolveMacAddress)
             {
                 arpEntities = ArpHelper.GetArpResult();
             }
 
-            tasksToProcessCount = ipAddresses.Count * scannerConfig.GetTasksToProcessCount();
+            tasksToProcessCount = ipAddresses.Count * Configuration.GetTasksToProcessCount();
             tasksProcessedCount = 0;
             processedScanResults.Clear();
 
@@ -97,7 +111,7 @@ public partial class IPScanner : IDisposable
                     await DoScan(ipAddress, cancellationToken);
                 });
 
-            var timeoutTask = Task.Delay((int)scannerConfig.Timeout.TotalMilliseconds, cancellationToken);
+            var timeoutTask = Task.Delay((int)Configuration.Timeout.TotalMilliseconds, cancellationToken);
 
             await Task.WhenAny(
                 TaskHelper.WhenAll(tasks),
@@ -161,35 +175,35 @@ public partial class IPScanner : IDisposable
         processedScanResults.Add(ipScanResult);
         RaiseProgressReporting(IPScannerProgressReportingType.IPAddressStart, ipScanResult);
 
-        if (scannerConfig.IcmpPing)
+        if (Configuration.IcmpPing)
         {
             await HandlePing(ipScanResult, ipAddress);
         }
 
-        if (scannerConfig.ResolveHostName)
+        if (Configuration.ResolveHostName)
         {
             await HandleResolveHostName(ipScanResult, ipAddress, cancellationToken);
         }
 
-        if (scannerConfig.ResolveMacAddress)
+        if (Configuration.ResolveMacAddress)
         {
             HandleResolveMacAddress(ipScanResult, ipAddress);
         }
 
-        if (scannerConfig.ResolveMacAddress &&
-            scannerConfig.ResolveVendorFromMacAddress)
+        if (Configuration.ResolveMacAddress &&
+            Configuration.ResolveVendorFromMacAddress)
         {
             await HandleResolveVendorFromMacAddress(ipScanResult, cancellationToken);
         }
 
-        if (scannerConfig.PortNumbers.Any())
+        if (Configuration.PortNumbers.Any())
         {
-            foreach (var portNumber in scannerConfig.PortNumbers)
+            foreach (var portNumber in Configuration.PortNumbers)
             {
                 await HandleTcpPort(ipScanResult, ipAddress, portNumber, cancellationToken);
             }
 
-            if (scannerConfig.TreatOpenPortsAsWebServices != IPServicePortExaminationLevel.None)
+            if (Configuration.TreatOpenPortsAsWebServices != IPServicePortExaminationLevel.None)
             {
                 await HandleTreatOpenPortsAsWebServices(ipScanResult, ipAddress, cancellationToken);
             }
@@ -203,7 +217,7 @@ public partial class IPScanner : IDisposable
         IPScanResult ipScanResult,
         IPAddress ipAddress)
     {
-        ipScanResult.PingStatus = await PingHelper.GetStatus(ipAddress, scannerConfig.TimeoutPing);
+        ipScanResult.PingStatus = await PingHelper.GetStatus(ipAddress, Configuration.TimeoutPing);
         Interlocked.Increment(ref tasksProcessedCount);
         RaiseProgressReporting(IPScannerProgressReportingType.Ping, ipScanResult);
     }
@@ -262,7 +276,7 @@ public partial class IPScanner : IDisposable
         ushort portNumber,
         CancellationToken cancellationToken)
     {
-        var ipPortScan = new IPPortScan(ipAddress, (int)scannerConfig.TimeoutTcp.TotalMilliseconds);
+        var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutTcp.TotalMilliseconds);
         var canConnect = await ipPortScan.CanConnectWithTcp(
             portNumber,
             cancellationToken);
@@ -287,10 +301,10 @@ public partial class IPScanner : IDisposable
         CancellationToken cancellationToken)
     {
         var handledCount = 0;
-        foreach (var portNumber in ipScanResult.OpenPort)
+        foreach (var portNumber in ipScanResult.OpenPortNumbers)
         {
-            if (!portNumber.IsPortForIPService(ServiceProtocolType.Http, scannerConfig.TreatOpenPortsAsWebServices) &&
-                !portNumber.IsPortForIPService(ServiceProtocolType.Https, scannerConfig.TreatOpenPortsAsWebServices))
+            if (!portNumber.IsPortForIPService(ServiceProtocolType.Http, Configuration.TreatOpenPortsAsWebServices) &&
+                !portNumber.IsPortForIPService(ServiceProtocolType.Https, Configuration.TreatOpenPortsAsWebServices))
             {
                 continue;
             }
@@ -330,7 +344,7 @@ public partial class IPScanner : IDisposable
             return;
         }
 
-        var ipPortScan = new IPPortScan(ipAddress, (int)scannerConfig.TimeoutHttp.TotalMilliseconds);
+        var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutHttp.TotalMilliseconds);
         var canConnectHttp = await ipPortScan.CanConnectWithHttp(
             portNumber,
             cancellationToken);

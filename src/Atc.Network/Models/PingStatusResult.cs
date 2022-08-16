@@ -52,6 +52,9 @@ public class PingStatusResult
         }
     }
 
+    public string QualityCategoryDescriptionAndTime
+        => $"{EnumHelper.GetDescription(QualityCategory)} - {TimeSpan.FromMilliseconds(PingInMs).GetPrettyTime()}";
+
     public override string ToString()
         => $"{nameof(IPAddress)}: {IPAddress}, {nameof(Exception)}: {Exception}, {nameof(Status)}: {Status}, {nameof(PingInMs)}: {PingInMs}, {nameof(QualityCategory)}: {QualityCategory}";
 }
