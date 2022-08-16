@@ -113,9 +113,9 @@
 >```csharp
 >MacVendor
 >```
-#### OpenPort
+#### OpenPortNumbers
 >```csharp
->OpenPort
+>OpenPortNumbers
 >```
 #### PingStatus
 >```csharp
@@ -154,9 +154,9 @@
 >```csharp
 >CollectedResults
 >```
-#### CollectedWithConnectionResults
+#### CollectedResultsFilteredOnHasConnections
 >```csharp
->CollectedWithConnectionResults
+>CollectedResultsFilteredOnHasConnections
 >```
 #### End
 >```csharp
@@ -214,6 +214,10 @@
 #### QualityCategory
 >```csharp
 >QualityCategory
+>```
+#### QualityCategoryDescriptionAndTime
+>```csharp
+>QualityCategoryDescriptionAndTime
 >```
 #### Status
 >```csharp
