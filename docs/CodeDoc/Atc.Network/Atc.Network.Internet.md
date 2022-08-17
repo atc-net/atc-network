@@ -7,6 +7,33 @@
 
 <br />
 
+## IIPPortScan
+
+>```csharp
+>public interface IIPPortScan
+>```
+
+### Methods
+
+#### CanConnectWithHttp
+>```csharp
+>Task<bool> CanConnectWithHttp(int portNumber = 80, CancellationToken cancellationToken = null)
+>```
+#### CanConnectWithHttpOrHttps
+>```csharp
+>Task<bool> CanConnectWithHttpOrHttps(int portNumber = 80, bool useHttps = False, CancellationToken cancellationToken = null)
+>```
+#### CanConnectWithHttps
+>```csharp
+>Task<bool> CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
+>```
+#### CanConnectWithTcp
+>```csharp
+>Task<bool> CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
+>```
+
+<br />
+
 ## IIPScanner
 
 >```csharp
@@ -45,7 +72,7 @@
 ## IPPortScan
 
 >```csharp
->public class IPPortScan
+>public class IPPortScan : IIPPortScan
 >```
 
 ### Methods
@@ -53,6 +80,10 @@
 #### CanConnectWithHttp
 >```csharp
 >Task<bool> CanConnectWithHttp(int portNumber = 80, CancellationToken cancellationToken = null)
+>```
+#### CanConnectWithHttpOrHttps
+>```csharp
+>Task<bool> CanConnectWithHttpOrHttps(int portNumber = 80, bool useHttps = False, CancellationToken cancellationToken = null)
 >```
 #### CanConnectWithHttps
 >```csharp
