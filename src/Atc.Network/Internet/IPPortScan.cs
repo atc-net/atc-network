@@ -2,7 +2,7 @@
 namespace Atc.Network.Internet;
 
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
-public class IPPortScan
+public class IPPortScan : IIPPortScan
 {
     private const int InternalDelayInMs = 5;
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
@@ -62,7 +62,7 @@ public class IPPortScan
         CancellationToken cancellationToken = default)
         => CanConnectWithHttpOrHttps(portNumber, useHttps: true, cancellationToken);
 
-    private async Task<bool> CanConnectWithHttpOrHttps(
+    public async Task<bool> CanConnectWithHttpOrHttps(
         int portNumber = 80,
         bool useHttps = false,
         CancellationToken cancellationToken = default)

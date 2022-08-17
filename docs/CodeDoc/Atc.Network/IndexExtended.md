@@ -106,6 +106,12 @@
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
 
+- [IIPPortScan](Atc.Network.Internet.md#iipportscan)
+  -  Methods
+     - CanConnectWithHttp(int portNumber = 80, CancellationToken cancellationToken = null)
+     - CanConnectWithHttpOrHttps(int portNumber = 80, bool useHttps = False, CancellationToken cancellationToken = null)
+     - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
+     - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
 - [IIPScanner](Atc.Network.Internet.md#iipscanner)
   -  Properties
      - Configuration
@@ -118,6 +124,7 @@
 - [IPPortScan](Atc.Network.Internet.md#ipportscan)
   -  Methods
      - CanConnectWithHttp(int portNumber = 80, CancellationToken cancellationToken = null)
+     - CanConnectWithHttpOrHttps(int portNumber = 80, bool useHttps = False, CancellationToken cancellationToken = null)
      - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
      - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
 - [IPScanner](Atc.Network.Internet.md#ipscanner)
