@@ -6,8 +6,13 @@ public class IPPortScan : IIPPortScan
 {
     private const int InternalDelayInMs = 5;
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
-    private readonly IPAddress ipAddress;
-    private readonly int timeoutInMs;
+
+    private IPAddress? ipAddress;
+    private int timeoutInMs = 100;
+
+    public IPPortScan()
+    {
+    }
 
     public IPPortScan(
         IPAddress ipAddress,
@@ -17,10 +22,23 @@ public class IPPortScan : IIPPortScan
         this.timeoutInMs = timeoutInMs;
     }
 
+    public void SetIPAddress(
+        IPAddress value)
+        => this.ipAddress = value;
+
+    public void SetTimeout(
+        TimeSpan value)
+        => this.timeoutInMs = (int)value.TotalMilliseconds;
+
     public async Task<bool> CanConnectWithTcp(
         int portNumber,
         CancellationToken cancellationToken = default)
     {
+        if (ipAddress is null)
+        {
+            throw new TcpException("IPAddress is not set.");
+        }
+
         try
         {
             await SyncLock.WaitAsync(cancellationToken);
@@ -72,6 +90,11 @@ public class IPPortScan : IIPPortScan
         bool useHttps = false,
         CancellationToken cancellationToken = default)
     {
+        if (ipAddress is null)
+        {
+            throw new TcpException("IPAddress is not set.");
+        }
+
         try
         {
             await SyncLock.WaitAsync(cancellationToken);

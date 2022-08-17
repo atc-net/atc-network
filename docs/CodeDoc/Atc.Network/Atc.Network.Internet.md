@@ -31,6 +31,14 @@
 >```csharp
 >Task<bool> CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
 >```
+#### SetIPAddress
+>```csharp
+>void SetIPAddress(IPAddress value)
+>```
+#### SetTimeout
+>```csharp
+>void SetTimeout(TimeSpan value)
+>```
 
 <br />
 
@@ -92,6 +100,14 @@
 #### CanConnectWithTcp
 >```csharp
 >Task<bool> CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
+>```
+#### SetIPAddress
+>```csharp
+>void SetIPAddress(IPAddress value)
+>```
+#### SetTimeout
+>```csharp
+>void SetTimeout(TimeSpan value)
 >```
 
 <br />

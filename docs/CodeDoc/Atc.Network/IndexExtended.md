@@ -112,6 +112,8 @@
      - CanConnectWithHttpOrHttps(int portNumber = 80, bool useHttps = False, CancellationToken cancellationToken = null)
      - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
      - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
+     - SetIPAddress(IPAddress value)
+     - SetTimeout(TimeSpan value)
 - [IIPScanner](Atc.Network.Internet.md#iipscanner)
   -  Properties
      - Configuration
@@ -127,6 +129,8 @@
      - CanConnectWithHttpOrHttps(int portNumber = 80, bool useHttps = False, CancellationToken cancellationToken = null)
      - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
      - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
+     - SetIPAddress(IPAddress value)
+     - SetTimeout(TimeSpan value)
 - [IPScanner](Atc.Network.Internet.md#ipscanner)
   -  Properties
      - Configuration

@@ -2,6 +2,12 @@ namespace Atc.Network.Internet;
 
 public interface IIPPortScan
 {
+    void SetIPAddress(
+        IPAddress value);
+
+    void SetTimeout(
+        TimeSpan value);
+
     Task<bool> CanConnectWithTcp(
         int portNumber,
         CancellationToken cancellationToken = default);
