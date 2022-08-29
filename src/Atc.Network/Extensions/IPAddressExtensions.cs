@@ -1,4 +1,5 @@
 // ReSharper disable once CheckNamespace
+// ReSharper disable LocalizableElement
 namespace Atc.Network;
 
 public static class IPAddressExtensions

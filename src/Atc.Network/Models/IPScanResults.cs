@@ -1,3 +1,4 @@
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Atc.Network.Models;
 
 public class IPScanResults
@@ -6,7 +7,7 @@ public class IPScanResults
 
     public DateTime? End { get; set; }
 
-    public ConcurrentBag<IPScanResult> CollectedResults { get; set; } = new();
+    public ConcurrentBag<IPScanResult> CollectedResults { get; } = new();
 
     public string? ErrorMessage { get; set; }
 

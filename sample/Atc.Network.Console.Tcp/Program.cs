@@ -1,3 +1,5 @@
+// ReSharper disable LocalizableElement
+
 void OnDataReceived(
     byte[] data)
 {

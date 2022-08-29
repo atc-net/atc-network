@@ -5,6 +5,7 @@ global using System.Reflection;
 global using System.Text;
 
 global using Atc.CodeDocumentation.Markdown;
+global using Atc.Helpers;
 global using Atc.Network.Data;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
