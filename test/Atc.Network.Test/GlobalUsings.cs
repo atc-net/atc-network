@@ -9,6 +9,7 @@ global using Atc.Network.Data;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
 global using Atc.Network.Tcp;
+global using Atc.Network.Udp;
 global using Atc.XUnit;
 
 global using Microsoft.Extensions.Logging.Abstractions;
