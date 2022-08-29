@@ -10,13 +10,13 @@ A sample reference implementation can be found [`here`](sample/Atc.Network.Conso
 
 ## Using the IPScanner
 
-The IPScanner can scan a range of IPAddresses or just a single IPAddress for information specified in the IPScannerConfig.
+The IPScanner can scan a range of IPAddresses or just a single IPAddress as specified in the IPScannerConfig.
 
-- If `IcmpPing` is enabled the result for given IPAddress will contains a PingResult with network quality information.
-- If `ResolveHostName` is enabled the result for given IPAddress will contains the hostname if possible to resolve.
-- If `ResolveMacAddress` is enabled the result for given IPAddress will contains the mac-address if possible to resolve.
-- If `ResolveVendorFromMacAddress` is enabled the result for given IPAddress will contains the vendor name from the mac-address if possible to resolve.
-- `TreatOpenPortsAsWebServices` define what kind of port numbers should be tested, the options is: `None`, `WellKnown`, `WellKnownAndCommon, `All`
+- If `IcmpPing` is enabled the result for given IPAddress will contain a PingResult with network quality information.
+- If `ResolveHostName` is enabled the result for given IPAddress will contain the hostname if possible to resolve.
+- If `ResolveMacAddress` is enabled the result for given IPAddress will contain the mac-address if possible to resolve.
+- If `ResolveVendorFromMacAddress` is enabled the result for given IPAddress will contain the vendor name from the mac-address if possible to resolve.
+- `TreatOpenPortsAsWebServices` defines what kind of port numbers should be tested, the options are: `None`, `WellKnown`, `WellKnownAndCommon`, `All`
 
 ### Example on ScanRange based on WellKnown port numbers
 
@@ -67,7 +67,7 @@ The IPScanner can scan a range of IPAddresses or just a single IPAddress for inf
 ### Example on CanConnectWithTcp
 
 ```csharp
-    var ipPortScan = new IPPortScan(IPAddress.Parse("192.168.0.27"),);
+    var ipPortScan = new IPPortScan(IPAddress.Parse("192.168.0.27"));
     var ipPortScanResult = await ipPortScan.CanConnectWithTcp(
         80,
         CancellationToken.None);
@@ -76,7 +76,7 @@ The IPScanner can scan a range of IPAddresses or just a single IPAddress for inf
 ### Example on CanConnectWithHttp
 
 ```csharp
-    var ipPortScan = new IPPortScan(IPAddress.Parse("192.168.0.27"),);
+    var ipPortScan = new IPPortScan(IPAddress.Parse("192.168.0.27"));
     var ipPortScanResult = await ipPortScan.CanConnectWithHttp(
         80,
         CancellationToken.None);

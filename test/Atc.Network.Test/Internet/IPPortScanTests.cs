@@ -6,7 +6,7 @@ namespace Atc.Network.Test.Internet;
 public class IPPortScanTests
 {
     [Fact]
-    public async Task CanConnectWithTcp()
+    public async Task Try_CanConnectWithTcp()
     {
         // Arrange
         var testIpAddress = GetTestIpAddress();
@@ -23,7 +23,7 @@ public class IPPortScanTests
     }
 
     [Fact]
-    public async Task CanConnectWithHttp()
+    public async Task Try_CanConnectWithHttp()
     {
         // Arrange
         var testIpAddress = GetTestIpAddress();
@@ -40,7 +40,7 @@ public class IPPortScanTests
     }
 
     [Fact]
-    public async Task CanConnectWithHttps()
+    public async Task Try_CanConnectWithHttps()
     {
         // Arrange
         var testIpAddress = GetTestIpAddress();
@@ -57,7 +57,7 @@ public class IPPortScanTests
     }
 
     [Fact]
-    public async Task CanConnectWithHttpOrHttps()
+    public async Task Try_CanConnectWithHttpOrHttps()
     {
         // Arrange
         var testIpAddress = GetTestIpAddress();
