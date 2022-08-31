@@ -1,4 +1,5 @@
 // ReSharper disable InvertIf
+// ReSharper disable InvertIf
 namespace Atc.Network.Tcp;
 
 /// <summary>
@@ -23,11 +24,6 @@ public partial class TcpClient : IDisposable
 
     private System.Net.Sockets.TcpClient? tcpClient;
     private Stream? networkStream;
-
-    /// <summary>
-    /// Is client connected
-    /// </summary>
-    public bool IsConnected { get; private set; }
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -63,10 +59,9 @@ public partial class TcpClient : IDisposable
         this.clientConfig = clientConfig ?? new TcpClientConfig();
         this.keepAliveConfig = keepAliveConfig ?? new TcpClientKeepAliveConfig();
 
-        cancellationTokenSource = new CancellationTokenSource();
-
         receiveBuffer = new byte[this.clientConfig.ReceiveBufferSize];
 
+        cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenRegistration = cancellationTokenSource.Token.Register(CancellationTokenCallback);
 
         receiveListenerTask = Task.Run(
@@ -145,6 +140,11 @@ public partial class TcpClient : IDisposable
     }
 
     /// <summary>
+    /// Is client connected.
+    /// </summary>
+    public bool IsConnected { get; private set; }
+
+    /// <summary>
     /// Connect.
     /// </summary>
     /// <param name="cancellationToken">The cancellationToken.</param>
@@ -164,52 +164,12 @@ public partial class TcpClient : IDisposable
     /// <param name="data">The data to send.</param>
     /// <param name="cancellationToken">The cancellationToken.</param>
     /// <remarks>
-    /// TerminationType is resolved from TcpClientConfig.
-    /// </remarks>
-    public Task Send(
-        byte[] data,
-        CancellationToken cancellationToken = default)
-        => Send(data, clientConfig.TerminationType, cancellationToken);
-
-    /// <summary>
-    /// Send data.
-    /// </summary>
-    /// <param name="data">The data to send.</param>
-    /// <param name="terminationType">The terminationType.</param>
-    /// <param name="cancellationToken">The cancellationToken.</param>
-    public async Task Send(
-        byte[] data,
-        TcpTerminationType terminationType,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(data);
-
-        if (!IsConnected)
-        {
-            LogClientNotConnected(ipAddressOrHostname, port);
-            throw new TcpException("Client is not connected!");
-        }
-
-        AppendTerminationBytesIfNeeded(ref data, terminationType);
-
-        LogDataSendingByteLength(data.Length);
-
-        await networkStream!.WriteAsync(data.AsMemory(0, data.Length), cancellationToken);
-        await networkStream.FlushAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Send data.
-    /// </summary>
-    /// <param name="data">The data to send.</param>
-    /// <param name="cancellationToken">The cancellationToken.</param>
-    /// <remarks>
-    /// Data will be encoded as ASCII.
+    /// Data will be encoded as client-config default encoding.
     /// </remarks>
     public Task Send(
         string data,
         CancellationToken cancellationToken = default)
-        => Send(Encoding.ASCII, data, cancellationToken);
+        => Send(clientConfig.DefaultEncoding, data, cancellationToken);
 
     /// <summary>
     /// Send data.
@@ -233,6 +193,46 @@ public partial class TcpClient : IDisposable
             encoding.GetBytes(data),
             clientConfig.TerminationType,
             cancellationToken);
+    }
+
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="data">The data to send.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    /// <remarks>
+    /// TerminationType is resolved from TcpClientConfig.
+    /// </remarks>
+    public Task Send(
+        byte[] data,
+        CancellationToken cancellationToken = default)
+        => Send(data, clientConfig.TerminationType, cancellationToken);
+
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="data">The data to send.</param>
+    /// <param name="terminationType">The terminationType.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    public async Task Send(
+        byte[] data,
+        TerminationType terminationType,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+
+        if (!IsConnected)
+        {
+            LogClientNotConnected(ipAddressOrHostname, port);
+            throw new TcpException("Client is not connected!");
+        }
+
+        TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
+
+        LogDataSendingByteLength(data.Length);
+
+        await networkStream!.WriteAsync(data.AsMemory(0, data.Length), cancellationToken);
+        await networkStream.FlushAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -317,7 +317,7 @@ public partial class TcpClient : IDisposable
             return false;
         }
 
-        await SetConnected(raiseEventsAndLog);
+        await SetConnected(raiseEventsAndLog, cancellationToken);
         PrepareNetworkStream();
 
         if (raiseEventsAndLog)
@@ -329,7 +329,7 @@ public partial class TcpClient : IDisposable
         return true;
     }
 
-    private async Task DoDisconnect(
+    private Task DoDisconnect(
         bool raiseEventsAndLog)
     {
         if (raiseEventsAndLog)
@@ -340,14 +340,7 @@ public partial class TcpClient : IDisposable
         }
 
         DisposeTcpClientAndStream();
-        await SetDisconnected(raiseEvents: raiseEventsAndLog);
-
-        if (raiseEventsAndLog)
-        {
-            LogDisconnected(ipAddressOrHostname, port);
-
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
-        }
+        return SetDisconnected(raiseEvents: raiseEventsAndLog);
     }
 
     private async Task DoReconnect()
@@ -364,11 +357,12 @@ public partial class TcpClient : IDisposable
     }
 
     private async Task SetConnected(
-        bool raiseEvents)
+        bool raiseEvents,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            await SyncLock.WaitAsync();
+            await SyncLock.WaitAsync(cancellationToken);
 
             if (IsConnected)
             {
@@ -388,11 +382,12 @@ public partial class TcpClient : IDisposable
     }
 
     private async Task SetDisconnected(
-        bool raiseEvents = true)
+        bool raiseEvents = true,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            await SyncLock.WaitAsync();
+            await SyncLock.WaitAsync(cancellationToken);
 
             if (!IsConnected)
             {
@@ -441,28 +436,8 @@ public partial class TcpClient : IDisposable
             keepAliveConfig.KeepAliveRetryCount);
     }
 
-    private static void AppendTerminationBytesIfNeeded(
-        ref byte[] data,
-        TcpTerminationType terminationType)
-    {
-        if (terminationType != TcpTerminationType.None)
-        {
-            var terminationTypeAsBytes = TcpTerminationTypeHelper.ConvertToBytes(terminationType);
-            if (data.Length >= terminationTypeAsBytes.Length)
-            {
-                var x = data[^terminationTypeAsBytes.Length..];
-                if (!x.SequenceEqual(terminationTypeAsBytes))
-                {
-                    data = data
-                        .Concat(terminationTypeAsBytes)
-                        .ToArray();
-                }
-            }
-        }
-    }
-
     private async Task DataReceiver(
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {

@@ -30,7 +30,7 @@ var tcpClient = new TcpClient(
 
 tcpClient.Connected += () => Console.WriteLine("Connected");
 tcpClient.Disconnected += () => Console.WriteLine("Disconnected");
-tcpClient.ConnectionStateChanged += (_, args) => Console.WriteLine($"Connection state: {args}");
+tcpClient.ConnectionStateChanged += (_, args) => Console.WriteLine($"Connection: {args.State}");
 tcpClient.DataReceived += OnDataReceived;
 if (!await tcpClient.Connect())
 {
