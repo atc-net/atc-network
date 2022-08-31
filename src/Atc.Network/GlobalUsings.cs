@@ -16,5 +16,6 @@ global using Atc.Network.Models;
 global using Atc.Network.Resource;
 global using Atc.Network.Tcp;
 
+global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
