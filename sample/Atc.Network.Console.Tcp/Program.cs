@@ -22,7 +22,7 @@ var tcpClient = new TcpClient(
     4242,
     new TcpClientConfig
     {
-        TerminationType = TcpTerminationType.LineFeed,
+        TerminationType = TerminationType.LineFeed,
         ConnectTimeout = 1000,
     });
 

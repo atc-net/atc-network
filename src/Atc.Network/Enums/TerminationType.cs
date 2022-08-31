@@ -1,6 +1,7 @@
-namespace Atc.Network.Tcp;
+// ReSharper disable once CheckNamespace
+namespace Atc.Network;
 
-public enum TcpTerminationType
+public enum TerminationType
 {
     None = 0,
     LineFeed = 1,
