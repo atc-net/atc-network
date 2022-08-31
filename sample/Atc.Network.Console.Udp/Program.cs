@@ -29,7 +29,7 @@ var loggerClient = loggerFactory.CreateLogger<UdpClient>();
 
 var udpServer = new UdpServer(
     loggerServer,
-    new IPEndPoint(IPAddress.Parse("127.0.0.1"), 27001),
+    new IPEndPoint(IPAddress.Loopback, 27001),
     new UdpServerConfig
     {
         EchoOnReceivedData = true,
@@ -41,7 +41,7 @@ await udpServer.StartAsync(CancellationToken.None);
 
 var udpClient = new UdpClient(
     loggerClient,
-    new IPEndPoint(IPAddress.Parse("127.0.0.1"), 27001),
+    new IPEndPoint(IPAddress.Loopback, 27001),
     27002);
 
 udpClient.Connected += () => Console.WriteLine("Connected");
@@ -58,7 +58,7 @@ if (!await udpClient.Connect())
 await udpClient.Send("Hallo", CancellationToken.None);
 await udpClient.Send("World..", CancellationToken.None);
 await udpClient.Send("ping", CancellationToken.None);
-await udpServer.Send(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 27002), "The UdpServer say hallo", CancellationToken.None);
+await udpServer.Send(new IPEndPoint(IPAddress.Loopback, 27002), "The UdpServer say hallo", CancellationToken.None);
 
 await Task.Delay(TimeSpan.FromMilliseconds(500));
 
