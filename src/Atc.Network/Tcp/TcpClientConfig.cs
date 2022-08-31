@@ -43,7 +43,12 @@ public class TcpClientConfig
     public int ReceiveBufferSize { get; set; } = TcpConstants.DefaultBufferSize;
 
     /// <summary>
-    /// The TerminationType.
+    /// Gets or sets the default encoding.
     /// </summary>
-    public TcpTerminationType TerminationType { get; set; } = TcpTerminationType.None;
+    public Encoding DefaultEncoding { get; set; } = Encoding.ASCII;
+
+    /// <summary>
+    /// Gets or sets the TerminationType.
+    /// </summary>
+    public TerminationType TerminationType { get; set; } = TerminationType.None;
 }
