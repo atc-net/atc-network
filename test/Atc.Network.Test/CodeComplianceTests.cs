@@ -20,6 +20,10 @@ public class CodeComplianceTests
         typeof(DnsLookupHelper),
         typeof(IPAddressExtensions),
         typeof(UshortExtensions),
+        typeof(TerminationHelper),
+        typeof(TerminationTypeHelper),
+        typeof(UdpClient),
+        typeof(UdpServer),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

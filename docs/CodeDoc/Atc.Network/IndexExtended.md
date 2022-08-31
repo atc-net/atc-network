@@ -44,12 +44,14 @@
      - int Disconnecting
      - int Reconnected
      - int Reconnecting
+     - int ServiceNotRunning
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
   -  Static Methods
      - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
+- [TerminationType](Atc.Network.md#terminationtype)
 - [TransportProtocolType](Atc.Network.md#transportprotocoltype)
 - [UshortExtensions](Atc.Network.md#ushortextensions)
   -  Static Methods
@@ -103,6 +105,16 @@
   -  Static Methods
      - GetStatus(IPAddress ipAddress, int timeoutInMs = 1000)
      - GetStatus(IPAddress ipAddress, TimeSpan timeout)
+- [TerminationHelper](Atc.Network.Helpers.md#terminationhelper)
+  -  Static Methods
+     - AppendTerminationBytesIfNeeded(ref byte data, TerminationType terminationType)
+- [TerminationTypeHelper](Atc.Network.Helpers.md#terminationtypehelper)
+  -  Static Fields
+     - byte CarriageReturn
+     - byte LineFeed
+  -  Static Methods
+     - ConvertToBytes(TerminationType terminationType)
+     - ConvertToString(TerminationType terminationType)
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
 
@@ -234,6 +246,22 @@
 
 ## [Atc.Network.Tcp](Atc.Network.Tcp.md)
 
+- [ITcpClient](Atc.Network.Tcp.md#itcpclient)
+  -  Properties
+     - IsConnected
+  -  Events
+     - Connected
+     - ConnectionStateChanged
+     - DataReceived
+     - Disconnected
+     - NoDataReceived
+  -  Methods
+     - Connect(CancellationToken cancellationToken = null)
+     - Disconnect()
+     - Send(byte[] data, CancellationToken cancellationToken = null)
+     - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
+     - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
+     - Send(string data, CancellationToken cancellationToken = null)
 - [TcpClient](Atc.Network.Tcp.md#tcpclient)
   -  Properties
      - IsConnected
@@ -248,12 +276,13 @@
      - Disconnect()
      - Dispose()
      - Send(byte[] data, CancellationToken cancellationToken = null)
-     - Send(byte[] data, TcpTerminationType terminationType, CancellationToken cancellationToken = null)
+     - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
      - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
      - Send(string data, CancellationToken cancellationToken = null)
 - [TcpClientConfig](Atc.Network.Tcp.md#tcpclientconfig)
   -  Properties
      - ConnectTimeout
+     - DefaultEncoding
      - ReceiveBufferSize
      - ReceiveTimeout
      - SendBufferSize
@@ -270,13 +299,75 @@
      - int DefaultBufferSize
      - int DefaultConnectTimeout
      - int DefaultSendReceiveTimeout
-- [TcpTerminationType](Atc.Network.Tcp.md#tcpterminationtype)
-- [TcpTerminationTypeHelper](Atc.Network.Tcp.md#tcpterminationtypehelper)
+
+## [Atc.Network.Udp](Atc.Network.Udp.md)
+
+- [IUdpClient](Atc.Network.Udp.md#iudpclient)
+  -  Properties
+     - IsConnected
+  -  Events
+     - Connected
+     - ConnectionStateChanged
+     - DataReceived
+     - Disconnected
+  -  Methods
+     - Connect(CancellationToken cancellationToken = null)
+     - Disconnect()
+     - Send(byte[] data, CancellationToken cancellationToken)
+     - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
+     - Send(Encoding encoding, string data, CancellationToken cancellationToken)
+     - Send(string data, CancellationToken cancellationToken)
+- [IUdpServer](Atc.Network.Udp.md#iudpserver)
+  -  Properties
+     - IsRunning
+  -  Events
+     - DataReceived
+  -  Methods
+     - Send(EndPoint recipient, byte[] data, CancellationToken cancellationToken)
+     - Send(EndPoint recipient, byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
+     - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
+     - Send(EndPoint recipient, string data, CancellationToken cancellationToken)
+- [UdpClient](Atc.Network.Udp.md#udpclient)
+  -  Properties
+     - IsConnected
+  -  Events
+     - Connected
+     - ConnectionStateChanged
+     - DataReceived
+     - Disconnected
+  -  Methods
+     - Connect(CancellationToken cancellationToken = null)
+     - Disconnect()
+     - Dispose()
+     - Send(byte[] data, CancellationToken cancellationToken)
+     - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
+     - Send(Encoding encoding, string data, CancellationToken cancellationToken)
+     - Send(string data, CancellationToken cancellationToken)
+- [UdpClientConfig](Atc.Network.Udp.md#udpclientconfig)
+- [UdpConfigBase](Atc.Network.Udp.md#udpconfigbase)
+  -  Properties
+     - DefaultEncoding
+     - ReceiveBufferSize
+     - SendBufferSize
+     - TerminationType
+- [UdpServer](Atc.Network.Udp.md#udpserver)
+  -  Properties
+     - IsRunning
+  -  Events
+     - DataReceived
+  -  Methods
+     - Dispose()
+     - Send(EndPoint recipient, byte[] data, CancellationToken cancellationToken)
+     - Send(EndPoint recipient, byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
+     - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
+     - Send(EndPoint recipient, string data, CancellationToken cancellationToken)
+     - StartAsync(CancellationToken cancellationToken)
+     - StopAsync(CancellationToken cancellationToken)
+- [UdpServerConfig](Atc.Network.Udp.md#udpserverconfig)
+  -  Properties
+     - EchoOnReceivedData
+- [UpdConstants](Atc.Network.Udp.md#updconstants)
   -  Static Fields
-     - byte CarriageReturn
-     - byte LineFeed
-  -  Static Methods
-     - ConvertToBytes(TcpTerminationType tcpTerminationType)
-     - ConvertToString(TcpTerminationType tcpTerminationType)
+     - int DefaultBufferSize
 
 <hr /><div style='text-align: right'><i>Generated by MarkdownCodeDoc version 1.2</i></div>

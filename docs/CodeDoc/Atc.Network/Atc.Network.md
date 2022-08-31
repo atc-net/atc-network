@@ -237,6 +237,10 @@ ConnectionStateEventArgs.
 >```csharp
 >int Reconnecting
 >```
+#### ServiceNotRunning
+>```csharp
+>int ServiceNotRunning
+>```
 
 <br />
 
@@ -317,6 +321,24 @@ Enumeration: NetworkQualityCategoryType.
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`tcpKeepAliveTime`&nbsp;&nbsp;-&nbsp;&nbsp;Specifies how often TCP sends keep-alive transmissions (milliseconds).<br />
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`tcpKeepAliveInterval`&nbsp;&nbsp;-&nbsp;&nbsp;Specifies how often TCP repeats keep-alive transmissions when no response is received.<br />
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`tcpKeepAliveRetryCount`&nbsp;&nbsp;-&nbsp;&nbsp;The number of TCP keep alive probes that will be sent before the connection is terminated.<br />
+
+<br />
+
+## TerminationType
+
+>```csharp
+>public enum TerminationType
+>```
+
+
+| Value | Name | Description | Summary | 
+| --- | --- | --- | --- | 
+| 0 | None | None |  | 
+| 1 | LineFeed | Line Feed |  | 
+| 2 | CarriageReturn | Carriage Return |  | 
+| 3 | CarriageReturnLineFeed | Carriage Return Line Feed |  | 
+
+
 
 <br />
 
