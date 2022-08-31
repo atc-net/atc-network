@@ -1,60 +1,21 @@
+// ReSharper disable InvertIf
 namespace Atc.Network.Udp;
 
 /// <summary>
 /// The main UdpClient - Handles call execution.
 /// </summary>
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK")]
-public partial class UdpClient : IDisposable
+public partial class UdpClient : IUdpClient
 {
+    private const int TimeToWaitForDisposeDisconnectionInMs = 50;
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
-
-    private readonly string ipAddressOrHostname = string.Empty;
-    private readonly int port;
-
-    private System.Net.Sockets.UdpClient? udpClient;
-
-    public UdpClient(
-        ILogger logger,
-        string hostname,
-        int port)
-    {
-        ArgumentNullException.ThrowIfNull(hostname);
-
-        this.logger = logger;
-        this.ipAddressOrHostname = hostname;
-        this.port = port;
-    }
-
-    public UdpClient(
-        ILogger logger,
-        IPAddress ipAddress,
-        int port)
-    {
-        ArgumentNullException.ThrowIfNull(ipAddress);
-
-        this.logger = logger;
-        this.ipAddressOrHostname = ipAddress.ToString();
-        this.port = port;
-    }
-
-    public UdpClient(
-        string hostname,
-        int port)
-        : this(NullLogger.Instance, hostname, port)
-    {
-    }
-
-    public UdpClient(
-        IPAddress ipAddress,
-        int port)
-        : this(NullLogger.Instance, ipAddress, port)
-    {
-    }
-
-    /// <summary>
-    /// Is client connected
-    /// </summary>
-    public bool IsConnected { get; private set; }
+    private readonly UdpClientConfig udpClientConfig;
+    private readonly Socket? socket;
+    private readonly ArraySegment<byte> receiveBufferSegment;
+    private readonly IPEndPoint? remoteEndPoint;
+    private readonly int receiveListenerPort;
+    private readonly Task? receiveListenerTask;
+    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -72,14 +33,83 @@ public partial class UdpClient : IDisposable
     public event EventHandler<ConnectionStateEventArgs>? ConnectionStateChanged;
 
     /// <summary>
-    /// Event to raise when no data received.
-    /// </summary>
-    public event Action? NoDataReceived;
-
-    /// <summary>
     /// Event to raise when data has become available from the server.
     /// </summary>
     public event Action<byte[]>? DataReceived;
+
+    private UdpClient(
+        ILogger logger,
+        UdpClientConfig? udpClientConfig)
+    {
+        ArgumentNullException.ThrowIfNull(logger);
+
+        this.logger = logger;
+        this.udpClientConfig = udpClientConfig ?? new UdpClientConfig();
+
+        socket = new Socket(
+            AddressFamily.InterNetwork,
+            SocketType.Dgram,
+            ProtocolType.Udp);
+
+        socket.SetSocketOption(
+            SocketOptionLevel.IP,
+            SocketOptionName.PacketInformation,
+            optionValue: true);
+
+        var receiveBuffer = new byte[this.udpClientConfig.ReceiveBufferSize];
+        receiveBufferSegment = new ArraySegment<byte>(receiveBuffer);
+    }
+
+    public UdpClient(
+        ILogger logger,
+        IPAddress ipAddress,
+        int port,
+        int receiveListenerPort,
+        UdpClientConfig? udpClientConfig = default)
+        : this(logger, udpClientConfig)
+    {
+        ArgumentNullException.ThrowIfNull(ipAddress);
+
+        remoteEndPoint = new IPEndPoint(ipAddress, port);
+        this.receiveListenerPort = receiveListenerPort;
+
+        receiveListenerTask = Task.Run(
+            async () => await DataReceiver(cancellationTokenSource.Token),
+            cancellationTokenSource.Token);
+    }
+
+    [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
+    public UdpClient(
+        ILogger logger,
+        IPEndPoint endpoint,
+        int receiveListenerPort,
+        UdpClientConfig? udpClientConfig = default)
+        : this(logger, endpoint.Address, endpoint.Port, receiveListenerPort, udpClientConfig)
+    {
+    }
+
+    public UdpClient(
+        IPAddress ipAddress,
+        int port,
+        int receiveListenerPort,
+        UdpClientConfig? udpClientConfig = default)
+        : this(NullLogger.Instance, ipAddress, port, receiveListenerPort, udpClientConfig)
+    {
+    }
+
+    [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
+    public UdpClient(
+        IPEndPoint endpoint,
+        int receiveListenerPort,
+        UdpClientConfig? udpClientConfig = default)
+        : this(NullLogger.Instance, endpoint.Address, endpoint.Port, receiveListenerPort, udpClientConfig)
+    {
+    }
+
+    /// <summary>
+    /// Is client connected.
+    /// </summary>
+    public bool IsConnected { get; private set; }
 
     /// <summary>
     /// Connect.
@@ -95,29 +125,26 @@ public partial class UdpClient : IDisposable
     public Task Disconnect()
         => DoDisconnect(raiseEventsAndLog: true);
 
-    public Task Send(
-        byte[] data,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(data);
-
-        if (!IsConnected)
-        {
-            throw new TcpException("Client is not connected!");
-        }
-
-        return udpClient!.SendAsync(data, data.Length);
-    }
-
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="data">The data to send.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
     public Task Send(
         string data,
-        CancellationToken cancellationToken = default)
-        => Send(Encoding.ASCII, data, cancellationToken);
+        CancellationToken cancellationToken)
+        => Send(udpClientConfig.DefaultEncoding, data, cancellationToken);
 
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="encoding">The encoding.</param>
+    /// <param name="data">The data to send.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
     public Task Send(
         Encoding encoding,
         string data,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(encoding);
 
@@ -126,104 +153,46 @@ public partial class UdpClient : IDisposable
             throw new ArgumentException("Data is empty.", nameof(data));
         }
 
-        return Send(encoding.GetBytes(data), cancellationToken);
+        return Send(
+            encoding.GetBytes(data),
+            udpClientConfig.TerminationType,
+            cancellationToken);
     }
 
-    private async Task<bool> DoConnect(
-        bool raiseEventsAndLog,
-        CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="data">The data to send.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    public Task Send(
+        byte[] data,
+        CancellationToken cancellationToken)
+        => Send(data, udpClientConfig.TerminationType, cancellationToken);
+
+    /// <summary>
+    /// Send data.
+    /// </summary>
+    /// <param name="data">The data to send.</param>
+    /// <param name="terminationType">The terminationType.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    public async Task Send(
+        byte[] data,
+        TerminationType terminationType,
+        CancellationToken cancellationToken)
     {
-        if (IsConnected)
-        {
-            return false;
-        }
+        ArgumentNullException.ThrowIfNull(data);
 
-        udpClient = new System.Net.Sockets.UdpClient();
-
-        try
-        {
-            udpClient.Connect(ipAddressOrHostname, port);
-            udpClient.BeginReceive(DataReceiver, null);
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-
-        await SetConnected(raiseEventsAndLog);
-
-        return true;
-    }
-
-    private async Task DoDisconnect(
-        bool raiseEventsAndLog)
-    {
         if (!IsConnected)
         {
+            LogClientNotConnected(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
             return;
         }
 
-        udpClient!.Close();
-        await SetDisconnected(raiseEvents: raiseEventsAndLog);
-    }
+        TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
-    private async Task SetConnected(
-        bool raiseEvents)
-    {
-        try
-        {
-            await SyncLock.WaitAsync();
-
-            if (IsConnected)
-            {
-                return;
-            }
-
-            IsConnected = true;
-            if (raiseEvents)
-            {
-                Connected?.Invoke();
-            }
-        }
-        finally
-        {
-            SyncLock.Release();
-        }
-    }
-
-    private async Task SetDisconnected(
-        bool raiseEvents = true)
-    {
-        try
-        {
-            await SyncLock.WaitAsync();
-
-            if (!IsConnected)
-            {
-                return;
-            }
-
-            if (udpClient is { Client.Connected: true })
-            {
-                if (raiseEvents)
-                {
-                    ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
-                }
-
-                udpClient.Close();
-            }
-
-            IsConnected = false;
-            if (raiseEvents)
-            {
-                Disconnected?.Invoke();
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
-            }
-        }
-        finally
-        {
-            SyncLock.Release();
-        }
+        var buffer = new ArraySegment<byte>(data);
+        await socket!.SendToAsync(buffer, SocketFlags.None, remoteEndPoint!, cancellationToken);
+        await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
     }
 
     /// <inheritdoc />
@@ -245,31 +214,153 @@ public partial class UdpClient : IDisposable
             return;
         }
 
-        DisposeUdpClientAndStream();
-    }
-
-    private void DisposeUdpClientAndStream()
-    {
-        if (udpClient is not null)
+        if (!cancellationTokenSource.IsCancellationRequested)
         {
-            udpClient.Dispose();
+            cancellationTokenSource.Cancel();
         }
+
+        cancellationTokenSource.Dispose();
+
+        if (receiveListenerTask!.Status == TaskStatus.Running)
+        {
+            receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
+        }
+
+        socket?.Dispose();
     }
 
-    private void DataReceiver(IAsyncResult result)
+    private async Task<bool> DoConnect(
+        bool raiseEventsAndLog,
+        CancellationToken cancellationToken = default)
     {
-        var ipEndPoint = new IPEndPoint(IPAddress.Any, port);
+        if (IsConnected)
+        {
+            return false;
+        }
+
+        if (raiseEventsAndLog)
+        {
+            LogConnecting(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
+        }
 
         try
         {
-            var data = udpClient!.EndReceive(result, ref ipEndPoint);
-            var msg = Encoding.Unicode.GetString(data);
-
-            udpClient!.BeginReceive(DataReceiver, null);
+            socket!.Bind(new IPEndPoint(remoteEndPoint!.Address, receiveListenerPort));
         }
-        catch (ObjectDisposedException)
+        catch (Exception ex)
         {
-            // Skip
+            if (raiseEventsAndLog)
+            {
+                LogConnectionError(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port, ex.Message);
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
+            }
+
+            return false;
+        }
+
+        await SetConnected(raiseEventsAndLog, cancellationToken);
+
+        if (raiseEventsAndLog)
+        {
+            LogConnected(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
+        }
+
+        return true;
+    }
+
+    private Task DoDisconnect(
+        bool raiseEventsAndLog)
+    {
+        if (raiseEventsAndLog)
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
+
+            LogDisconnecting(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
+        }
+
+        return SetDisconnected(raiseEvents: raiseEventsAndLog);
+    }
+
+    private async Task SetConnected(
+        bool raiseEvents,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await SyncLock.WaitAsync(cancellationToken);
+
+            if (IsConnected)
+            {
+                return;
+            }
+
+            IsConnected = true;
+            if (raiseEvents)
+            {
+                Connected?.Invoke();
+            }
+        }
+        finally
+        {
+            SyncLock.Release();
+        }
+    }
+
+    private async Task SetDisconnected(
+        bool raiseEvents = true,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await SyncLock.WaitAsync(cancellationToken);
+
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            if (socket is { Connected: true })
+            {
+                if (raiseEvents)
+                {
+                    ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
+                }
+
+                socket.Close();
+            }
+
+            socket?.Dispose();
+
+            IsConnected = false;
+            if (raiseEvents)
+            {
+                Disconnected?.Invoke();
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
+            }
+        }
+        finally
+        {
+            SyncLock.Release();
+        }
+    }
+
+    private async Task DataReceiver(
+        CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (!IsConnected)
+            {
+                continue;
+            }
+
+            var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, remoteEndPoint!);
+            var receivedBytes = new byte[res.ReceivedBytes];
+            Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
+
+            DataReceived?.Invoke(receivedBytes);
         }
     }
 }

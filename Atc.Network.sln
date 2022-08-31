@@ -18,7 +18,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atc.Network.Test", "test\At
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{0514CBF8-F8F9-46B7-B8F6-0900D0F71C41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atc.Network.Console.Tcp", "sample\Atc.Network.Console.Tcp\Atc.Network.Console.Tcp.csproj", "{5A4A2683-7F94-4C9F-8DBF-4F67C5014BF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atc.Network.Console.Tcp", "sample\Atc.Network.Console.Tcp\Atc.Network.Console.Tcp.csproj", "{5A4A2683-7F94-4C9F-8DBF-4F67C5014BF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atc.Network.Console.Udp", "sample\Atc.Network.Console.Udp\Atc.Network.Console.Udp.csproj", "{AEFFA50B-9DE9-4CD5-BF72-D6C65788C7BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{5A4A2683-7F94-4C9F-8DBF-4F67C5014BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A4A2683-7F94-4C9F-8DBF-4F67C5014BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A4A2683-7F94-4C9F-8DBF-4F67C5014BF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEFFA50B-9DE9-4CD5-BF72-D6C65788C7BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEFFA50B-9DE9-4CD5-BF72-D6C65788C7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEFFA50B-9DE9-4CD5-BF72-D6C65788C7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEFFA50B-9DE9-4CD5-BF72-D6C65788C7BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{24632154-8E16-49BD-B8E3-BA5F486F45A5} = {69C84246-AA75-43E8-94B2-66FD555B18B0}
 		{F50A2350-B9D4-4A11-9933-CD3B7D75E151} = {53B6038B-38A2-4891-BB4F-8449721E096D}
 		{5A4A2683-7F94-4C9F-8DBF-4F67C5014BF6} = {0514CBF8-F8F9-46B7-B8F6-0900D0F71C41}
+		{AEFFA50B-9DE9-4CD5-BF72-D6C65788C7BB} = {0514CBF8-F8F9-46B7-B8F6-0900D0F71C41}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {04120463-05C5-417B-8D7A-2D7D35B71A07}
