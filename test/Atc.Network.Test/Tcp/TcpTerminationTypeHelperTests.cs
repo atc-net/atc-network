@@ -3,18 +3,18 @@ namespace Atc.Network.Test.Tcp;
 public class TcpTerminationTypeHelperTests
 {
     [Theory]
-    [InlineData("", TcpTerminationType.None)]
-    [InlineData("\n", TcpTerminationType.LineFeed)]
-    [InlineData("\r", TcpTerminationType.CarriageReturn)]
-    [InlineData("\r\n", TcpTerminationType.CarriageReturnLineFeed)]
-    public void ConvertToString(string expected, TcpTerminationType value)
-        => Assert.Equal(expected, TcpTerminationTypeHelper.ConvertToString(value));
+    [InlineData("", TerminationType.None)]
+    [InlineData("\n", TerminationType.LineFeed)]
+    [InlineData("\r", TerminationType.CarriageReturn)]
+    [InlineData("\r\n", TerminationType.CarriageReturnLineFeed)]
+    public void ConvertToString(string expected, TerminationType value)
+        => Assert.Equal(expected, TerminationTypeHelper.ConvertToString(value));
 
     [Theory]
-    [InlineData(new byte[] { }, TcpTerminationType.None)]
-    [InlineData(new byte[] { 0x0A }, TcpTerminationType.LineFeed)]
-    [InlineData(new byte[] { 0x0D }, TcpTerminationType.CarriageReturn)]
-    [InlineData(new byte[] { 0x0A, 0x0D }, TcpTerminationType.CarriageReturnLineFeed)]
-    public void ConvertToBytes(byte[] expected, TcpTerminationType value)
-        => Assert.Equal(expected, TcpTerminationTypeHelper.ConvertToBytes(value));
+    [InlineData(new byte[] { }, TerminationType.None)]
+    [InlineData(new byte[] { 0x0A }, TerminationType.LineFeed)]
+    [InlineData(new byte[] { 0x0D }, TerminationType.CarriageReturn)]
+    [InlineData(new byte[] { 0x0A, 0x0D }, TerminationType.CarriageReturnLineFeed)]
+    public void ConvertToBytes(byte[] expected, TerminationType value)
+        => Assert.Equal(expected, TerminationTypeHelper.ConvertToBytes(value));
 }

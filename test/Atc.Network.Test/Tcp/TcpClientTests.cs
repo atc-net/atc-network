@@ -13,7 +13,7 @@ public class TcpClientTests
     private const int ConnectionTimeoutInMs = 2000;
     private const int ReceiveDataDelayInMs = 400;
     private const string TextToSend = "ping";
-    private const TcpTerminationType TerminationType = TcpTerminationType.LineFeed;
+    private const TerminationType Termination = TerminationType.LineFeed;
 
     private readonly List<byte> receivedData = new();
 
@@ -30,7 +30,7 @@ public class TcpClientTests
             ExternalTcpServerPort,
             new TcpClientConfig
             {
-                TerminationType = TerminationType,
+                TerminationType = Termination,
             });
 
         // Act & Assert
@@ -52,7 +52,7 @@ public class TcpClientTests
             ExternalTcpServerPort,
             new TcpClientConfig
             {
-                TerminationType = TerminationType,
+                TerminationType = Termination,
                 ConnectTimeout = ConnectionTimeoutInMs,
             });
 
@@ -74,7 +74,7 @@ public class TcpClientTests
             ExternalTcpServerPort,
             new TcpClientConfig
             {
-                TerminationType = TerminationType,
+                TerminationType = Termination,
             });
 
         using var cancellationTokenSource = new CancellationTokenSource(millisecondsDelay: 1000);
@@ -94,7 +94,7 @@ public class TcpClientTests
             ExternalTcpServerPort,
             new TcpClientConfig
             {
-                TerminationType = TerminationType,
+                TerminationType = Termination,
             });
 
         tcpClient.Connected += OnConnected;
@@ -134,7 +134,7 @@ public class TcpClientTests
             new TcpClientConfig
             {
                 ReceiveBufferSize = 5,
-                TerminationType = TerminationType,
+                TerminationType = Termination,
             });
 
         tcpClient.Connected += OnConnected;
@@ -160,7 +160,7 @@ public class TcpClientTests
 
         Assert.NotEmpty(receivedData);
         var receivedText = Encoding.ASCII.GetString(receivedData.ToArray());
-        Assert.Equal(TextToSend + TcpTerminationTypeHelper.ConvertToString(TcpTerminationType.LineFeed), receivedText);
+        Assert.Equal(TextToSend + TerminationTypeHelper.ConvertToString(TerminationType.LineFeed), receivedText);
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public class TcpClientTests
             ExternalTcpServerPort,
             new TcpClientConfig
             {
-                TerminationType = TerminationType,
+                TerminationType = Termination,
                 ConnectTimeout = 1000,
             });
 
@@ -208,7 +208,7 @@ public class TcpClientTests
         tcpClient.Connected -= OnConnected;
 
         // Assert
-        var byteArrayParts = receivedData.Split(TcpTerminationTypeHelper.LineFeed);
+        var byteArrayParts = receivedData.Split(TerminationTypeHelper.LineFeed);
 
         Assert.Equal(
             byteArrayParts.TryGetNonEnumeratedCount(out var partsCount)
@@ -233,7 +233,7 @@ public class TcpClientTests
             new TcpClientConfig
             {
                 ReceiveBufferSize = 2,
-                TerminationType = TerminationType,
+                TerminationType = Termination,
             });
 
         tcpClient.Connected += OnConnected;
