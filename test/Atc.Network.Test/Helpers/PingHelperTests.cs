@@ -1,5 +1,7 @@
 namespace Atc.Network.Test.Helpers;
 
+[Trait(Traits.Category, Traits.Categories.Integration)]
+[Trait(Traits.Category, Traits.Categories.SkipWhenLiveUnitTesting)]
 public class PingHelperTests
 {
     [Fact]
