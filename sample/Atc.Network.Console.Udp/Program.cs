@@ -41,8 +41,7 @@ await udpServer.StartAsync(CancellationToken.None);
 
 var udpClient = new UdpClient(
     loggerClient,
-    new IPEndPoint(IPAddress.Loopback, 27001),
-    27002);
+    new IPEndPoint(IPAddress.Loopback, 27001));
 
 udpClient.Connected += () => Console.WriteLine("Connected");
 udpClient.Disconnected += () => Console.WriteLine("Disconnected");

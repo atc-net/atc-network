@@ -13,7 +13,6 @@ public partial class UdpClient : IUdpClient
     private readonly Socket? socket;
     private readonly ArraySegment<byte> receiveBufferSegment;
     private readonly IPEndPoint? remoteEndPoint;
-    private readonly int receiveListenerPort;
     private readonly Task? receiveListenerTask;
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
@@ -64,14 +63,12 @@ public partial class UdpClient : IUdpClient
         ILogger logger,
         IPAddress ipAddress,
         int port,
-        int receiveListenerPort,
         UdpClientConfig? udpClientConfig = default)
         : this(logger, udpClientConfig)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
         remoteEndPoint = new IPEndPoint(ipAddress, port);
-        this.receiveListenerPort = receiveListenerPort;
 
         receiveListenerTask = Task.Run(
             async () => await DataReceiver(cancellationTokenSource.Token),
@@ -82,27 +79,24 @@ public partial class UdpClient : IUdpClient
     public UdpClient(
         ILogger logger,
         IPEndPoint endpoint,
-        int receiveListenerPort,
         UdpClientConfig? udpClientConfig = default)
-        : this(logger, endpoint.Address, endpoint.Port, receiveListenerPort, udpClientConfig)
+        : this(logger, endpoint.Address, endpoint.Port, udpClientConfig)
     {
     }
 
     public UdpClient(
         IPAddress ipAddress,
         int port,
-        int receiveListenerPort,
         UdpClientConfig? udpClientConfig = default)
-        : this(NullLogger.Instance, ipAddress, port, receiveListenerPort, udpClientConfig)
+        : this(NullLogger.Instance, ipAddress, port, udpClientConfig)
     {
     }
 
     [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
     public UdpClient(
         IPEndPoint endpoint,
-        int receiveListenerPort,
         UdpClientConfig? udpClientConfig = default)
-        : this(NullLogger.Instance, endpoint.Address, endpoint.Port, receiveListenerPort, udpClientConfig)
+        : this(NullLogger.Instance, endpoint.Address, endpoint.Port, udpClientConfig)
     {
     }
 
@@ -246,7 +240,7 @@ public partial class UdpClient : IUdpClient
 
         try
         {
-            socket!.Bind(new IPEndPoint(remoteEndPoint!.Address, receiveListenerPort));
+            await socket!.ConnectAsync(remoteEndPoint!, cancellationToken);
         }
         catch (Exception ex)
         {
