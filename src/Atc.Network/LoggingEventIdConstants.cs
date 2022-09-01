@@ -16,4 +16,6 @@ public static class LoggingEventIdConstants
     public const int DataReceiveTimeout = 10012;
     public const int DataReceiveNoData = 10013;
     public const int DataReceiveError = 10014;
+
+    public const int ServiceNotRunning = 10020;
 }

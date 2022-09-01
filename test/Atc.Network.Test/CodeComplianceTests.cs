@@ -10,7 +10,6 @@ public class CodeComplianceTests
     private readonly List<Type> excludeTypes = new()
     {
         // TODO: Imp. missing test for:
-        typeof(TcpClientExtensions),
         typeof(TcpClient),
         typeof(IPv4AddressHelper),
         typeof(MacAddressVendorLookupHelper),
@@ -20,6 +19,8 @@ public class CodeComplianceTests
         typeof(DnsLookupHelper),
         typeof(IPAddressExtensions),
         typeof(UshortExtensions),
+        typeof(UdpClient),
+        typeof(UdpServer),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

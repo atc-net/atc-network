@@ -8,6 +8,10 @@ Library for doing network communication
 
 A sample reference implementation can be found [`here`](sample/Atc.Network.Console.Tcp/Program.cs)
 
+## Using the UdpClient and UdpServer
+
+A sample reference implementation can be found [`here`](sample/Atc.Network.Console.Udp/Program.cs)
+
 ## Using the IPScanner
 
 The IPScanner can scan a range of IPAddresses or just a single IPAddress as specified in the IPScannerConfig.

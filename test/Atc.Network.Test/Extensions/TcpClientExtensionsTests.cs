@@ -26,4 +26,36 @@ public class TcpClientExtensionsTests
         Assert.Equal(receiveTimeout, tcpClient.ReceiveTimeout);
         Assert.Equal(receiveBufferSize, tcpClient.ReceiveBufferSize);
     }
+
+    [Theory]
+    [InlineData(false, 0, 0, 0)]
+    [InlineData(true, 1, 1, 1)]
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
+    public void SetKeepAlive(bool expected, int tcpKeepAliveTime, int tcpKeepAliveInterval, int tcpKeepAliveRetryCount)
+    {
+        // Arrange
+        var tcpClient = new System.Net.Sockets.TcpClient();
+
+        // Atc
+        bool? result = null;
+        if (expected)
+        {
+            tcpClient.SetKeepAlive(tcpKeepAliveTime, tcpKeepAliveInterval, tcpKeepAliveRetryCount);
+            result = true;
+        }
+        else
+        {
+            try
+            {
+                tcpClient.SetKeepAlive(tcpKeepAliveTime, tcpKeepAliveInterval, tcpKeepAliveRetryCount);
+            }
+            catch
+            {
+                result = false;
+            }
+        }
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
 }

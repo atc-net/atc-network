@@ -7,6 +7,106 @@
 
 <br />
 
+## ITcpClient
+
+>```csharp
+>public interface ITcpClient
+>```
+
+### Properties
+
+#### IsConnected
+>```csharp
+>IsConnected
+>```
+><b>Summary:</b> Is client connected.
+### Events
+
+#### Connected
+>```csharp
+>Connected
+>```
+><b>Summary:</b> Event to raise when connection is established.
+#### ConnectionStateChanged
+>```csharp
+>ConnectionStateChanged
+>```
+><b>Summary:</b> Event to raise when connection state is changed.
+#### DataReceived
+>```csharp
+>DataReceived
+>```
+><b>Summary:</b> Event to raise when data has become available from the server.
+#### Disconnected
+>```csharp
+>Disconnected
+>```
+><b>Summary:</b> Event to raise when connection is destroyed.
+#### NoDataReceived
+>```csharp
+>NoDataReceived
+>```
+><b>Summary:</b> Event to raise when no data received.
+### Methods
+
+#### Connect
+>```csharp
+>Task<bool> Connect(CancellationToken cancellationToken = null)
+>```
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+#### Disconnect
+>```csharp
+>Task Disconnect()
+>```
+#### Send
+>```csharp
+>Task Send(string data, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Send data.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
+#### Send
+>```csharp
+>Task Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Send data.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
+#### Send
+>```csharp
+>Task Send(byte[] data, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Send data.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
+#### Send
+>```csharp
+>Task Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Send data.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
+
+<br />
+
 ## TcpClient
 The main TcpClient - Handles call execution.
 
@@ -20,7 +120,7 @@ The main TcpClient - Handles call execution.
 >```csharp
 >IsConnected
 >```
-><b>Summary:</b> Is client connected
+><b>Summary:</b> Is client connected.
 ### Events
 
 #### Connected
@@ -67,28 +167,6 @@ The main TcpClient - Handles call execution.
 >```
 #### Send
 >```csharp
->Task Send(byte[] data, CancellationToken cancellationToken = null)
->```
-><b>Summary:</b> Send data.
->
-><b>Parameters:</b><br>
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
->
-><b>Remarks:</b> TerminationType is resolved from TcpClientConfig.
-#### Send
->```csharp
->Task Send(byte[] data, TcpTerminationType terminationType, CancellationToken cancellationToken = null)
->```
-><b>Summary:</b> Send data.
->
-><b>Parameters:</b><br>
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
->
-><b>Remarks:</b> TerminationType is resolved from TcpClientConfig.
-#### Send
->```csharp
 >Task Send(string data, CancellationToken cancellationToken = null)
 >```
 ><b>Summary:</b> Send data.
@@ -97,7 +175,7 @@ The main TcpClient - Handles call execution.
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
 >
-><b>Remarks:</b> TerminationType is resolved from TcpClientConfig.
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
 #### Send
 >```csharp
 >Task Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
@@ -108,7 +186,29 @@ The main TcpClient - Handles call execution.
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
 >
-><b>Remarks:</b> TerminationType is resolved from TcpClientConfig.
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
+#### Send
+>```csharp
+>Task Send(byte[] data, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Send data.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
+#### Send
+>```csharp
+>Task Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Send data.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The data to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Remarks:</b> Data will be encoded as client-config default encoding.
 
 <br />
 
@@ -127,6 +227,11 @@ The main TcpClient - Handles call execution.
 ><b>Summary:</b> Gets or sets the send timeout value of the connection in milliseconds.
 >
 ><b>Returns:</b> The connect time-out value, in milliseconds. The default is 10000 (10 sec);
+#### DefaultEncoding
+>```csharp
+>DefaultEncoding
+>```
+><b>Summary:</b> Gets or sets the default encoding.
 #### ReceiveBufferSize
 >```csharp
 >ReceiveBufferSize
@@ -159,7 +264,7 @@ The main TcpClient - Handles call execution.
 >```csharp
 >TerminationType
 >```
-><b>Summary:</b> The TerminationType.
+><b>Summary:</b> Gets or sets the TerminationType.
 
 <br />
 
@@ -218,51 +323,4 @@ TcpClient KeepAlive Config
 >int DefaultSendReceiveTimeout
 >```
 ><b>Summary:</b> The send/receive time-out value, in milliseconds. The default is 0;
-
-<br />
-
-## TcpTerminationType
-
->```csharp
->public enum TcpTerminationType
->```
-
-
-| Value | Name | Description | Summary | 
-| --- | --- | --- | --- | 
-| 0 | None | None |  | 
-| 1 | LineFeed | Line Feed |  | 
-| 2 | CarriageReturn | Carriage Return |  | 
-| 3 | CarriageReturnLineFeed | Carriage Return Line Feed |  | 
-
-
-
-<br />
-
-## TcpTerminationTypeHelper
-
->```csharp
->public static class TcpTerminationTypeHelper
->```
-
-### Static Fields
-
-#### CarriageReturn
->```csharp
->byte CarriageReturn
->```
-#### LineFeed
->```csharp
->byte LineFeed
->```
-### Static Methods
-
-#### ConvertToBytes
->```csharp
->byte[] ConvertToBytes(TcpTerminationType tcpTerminationType)
->```
-#### ConvertToString
->```csharp
->string ConvertToString(TcpTerminationType tcpTerminationType)
->```
 <hr /><div style='text-align: right'><i>Generated by MarkdownCodeDoc version 1.2</i></div>

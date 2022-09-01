@@ -1,6 +1,6 @@
+global using System.Net;
 global using System.Text;
 
-global using Atc.Network;
-global using Atc.Network.Tcp;
+global using Atc.Network.Udp;
 
 global using Microsoft.Extensions.Logging;
