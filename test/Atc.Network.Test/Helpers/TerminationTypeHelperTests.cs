@@ -1,6 +1,6 @@
-namespace Atc.Network.Test.Tcp;
+namespace Atc.Network.Test.Helpers;
 
-public class TcpTerminationTypeHelperTests
+public class TerminationTypeHelperTests
 {
     [Theory]
     [InlineData("", TerminationType.None)]
