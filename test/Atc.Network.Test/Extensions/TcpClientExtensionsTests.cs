@@ -30,6 +30,7 @@ public class TcpClientExtensionsTests
     [Theory]
     [InlineData(false, 0, 0, 0)]
     [InlineData(true, 1, 1, 1)]
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
     public void SetKeepAlive(bool expected, int tcpKeepAliveTime, int tcpKeepAliveInterval, int tcpKeepAliveRetryCount)
     {
         // Arrange
