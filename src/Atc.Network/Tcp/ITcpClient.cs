@@ -28,6 +28,16 @@ public interface ITcpClient
     event Action<byte[]>? DataReceived;
 
     /// <summary>
+    /// IPAddress or hostname for server connection.
+    /// </summary>
+    string IPAddressOrHostname { get; }
+
+    /// <summary>
+    /// Port number for server connection.
+    /// </summary>
+    int Port { get; }
+
+    /// <summary>
     /// Is client connected.
     /// </summary>
     bool IsConnected { get; }

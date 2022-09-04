@@ -16,9 +16,6 @@ public partial class TcpClient : IDisposable
     private readonly CancellationTokenSource cancellationTokenSource;
     private readonly CancellationTokenRegistration cancellationTokenRegistration;
 
-    private readonly string ipAddressOrHostname = string.Empty;
-    private readonly int port;
-
     private readonly byte[] receiveBuffer;
     private readonly Task receiveListenerTask;
 
@@ -82,8 +79,8 @@ public partial class TcpClient : IDisposable
             throw new ArgumentNullException(nameof(hostname));
         }
 
-        ipAddressOrHostname = hostname;
-        this.port = port;
+        IPAddressOrHostname = hostname;
+        this.Port = port;
     }
 
     public TcpClient(
@@ -96,8 +93,8 @@ public partial class TcpClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
-        ipAddressOrHostname = ipAddress.ToString();
-        this.port = port;
+        IPAddressOrHostname = ipAddress.ToString();
+        this.Port = port;
     }
 
     public TcpClient(
@@ -109,8 +106,8 @@ public partial class TcpClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(ipEndpoint);
 
-        ipAddressOrHostname = ipEndpoint.Address.ToString();
-        port = ipEndpoint.Port;
+        IPAddressOrHostname = ipEndpoint.Address.ToString();
+        Port = ipEndpoint.Port;
     }
 
     public TcpClient(
@@ -138,6 +135,16 @@ public partial class TcpClient : IDisposable
             : this(NullLogger.Instance, ipEndpoint, clientConfig, keepAliveConfig)
     {
     }
+
+    /// <summary>
+    /// IPAddress or hostname for server connection.
+    /// </summary>
+    public string IPAddressOrHostname { get; } = string.Empty;
+
+    /// <summary>
+    /// Port number for server connection.
+    /// </summary>
+    public int Port { get; }
 
     /// <summary>
     /// Is client connected.
@@ -223,7 +230,7 @@ public partial class TcpClient : IDisposable
 
         if (!IsConnected)
         {
-            LogClientNotConnected(ipAddressOrHostname, port);
+            LogClientNotConnected(IPAddressOrHostname, Port);
             throw new TcpException("Client is not connected!");
         }
 
@@ -282,7 +289,7 @@ public partial class TcpClient : IDisposable
 
         if (raiseEventsAndLog)
         {
-            LogConnecting(ipAddressOrHostname, port);
+            LogConnecting(IPAddressOrHostname, Port);
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
         }
 
@@ -293,7 +300,7 @@ public partial class TcpClient : IDisposable
         {
             var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, cancellationToken);
             var connectTask = tcpClient
-                .ConnectAsync(ipAddressOrHostname, port, cancellationToken)
+                .ConnectAsync(IPAddressOrHostname, Port, cancellationToken)
                 .AsTask();
 
             // Double await so if connectTimeoutTask throws exception, this throws it
@@ -310,7 +317,7 @@ public partial class TcpClient : IDisposable
         {
             if (raiseEventsAndLog)
             {
-                LogConnectionError(ipAddressOrHostname, port, ex.Message);
+                LogConnectionError(IPAddressOrHostname, Port, ex.Message);
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
             }
 
@@ -322,7 +329,7 @@ public partial class TcpClient : IDisposable
 
         if (raiseEventsAndLog)
         {
-            LogConnected(ipAddressOrHostname, port);
+            LogConnected(IPAddressOrHostname, Port);
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
         }
 
@@ -336,7 +343,7 @@ public partial class TcpClient : IDisposable
         {
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
 
-            LogDisconnecting(ipAddressOrHostname, port);
+            LogDisconnecting(IPAddressOrHostname, Port);
         }
 
         DisposeTcpClientAndStream();
@@ -345,14 +352,14 @@ public partial class TcpClient : IDisposable
 
     private async Task DoReconnect()
     {
-        LogReconnecting(ipAddressOrHostname, port);
+        LogReconnecting(IPAddressOrHostname, Port);
         ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnecting));
 
         DisposeTcpClientAndStream();
         await SetDisconnected(raiseEvents: false);
         await DoConnect(raiseEventsAndLog: false, CancellationToken.None);
 
-        LogReconnected(ipAddressOrHostname, port);
+        LogReconnected(IPAddressOrHostname, Port);
         ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnected));
     }
 
