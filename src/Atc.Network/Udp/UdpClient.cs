@@ -12,7 +12,6 @@ public partial class UdpClient : IUdpClient
     private readonly UdpClientConfig udpClientConfig;
     private readonly Socket? socket;
     private readonly ArraySegment<byte> receiveBufferSegment;
-    private readonly IPEndPoint? remoteEndPoint;
     private readonly Task? receiveListenerTask;
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
@@ -73,7 +72,7 @@ public partial class UdpClient : IUdpClient
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
-        remoteEndPoint = new IPEndPoint(ipAddress, port);
+        RemoteEndPoint = new IPEndPoint(ipAddress, port);
 
         receiveListenerTask = Task.Run(
             async () => await DataReceiver(cancellationTokenSource.Token),
@@ -104,6 +103,11 @@ public partial class UdpClient : IUdpClient
         : this(NullLogger.Instance, endpoint.Address, endpoint.Port, udpClientConfig)
     {
     }
+
+    /// <summary>
+    /// IPEndPoint for server connection.
+    /// </summary>
+    public IPEndPoint RemoteEndPoint { get; } = new(IPAddress.Loopback, 0);
 
     /// <summary>
     /// Is client connected.
@@ -183,14 +187,14 @@ public partial class UdpClient : IUdpClient
 
         if (!IsConnected)
         {
-            LogClientNotConnected(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
+            LogClientNotConnected(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
             return;
         }
 
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
         var buffer = new ArraySegment<byte>(data);
-        await socket!.SendToAsync(buffer, SocketFlags.None, remoteEndPoint!, cancellationToken);
+        await socket!.SendToAsync(buffer, SocketFlags.None, RemoteEndPoint, cancellationToken);
         await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
     }
 
@@ -239,19 +243,19 @@ public partial class UdpClient : IUdpClient
 
         if (raiseEventsAndLog)
         {
-            LogConnecting(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
+            LogConnecting(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
         }
 
         try
         {
-            await socket!.ConnectAsync(remoteEndPoint!, cancellationToken);
+            await socket!.ConnectAsync(RemoteEndPoint, cancellationToken);
         }
         catch (Exception ex)
         {
             if (raiseEventsAndLog)
             {
-                LogConnectionError(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port, ex.Message);
+                LogConnectionError(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port, ex.Message);
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
             }
 
@@ -262,7 +266,7 @@ public partial class UdpClient : IUdpClient
 
         if (raiseEventsAndLog)
         {
-            LogConnected(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
+            LogConnected(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
         }
 
@@ -276,7 +280,7 @@ public partial class UdpClient : IUdpClient
         {
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
 
-            LogDisconnecting(remoteEndPoint!.Address.ToString(), remoteEndPoint.Port);
+            LogDisconnecting(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
         }
 
         return SetDisconnected(raiseEvents: raiseEventsAndLog);
@@ -355,7 +359,7 @@ public partial class UdpClient : IUdpClient
                 continue;
             }
 
-            var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, remoteEndPoint!);
+            var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, RemoteEndPoint);
             var receivedBytes = new byte[res.ReceivedBytes];
             Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
 

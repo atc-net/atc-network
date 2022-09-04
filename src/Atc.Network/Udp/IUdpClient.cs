@@ -23,6 +23,11 @@ public interface IUdpClient : IDisposable
     event Action<byte[]>? DataReceived;
 
     /// <summary>
+    /// IPEndPoint for server connection.
+    /// </summary>
+    IPEndPoint RemoteEndPoint { get; }
+
+    /// <summary>
     /// Is client connected.
     /// </summary>
     bool IsConnected { get; }
