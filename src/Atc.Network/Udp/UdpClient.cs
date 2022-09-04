@@ -55,6 +55,11 @@ public partial class UdpClient : IUdpClient
             SocketOptionName.PacketInformation,
             optionValue: true);
 
+        if (OperatingSystem.IsWindows())
+        {
+            socket.SetIPProtectionLevel(IPProtectionLevel.Unrestricted);
+        }
+
         var receiveBuffer = new byte[this.udpClientConfig.ReceiveBufferSize];
         receiveBufferSegment = new ArraySegment<byte>(receiveBuffer);
     }
