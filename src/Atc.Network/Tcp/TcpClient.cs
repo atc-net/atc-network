@@ -357,10 +357,16 @@ public partial class TcpClient : IDisposable
 
         DisposeTcpClientAndStream();
         await SetDisconnected(raiseEvents: false);
-        await DoConnect(raiseEventsAndLog: false, CancellationToken.None);
-
-        LogReconnected(IPAddressOrHostname, Port);
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnected));
+        if (await DoConnect(raiseEventsAndLog: false, CancellationToken.None))
+        {
+            LogReconnected(IPAddressOrHostname, Port);
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnected));
+        }
+        else
+        {
+            LogConnectionError(IPAddressOrHostname, Port, "Could not reconnect");
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed));
+        }
     }
 
     private async Task SetConnected(
