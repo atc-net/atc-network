@@ -6,22 +6,21 @@ namespace Atc.Network.Tcp;
 public class TcpClientKeepAliveConfig
 {
     /// <summary>
-    /// KeepAliveInterval
+    /// Keep alive interval on the socket option <see cref="SocketOptionName.TcpKeepAliveInterval"/>.
     /// </summary>
     public int KeepAliveInterval { get; set; } = 2;
 
     /// <summary>
-    /// KeepAliveTime
+    /// Keep alive time on the socket option <see cref="SocketOptionName.TcpKeepAliveTime"/>.
     /// </summary>
     public int KeepAliveTime { get; set; } = 2;
 
     /// <summary>
-    /// KeepAliveRetryCount
+    /// Keep alive retry count on the socket option <see cref="SocketOptionName.TcpKeepAliveRetryCount"/>.
     /// </summary>
     public int KeepAliveRetryCount { get; set; } = 3;
 
-    /// <summary>
-    /// ReconnectOnSenderSocketClosed
-    /// </summary>
-    public bool ReconnectOnSenderSocketClosed { get; set; } = true;
+    /// <inheritdoc />
+    public override string ToString()
+        => $"{nameof(KeepAliveInterval)}: {KeepAliveInterval}, {nameof(KeepAliveTime)}: {KeepAliveTime}, {nameof(KeepAliveRetryCount)}: {KeepAliveRetryCount}";
 }

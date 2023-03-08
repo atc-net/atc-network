@@ -25,7 +25,7 @@ public class IPScanResults
     public IEnumerable<IPScanResult> CollectedResultsFilteredOnHasConnections
         => CollectedResults
             .Where(x => x.HasConnection)
-            .OrderBy(x => x.IPAddress.ToString());
+            .OrderBy(x => x.IPAddress.ToString(), StringComparer.Ordinal);
 
     public override string ToString()
     {

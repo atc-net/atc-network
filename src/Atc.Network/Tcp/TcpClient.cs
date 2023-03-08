@@ -357,6 +357,12 @@ public partial class TcpClient : IDisposable
 
         DisposeTcpClientAndStream();
         await SetDisconnected(raiseEvents: false);
+
+        if (clientConfig.ReconnectDelay.HasValue)
+        {
+            await Task.Delay(clientConfig.ReconnectDelay.Value);
+        }
+
         if (await DoConnect(raiseEventsAndLog: false, CancellationToken.None))
         {
             LogReconnected(IPAddressOrHostname, Port);
@@ -501,7 +507,7 @@ public partial class TcpClient : IDisposable
                     LogDataReceiveNoData();
                     NoDataReceived?.Invoke();
 
-                    if (keepAliveConfig.ReconnectOnSenderSocketClosed)
+                    if (clientConfig.ReconnectOnSenderSocketClosed)
                     {
                         ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
 

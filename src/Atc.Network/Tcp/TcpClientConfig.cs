@@ -51,4 +51,21 @@ public class TcpClientConfig
     /// Gets or sets the TerminationType.
     /// </summary>
     public TerminationType TerminationType { get; set; } = TerminationType.None;
+
+    /// <summary>
+    /// Controls if the tcp client should reconnect on sender socked closed.
+    /// </summary>
+    public bool ReconnectOnSenderSocketClosed { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the reconnect delay in milliseconds.
+    /// </summary>
+    /// <returns>
+    /// The reconnect delay, in milliseconds. The default value is 100 ms.
+    /// </returns>
+    public int? ReconnectDelay { get; set; } = TcpConstants.DefaultReconnectDelay;
+
+    /// <inheritdoc />
+    public override string ToString()
+        => $"{nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(SendTimeout)}: {SendTimeout}, {nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}, {nameof(ReconnectOnSenderSocketClosed)}: {ReconnectOnSenderSocketClosed}, {nameof(ReconnectDelay)}: {ReconnectDelay}";
 }

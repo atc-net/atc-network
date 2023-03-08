@@ -1,8 +1,9 @@
+// ReSharper disable once NotAccessedField.Local
 namespace Atc.Network.Test;
 
 public class CodeDocumentationTests
 {
-    // ReSharper disable once NotAccessedField.Local
+    [SuppressMessage("Critical Code Smell", "S4487:Unread \"private\" fields should be removed", Justification = "OK.")]
     private readonly ITestOutputHelper testOutputHelper;
     private readonly Assembly sourceAssembly = typeof(AtcNetworkAssemblyTypeInitializer).Assembly;
 

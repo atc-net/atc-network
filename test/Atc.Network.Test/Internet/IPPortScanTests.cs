@@ -15,7 +15,7 @@ public class IPPortScanTests
 
         // Act
         var actual = await ipPortScan.CanConnectWithTcp(
-            80,
+            79,
             CancellationToken.None);
 
         // Assert

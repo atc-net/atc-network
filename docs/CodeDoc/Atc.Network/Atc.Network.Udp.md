@@ -20,6 +20,11 @@
 >IsConnected
 >```
 ><b>Summary:</b> Is client connected.
+#### RemoteEndPoint
+>```csharp
+>RemoteEndPoint
+>```
+><b>Summary:</b> IPEndPoint for server connection.
 ### Events
 
 #### Connected
@@ -173,6 +178,11 @@ The main UdpClient - Handles call execution.
 >IsConnected
 >```
 ><b>Summary:</b> Is client connected.
+#### RemoteEndPoint
+>```csharp
+>RemoteEndPoint
+>```
+><b>Summary:</b> IPEndPoint for server connection.
 ### Events
 
 #### Connected
@@ -257,6 +267,15 @@ The main UdpClient - Handles call execution.
 >public class UdpClientConfig : UdpConfigBase
 >```
 
+### Properties
+
+#### IPProtectionLevel
+>```csharp
+>IPProtectionLevel
+>```
+><b>Summary:</b> Gets or sets the IP protection level on the socket.
+>
+><b>Remarks:</b> Only used for Windows OS.
 
 <br />
 
