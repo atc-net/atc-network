@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <PackageId>Atc.Network</PackageId>
     <PackageTags>network</PackageTags>
     <Description>Atc.Network is a collection of classes and clients for network communication.</Description>
