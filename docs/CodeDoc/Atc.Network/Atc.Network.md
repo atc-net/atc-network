@@ -201,10 +201,6 @@ ConnectionStateEventArgs.
 >```csharp
 >int ConnectionError
 >```
-#### DataReceivedByteLength
->```csharp
->int DataReceivedByteLength
->```
 #### DataReceiveError
 >```csharp
 >int DataReceiveError
@@ -216,6 +212,10 @@ ConnectionStateEventArgs.
 #### DataReceiveTimeout
 >```csharp
 >int DataReceiveTimeout
+>```
+#### DataReceivedByteLength
+>```csharp
+>int DataReceivedByteLength
 >```
 #### DataSendingByteLength
 >```csharp

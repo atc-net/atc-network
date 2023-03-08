@@ -35,10 +35,10 @@
      - int Connected
      - int Connecting
      - int ConnectionError
-     - int DataReceivedByteLength
      - int DataReceiveError
      - int DataReceiveNoData
      - int DataReceiveTimeout
+     - int DataReceivedByteLength
      - int DataSendingByteLength
      - int Disconnected
      - int Disconnecting
@@ -103,8 +103,8 @@
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
   -  Static Methods
-     - GetStatus(IPAddress ipAddress, int timeoutInMs = 1000)
      - GetStatus(IPAddress ipAddress, TimeSpan timeout)
+     - GetStatus(IPAddress ipAddress, int timeoutInMs = 1000)
 - [TerminationHelper](Atc.Network.Helpers.md#terminationhelper)
   -  Static Methods
      - AppendTerminationBytesIfNeeded(ref byte data, TerminationType terminationType)
@@ -166,9 +166,9 @@
      - TimeoutTcp
      - TreatOpenPortsAsWebServices
   -  Methods
+     - SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel)
      - SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel, ServiceProtocolType serviceProtocolType)
      - SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel, ServiceProtocolType[] serviceProtocolTypes)
-     - SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel)
      - ToString()
 - [IPScannerConstants](Atc.Network.Internet.md#ipscannerconstants)
   -  Static Fields
@@ -248,7 +248,9 @@
 
 - [ITcpClient](Atc.Network.Tcp.md#itcpclient)
   -  Properties
+     - IPAddressOrHostname
      - IsConnected
+     - Port
   -  Events
      - Connected
      - ConnectionStateChanged
@@ -258,13 +260,15 @@
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
+     - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
      - Send(byte[] data, CancellationToken cancellationToken = null)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
-     - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
      - Send(string data, CancellationToken cancellationToken = null)
 - [TcpClient](Atc.Network.Tcp.md#tcpclient)
   -  Properties
+     - IPAddressOrHostname
      - IsConnected
+     - Port
   -  Events
      - Connected
      - ConnectionStateChanged
@@ -275,9 +279,9 @@
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
      - Dispose()
+     - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
      - Send(byte[] data, CancellationToken cancellationToken = null)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
-     - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
      - Send(string data, CancellationToken cancellationToken = null)
 - [TcpClientConfig](Atc.Network.Tcp.md#tcpclientconfig)
   -  Properties
@@ -285,19 +289,25 @@
      - DefaultEncoding
      - ReceiveBufferSize
      - ReceiveTimeout
+     - ReconnectDelay
+     - ReconnectOnSenderSocketClosed
      - SendBufferSize
      - SendTimeout
      - TerminationType
+  -  Methods
+     - ToString()
 - [TcpClientKeepAliveConfig](Atc.Network.Tcp.md#tcpclientkeepaliveconfig)
   -  Properties
      - KeepAliveInterval
      - KeepAliveRetryCount
      - KeepAliveTime
-     - ReconnectOnSenderSocketClosed
+  -  Methods
+     - ToString()
 - [TcpConstants](Atc.Network.Tcp.md#tcpconstants)
   -  Static Fields
      - int DefaultBufferSize
      - int DefaultConnectTimeout
+     - int DefaultReconnectDelay
      - int DefaultSendReceiveTimeout
 
 ## [Atc.Network.Udp](Atc.Network.Udp.md)
@@ -305,6 +315,7 @@
 - [IUdpClient](Atc.Network.Udp.md#iudpclient)
   -  Properties
      - IsConnected
+     - RemoteEndPoint
   -  Events
      - Connected
      - ConnectionStateChanged
@@ -313,9 +324,9 @@
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
+     - Send(Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(byte[] data, CancellationToken cancellationToken)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
-     - Send(Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(string data, CancellationToken cancellationToken)
 - [IUdpServer](Atc.Network.Udp.md#iudpserver)
   -  Properties
@@ -323,13 +334,14 @@
   -  Events
      - DataReceived
   -  Methods
+     - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, byte[] data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
-     - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, string data, CancellationToken cancellationToken)
 - [UdpClient](Atc.Network.Udp.md#udpclient)
   -  Properties
      - IsConnected
+     - RemoteEndPoint
   -  Events
      - Connected
      - ConnectionStateChanged
@@ -339,11 +351,13 @@
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
      - Dispose()
+     - Send(Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(byte[] data, CancellationToken cancellationToken)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
-     - Send(Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(string data, CancellationToken cancellationToken)
 - [UdpClientConfig](Atc.Network.Udp.md#udpclientconfig)
+  -  Properties
+     - IPProtectionLevel
 - [UdpConfigBase](Atc.Network.Udp.md#udpconfigbase)
   -  Properties
      - DefaultEncoding
@@ -357,9 +371,9 @@
      - DataReceived
   -  Methods
      - Dispose()
+     - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, byte[] data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
-     - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, string data, CancellationToken cancellationToken)
      - StartAsync(CancellationToken cancellationToken)
      - StopAsync(CancellationToken cancellationToken)
