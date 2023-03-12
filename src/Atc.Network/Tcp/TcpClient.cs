@@ -1,5 +1,6 @@
+// ReSharper disable CommentTypo
 // ReSharper disable InvertIf
-// ReSharper disable InvertIf
+// ReSharper disable InconsistentNaming
 namespace Atc.Network.Tcp;
 
 /// <summary>
@@ -10,15 +11,19 @@ public partial class TcpClient : IDisposable
 {
     private const int TimeToWaitForDisconnectionInMs = 200;
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
+    private const int TimeToWaitForDataReceiverInMs = 150;
+
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
+
     private readonly TcpClientConfig clientConfig;
-    private readonly TcpClientKeepAliveConfig keepAliveConfig;
-    private readonly CancellationTokenSource cancellationTokenSource;
-    private readonly CancellationTokenRegistration cancellationTokenRegistration;
-
+    private readonly TcpClientReconnectConfig clientReconnectConfig;
+    private readonly TcpClientKeepAliveConfig clientKeepAliveConfig;
     private readonly byte[] receiveBuffer;
-    private readonly Task receiveListenerTask;
 
+    private int reconnectRetryCounter;
+    private CancellationTokenSource? cancellationTokenSource;
+    private CancellationTokenRegistration? cancellationTokenRegistration;
+    private Task? receiveListenerTask;
     private System.Net.Sockets.TcpClient? tcpClient;
     private Stream? networkStream;
 
@@ -50,20 +55,15 @@ public partial class TcpClient : IDisposable
     private TcpClient(
         ILogger logger,
         TcpClientConfig? clientConfig,
+        TcpClientReconnectConfig? reconnectConfig,
         TcpClientKeepAliveConfig? keepAliveConfig)
     {
         this.logger = logger;
         this.clientConfig = clientConfig ?? new TcpClientConfig();
-        this.keepAliveConfig = keepAliveConfig ?? new TcpClientKeepAliveConfig();
+        this.clientReconnectConfig = reconnectConfig ?? new TcpClientReconnectConfig();
+        this.clientKeepAliveConfig = keepAliveConfig ?? new TcpClientKeepAliveConfig();
 
         receiveBuffer = new byte[this.clientConfig.ReceiveBufferSize];
-
-        cancellationTokenSource = new CancellationTokenSource();
-        cancellationTokenRegistration = cancellationTokenSource.Token.Register(CancellationTokenCallback);
-
-        receiveListenerTask = Task.Run(
-            async () => await DataReceiver(cancellationTokenSource.Token),
-            cancellationTokenSource.Token);
     }
 
     public TcpClient(
@@ -71,8 +71,9 @@ public partial class TcpClient : IDisposable
         string hostname,
         int port,
         TcpClientConfig? clientConfig = default,
+        TcpClientReconnectConfig? reconnectConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-            : this(logger, clientConfig, keepAliveConfig)
+            : this(logger, clientConfig, reconnectConfig, keepAliveConfig)
     {
         if (string.IsNullOrEmpty(hostname))
         {
@@ -88,8 +89,9 @@ public partial class TcpClient : IDisposable
         IPAddress ipAddress,
         int port,
         TcpClientConfig? clientConfig = default,
+        TcpClientReconnectConfig? reconnectConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-            : this(logger, clientConfig, keepAliveConfig)
+            : this(logger, clientConfig, reconnectConfig, keepAliveConfig)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
@@ -101,8 +103,9 @@ public partial class TcpClient : IDisposable
         ILogger logger,
         IPEndPoint ipEndpoint,
         TcpClientConfig? clientConfig = default,
+        TcpClientReconnectConfig? reconnectConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-            : this(logger, clientConfig, keepAliveConfig)
+            : this(logger, clientConfig, reconnectConfig, keepAliveConfig)
     {
         ArgumentNullException.ThrowIfNull(ipEndpoint);
 
@@ -111,11 +114,28 @@ public partial class TcpClient : IDisposable
     }
 
     public TcpClient(
+        ILogger logger,
+        IPEndPoint ipEndpoint,
+        TerminationType terminationType)
+        : this(
+            logger,
+            ipEndpoint,
+            new TcpClientConfig
+            {
+                TerminationType = terminationType,
+            },
+            new TcpClientReconnectConfig(),
+            new TcpClientKeepAliveConfig())
+    {
+    }
+
+    public TcpClient(
         string hostname,
         int port,
         TcpClientConfig? clientConfig = default,
+        TcpClientReconnectConfig? reconnectConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-            : this(NullLogger.Instance, hostname, port, clientConfig, keepAliveConfig)
+            : this(NullLogger.Instance, hostname, port, clientConfig, reconnectConfig, keepAliveConfig)
     {
     }
 
@@ -123,16 +143,33 @@ public partial class TcpClient : IDisposable
         IPAddress ipAddress,
         int port,
         TcpClientConfig? clientConfig = default,
+        TcpClientReconnectConfig? reconnectConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-            : this(NullLogger.Instance, ipAddress, port, clientConfig, keepAliveConfig)
+            : this(NullLogger.Instance, ipAddress, port, clientConfig, reconnectConfig, keepAliveConfig)
     {
     }
 
     public TcpClient(
         IPEndPoint ipEndpoint,
         TcpClientConfig? clientConfig = default,
+        TcpClientReconnectConfig? reconnectConfig = default,
         TcpClientKeepAliveConfig? keepAliveConfig = default)
-            : this(NullLogger.Instance, ipEndpoint, clientConfig, keepAliveConfig)
+            : this(NullLogger.Instance, ipEndpoint, clientConfig, reconnectConfig, keepAliveConfig)
+    {
+    }
+
+    public TcpClient(
+        IPEndPoint ipEndpoint,
+        TerminationType terminationType)
+        : this(
+            NullLogger.Instance,
+            ipEndpoint,
+            new TcpClientConfig
+            {
+                TerminationType = terminationType,
+            },
+            new TcpClientReconnectConfig(),
+            new TcpClientKeepAliveConfig())
     {
     }
 
@@ -163,7 +200,10 @@ public partial class TcpClient : IDisposable
     /// Disconnect.
     /// </summary>
     public Task Disconnect()
-        => DoDisconnect(raiseEventsAndLog: true);
+    {
+        var dispose = !clientReconnectConfig.Enable;
+        return DoDisconnect(raiseEventsAndLog: true, dispose: dispose);
+    }
 
     /// <summary>
     /// Send data.
@@ -261,20 +301,7 @@ public partial class TcpClient : IDisposable
             return;
         }
 
-        if (!cancellationTokenSource.IsCancellationRequested)
-        {
-            cancellationTokenSource.Cancel();
-        }
-
-        cancellationTokenSource.Dispose();
-
-        if (receiveListenerTask.Status == TaskStatus.Running)
-        {
-            receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
-        }
-
-        cancellationTokenRegistration.Dispose();
-
+        DisposeCancellationTokenAndTask();
         DisposeTcpClientAndStream();
     }
 
@@ -293,8 +320,11 @@ public partial class TcpClient : IDisposable
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
         }
 
+        DoConnectCleanupIfNeeded();
+
         tcpClient = new System.Net.Sockets.TcpClient();
-        SetBufferSizeAndTimeouts();
+
+        DoConnectSetBufferSizeAndTimeouts();
 
         try
         {
@@ -321,11 +351,14 @@ public partial class TcpClient : IDisposable
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
             }
 
+            tcpClient.Close();
+            tcpClient.Dispose();
+
             return false;
         }
 
         await SetConnected(raiseEventsAndLog, cancellationToken);
-        PrepareNetworkStream();
+        DoConnectPrepareNetworkStreamAndKeepAlive();
 
         if (raiseEventsAndLog)
         {
@@ -337,7 +370,8 @@ public partial class TcpClient : IDisposable
     }
 
     private Task DoDisconnect(
-        bool raiseEventsAndLog)
+        bool raiseEventsAndLog,
+        bool dispose)
     {
         if (raiseEventsAndLog)
         {
@@ -346,8 +380,7 @@ public partial class TcpClient : IDisposable
             LogDisconnecting(IPAddressOrHostname, Port);
         }
 
-        DisposeTcpClientAndStream();
-        return SetDisconnected(raiseEvents: raiseEventsAndLog);
+        return SetDisconnected(raiseEvents: raiseEventsAndLog, dispose: dispose);
     }
 
     private async Task DoReconnect()
@@ -355,23 +388,33 @@ public partial class TcpClient : IDisposable
         LogReconnecting(IPAddressOrHostname, Port);
         ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnecting));
 
-        DisposeTcpClientAndStream();
-        await SetDisconnected(raiseEvents: false);
+        await SetDisconnected(raiseEvents: false, dispose: false);
 
-        if (clientConfig.ReconnectDelay.HasValue)
-        {
-            await Task.Delay(clientConfig.ReconnectDelay.Value);
-        }
+        await Task.Delay(clientReconnectConfig.RetryInterval);
 
         if (await DoConnect(raiseEventsAndLog: false, CancellationToken.None))
         {
+            reconnectRetryCounter = 0;
             LogReconnected(IPAddressOrHostname, Port);
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnected));
         }
         else
         {
-            LogConnectionError(IPAddressOrHostname, Port, "Could not reconnect");
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed));
+            if (reconnectRetryCounter < clientReconnectConfig.RetryMaxAttempts)
+            {
+                LogReconnectionWarning(IPAddressOrHostname, Port, reconnectRetryCounter, clientReconnectConfig.RetryMaxAttempts);
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ReconnectionFailed));
+
+                reconnectRetryCounter++;
+
+                // ReSharper disable once TailRecursiveCall
+                await DoReconnect();
+            }
+            else
+            {
+                LogReconnectionMaxRetryExceededError(IPAddressOrHostname, Port);
+                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ReconnectionFailed));
+            }
         }
     }
 
@@ -401,7 +444,8 @@ public partial class TcpClient : IDisposable
     }
 
     private async Task SetDisconnected(
-        bool raiseEvents = true,
+        bool raiseEvents,
+        bool dispose,
         CancellationToken cancellationToken = default)
     {
         try
@@ -420,7 +464,16 @@ public partial class TcpClient : IDisposable
                     ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
                 }
 
-                tcpClient.Close();
+                if (dispose)
+                {
+                    DisposeCancellationTokenAndTask();
+                    DisposeTcpClientAndStream();
+                }
+                else
+                {
+                    tcpClient.GetStream().Close();
+                    tcpClient.Close();
+                }
             }
 
             IsConnected = false;
@@ -436,25 +489,6 @@ public partial class TcpClient : IDisposable
         }
     }
 
-    private void SetBufferSizeAndTimeouts()
-    {
-        tcpClient!.SetBufferSizeAndTimeouts(
-            clientConfig.SendTimeout,
-            clientConfig.ReceiveTimeout,
-            clientConfig.SendBufferSize,
-            clientConfig.ReceiveBufferSize);
-    }
-
-    private void PrepareNetworkStream()
-    {
-        networkStream = tcpClient!.GetStream();
-
-        tcpClient.SetKeepAlive(
-            keepAliveConfig.KeepAliveTime,
-            keepAliveConfig.KeepAliveInterval,
-            keepAliveConfig.KeepAliveRetryCount);
-    }
-
     private async Task DataReceiver(
         CancellationToken cancellationToken)
     {
@@ -463,6 +497,7 @@ public partial class TcpClient : IDisposable
             if (!IsConnected ||
                 networkStream is null)
             {
+                await Task.Delay(TimeToWaitForDataReceiverInMs, cancellationToken);
                 continue;
             }
 
@@ -493,7 +528,14 @@ public partial class TcpClient : IDisposable
                 LogDataReceiveError("Unknown error");
             }
 
-            await SetDisconnected();
+            if (clientReconnectConfig.Enable)
+            {
+                await SetDisconnected(raiseEvents: true, dispose: false);
+            }
+            else
+            {
+                await SetDisconnected(raiseEvents: true, dispose: true);
+            }
         }
 
         var data = await readDataTask;
@@ -507,7 +549,7 @@ public partial class TcpClient : IDisposable
                     LogDataReceiveNoData();
                     NoDataReceived?.Invoke();
 
-                    if (clientConfig.ReconnectOnSenderSocketClosed)
+                    if (clientReconnectConfig.Enable)
                     {
                         ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
 
@@ -515,7 +557,7 @@ public partial class TcpClient : IDisposable
                     }
                     else
                     {
-                        await SetDisconnected(raiseEvents: true);
+                        await SetDisconnected(raiseEvents: true, dispose: true);
                     }
                 }
             }
@@ -558,40 +600,122 @@ public partial class TcpClient : IDisposable
         {
             // Skip
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
-            var (isKnownException, _) = exception.IsKnownExceptionForConsumerDisposed();
+            var (isKnownException, _) = ex.IsKnownExceptionForConsumerDisposed();
             if (!isKnownException)
             {
-                LogDataReceiveError(exception.Message);
+                LogDataReceiveError(ex.Message);
             }
         }
 
         return Array.Empty<byte>();
     }
 
+    private void DoConnectCleanupIfNeeded()
+    {
+        if (cancellationTokenSource is null)
+        {
+            cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenRegistration = cancellationTokenSource.Token.Register(CancellationTokenCallback);
+
+            receiveListenerTask = Task.Run(
+                async () => await DataReceiver(cancellationTokenSource.Token),
+                cancellationTokenSource.Token);
+        }
+
+        if (tcpClient is not null)
+        {
+            DisposeTcpClientAndStream();
+        }
+    }
+
+    private void DoConnectSetBufferSizeAndTimeouts()
+    {
+        tcpClient!.LingerState = new LingerOption(enable: true, seconds: 0);
+
+        tcpClient.SetBufferSizeAndTimeouts(
+            clientConfig.SendTimeout,
+            clientConfig.ReceiveTimeout,
+            clientConfig.SendBufferSize,
+            clientConfig.ReceiveBufferSize);
+    }
+
+    private void DoConnectPrepareNetworkStreamAndKeepAlive()
+    {
+        networkStream = tcpClient!.GetStream();
+
+        if (clientKeepAliveConfig.Enable)
+        {
+            tcpClient.SetKeepAlive(
+                clientKeepAliveConfig.Time,
+                clientKeepAliveConfig.Interval,
+                clientKeepAliveConfig.RetryCount);
+        }
+        else
+        {
+            tcpClient.DisableKeepAlive();
+        }
+    }
+
+    private void DisposeCancellationTokenAndTask()
+    {
+        if (cancellationTokenSource is not null)
+        {
+            if (!cancellationTokenSource.IsCancellationRequested)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            cancellationTokenSource.Dispose();
+            cancellationTokenSource = null;
+        }
+
+        if (receiveListenerTask is not null)
+        {
+            if (receiveListenerTask.Status == TaskStatus.Running)
+            {
+                receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
+            }
+
+            receiveListenerTask = null;
+        }
+
+        if (cancellationTokenRegistration is not null)
+        {
+            cancellationTokenRegistration.Value.Dispose();
+            cancellationTokenRegistration = null;
+        }
+    }
+
     private void DisposeTcpClientAndStream()
     {
+        IsConnected = false;
+
+        if (clientKeepAliveConfig.Enable)
+        {
+            tcpClient?.DisableKeepAlive();
+        }
+
         if (networkStream is not null)
         {
             if (networkStream.CanWrite ||
                 networkStream.CanRead ||
                 networkStream.CanSeek)
             {
+                networkStream.Flush();
                 networkStream.Close();
             }
 
             networkStream.Dispose();
+            networkStream = null;
         }
 
         if (tcpClient is not null)
         {
-            if (tcpClient.Connected)
-            {
-                tcpClient.Close();
-            }
-
+            tcpClient.Close();
             tcpClient.Dispose();
+            tcpClient = null;
         }
     }
 
@@ -602,6 +726,7 @@ public partial class TcpClient : IDisposable
             return;
         }
 
+        networkStream.Flush();
         networkStream.Close();
     }
 }
