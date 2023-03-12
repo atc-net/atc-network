@@ -1,5 +1,8 @@
 namespace Atc.Network.Udp;
 
+/// <summary>
+/// This is a interface for <see cref="UdpClient"/>.
+/// </summary>
 public interface IUdpClient : IDisposable
 {
     /// <summary>

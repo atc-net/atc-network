@@ -1,5 +1,9 @@
 namespace Atc.Network.Udp;
 
+/// <summary>
+/// This class contains default constant for
+/// <see cref="UdpClient"/> and <see cref="UdpServer"/>.
+/// </summary>
 public static class UpdConstants
 {
     /// <summary>
