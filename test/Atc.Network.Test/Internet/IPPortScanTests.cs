@@ -67,7 +67,7 @@ public class IPPortScanTests
         // Act
         var actual = await ipPortScan.CanConnectWithHttpOrHttps(
             80,
-            true,
+            useHttps: true,
             CancellationToken.None);
 
         // Assert
