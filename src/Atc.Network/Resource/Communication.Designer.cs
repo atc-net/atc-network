@@ -214,6 +214,15 @@ namespace Atc.Network.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reconnection failed.
+        /// </summary>
+        public static string ReconnectionFailed {
+            get {
+                return ResourceManager.GetString("ReconnectionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Trying to reconnect.
         /// </summary>
         public static string TryingToReconnect {

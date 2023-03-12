@@ -42,6 +42,12 @@ public enum ConnectionState
     ConnectionFailed,
 
     /// <summary>
+    /// The reconnection failed.
+    /// </summary>
+    [LocalizedDescription(nameof(ReconnectionFailed), typeof(Communication))]
+    ReconnectionFailed,
+
+    /// <summary>
     /// Reconnecting.
     /// </summary>
     [LocalizedDescription(nameof(Reconnecting), typeof(Communication))]
