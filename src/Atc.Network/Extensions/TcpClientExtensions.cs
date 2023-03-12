@@ -1,4 +1,6 @@
 // ReSharper disable once CheckNamespace
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+// ReSharper disable CommentTypo
 namespace Atc.Network;
 
 public static class TcpClientExtensions
@@ -47,8 +49,44 @@ public static class TcpClientExtensions
         }
 
         tcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, optionValue: true);
-        tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, tcpKeepAliveTime);
-        tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, tcpKeepAliveInterval);
-        tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, tcpKeepAliveRetryCount);
+        if (tcpKeepAliveTime >= 1)
+        {
+            tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, tcpKeepAliveTime);
+        }
+
+        if (tcpKeepAliveInterval >= 1)
+        {
+            tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, tcpKeepAliveInterval);
+        }
+
+        if (tcpKeepAliveRetryCount >= 0)
+        {
+            tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, tcpKeepAliveRetryCount);
+        }
+    }
+
+    /// <summary>
+    /// Disables the keep alive.
+    /// </summary>
+    /// <param name="tcpClient">The TCP client.</param>
+    public static void DisableKeepAlive(
+        this System.Net.Sockets.TcpClient tcpClient)
+    {
+        ArgumentNullException.ThrowIfNull(tcpClient);
+
+        if (tcpClient.Client is null ||
+            !tcpClient.Client.Connected)
+        {
+            return;
+        }
+
+        tcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, optionValue: false);
+        tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 1);
+        tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 1);
+        tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 0);
+
+        // This will disable the Nagle algorithm, which is a mechanism used to reduce network traffic
+        // by buffering small packets and sending them together in larger segments.
+        tcpClient.Client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, optionValue: true);
     }
 }
