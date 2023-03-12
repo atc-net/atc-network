@@ -60,6 +60,7 @@
 - [TcpClient](Atc.Network.Tcp.md#tcpclient)
 - [TcpClientConfig](Atc.Network.Tcp.md#tcpclientconfig)
 - [TcpClientKeepAliveConfig](Atc.Network.Tcp.md#tcpclientkeepaliveconfig)
+- [TcpClientReconnectConfig](Atc.Network.Tcp.md#tcpclientreconnectconfig)
 - [TcpConstants](Atc.Network.Tcp.md#tcpconstants)
 
 ## [Atc.Network.Udp](Atc.Network.Udp.md)
