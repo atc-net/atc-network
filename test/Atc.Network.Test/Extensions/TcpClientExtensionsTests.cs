@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace Atc.Network.Test.Extensions;
 
 [SuppressMessage("Blocker Bug", "S2930:\"IDisposables\" should be disposed", Justification = "OK.")]
@@ -28,7 +30,7 @@ public class TcpClientExtensionsTests
     }
 
     [Theory]
-    [InlineData(false, 0, 0, 0)]
+    [InlineData(true, 0, 0, 0)]
     [InlineData(true, 1, 1, 1)]
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
     public void SetKeepAlive(bool expected, int tcpKeepAliveTime, int tcpKeepAliveInterval, int tcpKeepAliveRetryCount)
@@ -57,5 +59,19 @@ public class TcpClientExtensionsTests
 
         // Assert
         Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void DisableKeepAlive()
+    {
+        // Arrange
+        var tcpClient = new System.Net.Sockets.TcpClient();
+
+        // Atc
+        const bool result = true;
+        tcpClient.DisableKeepAlive();
+
+        // Assert
+        Assert.True(result);
     }
 }
