@@ -320,11 +320,11 @@ public partial class TcpClient : IDisposable
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
         }
 
-        DoConnectCleanupIfNeeded();
+        CleanupIfNeededInDoConnect();
 
         tcpClient = new System.Net.Sockets.TcpClient();
 
-        DoConnectSetBufferSizeAndTimeouts();
+        SetBufferSizeAndTimeoutsInDoConnect();
 
         try
         {
@@ -358,7 +358,7 @@ public partial class TcpClient : IDisposable
         }
 
         await SetConnected(raiseEventsAndLog, cancellationToken);
-        DoConnectPrepareNetworkStreamAndKeepAlive();
+        PrepareNetworkStreamAndKeepAliveInDoConnect();
 
         if (raiseEventsAndLog)
         {
@@ -612,7 +612,7 @@ public partial class TcpClient : IDisposable
         return Array.Empty<byte>();
     }
 
-    private void DoConnectCleanupIfNeeded()
+    private void CleanupIfNeededInDoConnect()
     {
         if (cancellationTokenSource is null)
         {
@@ -630,7 +630,7 @@ public partial class TcpClient : IDisposable
         }
     }
 
-    private void DoConnectSetBufferSizeAndTimeouts()
+    private void SetBufferSizeAndTimeoutsInDoConnect()
     {
         tcpClient!.LingerState = new LingerOption(enable: true, seconds: 0);
 
@@ -641,7 +641,7 @@ public partial class TcpClient : IDisposable
             clientConfig.ReceiveBufferSize);
     }
 
-    private void DoConnectPrepareNetworkStreamAndKeepAlive()
+    private void PrepareNetworkStreamAndKeepAliveInDoConnect()
     {
         networkStream = tcpClient!.GetStream();
 
