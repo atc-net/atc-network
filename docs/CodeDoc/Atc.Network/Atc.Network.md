@@ -32,9 +32,10 @@ Enumeration: ConnectionType.
 | 3 | Disconnecting | Disconnecting | Disconnecting. | 
 | 4 | Disconnected | Disconnected | Disconnected. | 
 | 5 | ConnectionFailed | Connection failed | The connection failed. | 
-| 6 | Reconnecting | Reconnecting | Reconnecting. | 
-| 7 | Reconnected | Reconnected | Reconnected. | 
-| 8 | Pulse | Pulse | Pulse. | 
+| 6 | ReconnectionFailed | Reconnection failed | The reconnection failed. | 
+| 7 | Reconnecting | Reconnecting | Reconnecting. | 
+| 8 | Reconnected | Reconnected | Reconnected. | 
+| 9 | Pulse | Pulse | Pulse. | 
 
 
 
@@ -237,6 +238,14 @@ ConnectionStateEventArgs.
 >```csharp
 >int Reconnecting
 >```
+#### ReconnectionMaxRetryExceededError
+>```csharp
+>int ReconnectionMaxRetryExceededError
+>```
+#### ReconnectionWarning
+>```csharp
+>int ReconnectionWarning
+>```
 #### ServiceNotRunning
 >```csharp
 >int ServiceNotRunning
@@ -298,6 +307,14 @@ Enumeration: NetworkQualityCategoryType.
 
 ### Static Methods
 
+#### DisableKeepAlive
+>```csharp
+>void DisableKeepAlive(this TcpClient tcpClient)
+>```
+><b>Summary:</b> Disables the keep alive.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`tcpClient`&nbsp;&nbsp;-&nbsp;&nbsp;The TCP client.<br />
 #### SetBufferSizeAndTimeouts
 >```csharp
 >void SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)

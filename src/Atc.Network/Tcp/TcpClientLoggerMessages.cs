@@ -36,8 +36,20 @@ public partial class TcpClient
     [LoggerMessage(
         EventId = LoggingEventIdConstants.ConnectionError,
         Level = LogLevel.Error,
-        Message = "Could not connect to '{ipAddressOrHostName}' on port '{port}': '{errorMessage}'.")]
+        Message = "Could not connect to '{ipAddressOrHostName}' on port '{port}': {errorMessage}.")]
     private partial void LogConnectionError(string ipAddressOrHostName, int port, string errorMessage);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.ReconnectionWarning,
+        Level = LogLevel.Warning,
+        Message = "Could not reconnect to '{ipAddressOrHostName}' on port '{port}': Retry attempt {reconnectRetryCounter} of {retryMaxAttempts}.")]
+    private partial void LogReconnectionWarning(string ipAddressOrHostName, int port, int reconnectRetryCounter, int retryMaxAttempts);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.ReconnectionMaxRetryExceededError,
+        Level = LogLevel.Error,
+        Message = "Could not reconnect to '{ipAddressOrHostName}' on port '{port}': max retry attempts exceeded.")]
+    private partial void LogReconnectionMaxRetryExceededError(string ipAddressOrHostName, int port);
 
     [LoggerMessage(
         EventId = LoggingEventIdConstants.ClientNotConnected,
@@ -84,6 +96,6 @@ public partial class TcpClient
     [LoggerMessage(
         EventId = LoggingEventIdConstants.DataReceiveError,
         Level = LogLevel.Error,
-        Message = "Received error when retrieving data: '{errorMessage}'.")]
+        Message = "Received error when retrieving data: {errorMessage}.")]
     private partial void LogDataReceiveError(string errorMessage);
 }

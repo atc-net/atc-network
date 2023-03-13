@@ -1,5 +1,8 @@
 namespace Atc.Network.Udp;
 
+/// <summary>
+/// This is a interface for <see cref="UdpServer"/>.
+/// </summary>
 public interface IUdpServer : IHostedService, IDisposable
 {
     /// <summary>

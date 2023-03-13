@@ -1,3 +1,4 @@
+// ReSharper disable InvertIf
 // ReSharper disable MethodSupportsCancellation
 namespace Atc.Network.Internet;
 
@@ -61,9 +62,10 @@ public class IPPortScan : IIPPortScan
             if (client.Connected)
             {
                 client.Close();
+                return true;
             }
 
-            return true;
+            return false;
         }
         catch
         {

@@ -7,9 +7,11 @@ public static class LoggingEventIdConstants
     public const int Reconnecting = 10002;
     public const int Reconnected = 10003;
     public const int ConnectionError = 10004;
-    public const int ClientNotConnected = 10005;
-    public const int Disconnecting = 10006;
-    public const int Disconnected = 10007;
+    public const int ReconnectionWarning = 10005;
+    public const int ReconnectionMaxRetryExceededError = 10006;
+    public const int ClientNotConnected = 10007;
+    public const int Disconnecting = 10008;
+    public const int Disconnected = 10009;
 
     public const int DataSendingByteLength = 10010;
     public const int DataReceivedByteLength = 10011;

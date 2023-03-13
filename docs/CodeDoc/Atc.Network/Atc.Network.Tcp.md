@@ -8,6 +8,7 @@
 <br />
 
 ## ITcpClient
+This is a interface for `Atc.Network.Tcp.TcpClient`.
 
 >```csharp
 >public interface ITcpClient
@@ -233,6 +234,7 @@ The main TcpClient - Handles call execution.
 <br />
 
 ## TcpClientConfig
+Base configurations for `Atc.Network.Tcp.TcpClient`.
 
 >```csharp
 >public class TcpClientConfig
@@ -266,18 +268,6 @@ The main TcpClient - Handles call execution.
 ><b>Summary:</b> Gets or sets the receive timeout value of the connection in milliseconds.
 >
 ><b>Returns:</b> The receive time-out value, in milliseconds. The default is 0;
-#### ReconnectDelay
->```csharp
->ReconnectDelay
->```
-><b>Summary:</b> Gets or sets the reconnect delay in milliseconds.
->
-><b>Returns:</b> The reconnect delay, in milliseconds. The default value is 100 ms.
-#### ReconnectOnSenderSocketClosed
->```csharp
->ReconnectOnSenderSocketClosed
->```
-><b>Summary:</b> Controls if the tcp client should reconnect on sender socked closed.
 #### SendBufferSize
 >```csharp
 >SendBufferSize
@@ -307,7 +297,7 @@ The main TcpClient - Handles call execution.
 <br />
 
 ## TcpClientKeepAliveConfig
-TcpClient KeepAlive Config
+KeepAlive configurations for `Atc.Network.Tcp.TcpClient`.
 
 >```csharp
 >public class TcpClientKeepAliveConfig
@@ -315,19 +305,24 @@ TcpClient KeepAlive Config
 
 ### Properties
 
-#### KeepAliveInterval
+#### Enable
 >```csharp
->KeepAliveInterval
+>Enable
+>```
+><b>Summary:</b> Keep alive enable/disable on the socket option `System.Net.Sockets.SocketOptionName.KeepAlive`.
+#### Interval
+>```csharp
+>Interval
 >```
 ><b>Summary:</b> Keep alive interval on the socket option `System.Net.Sockets.SocketOptionName.TcpKeepAliveInterval`.
-#### KeepAliveRetryCount
+#### RetryCount
 >```csharp
->KeepAliveRetryCount
+>RetryCount
 >```
 ><b>Summary:</b> Keep alive retry count on the socket option `System.Net.Sockets.SocketOptionName.TcpKeepAliveRetryCount`.
-#### KeepAliveTime
+#### Time
 >```csharp
->KeepAliveTime
+>Time
 >```
 ><b>Summary:</b> Keep alive time on the socket option `System.Net.Sockets.SocketOptionName.TcpKeepAliveTime`.
 ### Methods
@@ -339,7 +334,51 @@ TcpClient KeepAlive Config
 
 <br />
 
+## TcpClientReconnectConfig
+Reconnect configurations for `Atc.Network.Tcp.TcpClient`.
+
+>```csharp
+>public class TcpClientReconnectConfig
+>```
+
+### Properties
+
+#### Enable
+>```csharp
+>Enable
+>```
+><b>Summary:</b> Enable auto-reconnect then disconnect.
+>
+><b>Remarks:</b> Disconnect happens 'on sender socket closed'.
+#### RetryInterval
+>```csharp
+>RetryInterval
+>```
+><b>Summary:</b> Gets or sets the retry interval in milliseconds.
+>
+><b>Returns:</b> The retry interval value, in milliseconds. The default is 1000 (1 sec).
+>
+><b>Remarks:</b> If the `Atc.Network.Tcp.TcpClientReconnectConfig.RetryInterval` and the `Atc.Network.Tcp.TcpClientReconnectConfig.RetryMaxAttempts` is set to the defaults as a calculation example: 1sec * 3600 attempts, then the `Atc.Network.Tcp.TcpClient` will try auto-reconnect within 1hour, before it gives up on auto reconnection.
+#### RetryMaxAttempts
+>```csharp
+>RetryMaxAttempts
+>```
+><b>Summary:</b> Gets or sets the retry max attempts.
+>
+><b>Returns:</b> The retry max attempts value.
+>
+><b>Remarks:</b> If the `Atc.Network.Tcp.TcpClientReconnectConfig.RetryInterval` and the `Atc.Network.Tcp.TcpClientReconnectConfig.RetryMaxAttempts` is set to the defaults as a calculation example: 1sec * 3600 attempts, then the `Atc.Network.Tcp.TcpClient` will try auto-reconnect within 1hour, before it gives up on auto reconnection.
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
+
+<br />
+
 ## TcpConstants
+This class contains default constant for `Atc.Network.Tcp.TcpClient` and `Atc.Network.Tcp.TcpClientReconnectConfig`.
 
 >```csharp
 >public static class TcpConstants
@@ -351,17 +390,22 @@ TcpClient KeepAlive Config
 >```csharp
 >int DefaultBufferSize
 >```
-><b>Summary:</b> The send/receive buffer value, in bytes (8 Kb);
+><b>Summary:</b> The send/receive buffer value, in bytes (8 Kb).
 #### DefaultConnectTimeout
 >```csharp
 >int DefaultConnectTimeout
 >```
-><b>Summary:</b> The connect time-out value, in milliseconds (10 sec);
-#### DefaultReconnectDelay
+><b>Summary:</b> The connect time-out value, in milliseconds (10 sec).
+#### DefaultReconnectRetryInterval
 >```csharp
->int DefaultReconnectDelay
+>int DefaultReconnectRetryInterval
 >```
-><b>Summary:</b> The reconnect delay value, in milliseconds.
+><b>Summary:</b> The reconnect retry interval value, in milliseconds (1 sec).
+#### DefaultReconnectRetryMaxAttempts
+>```csharp
+>int DefaultReconnectRetryMaxAttempts
+>```
+><b>Summary:</b> The reconnect retry max attempts value.
 #### DefaultSendReceiveTimeout
 >```csharp
 >int DefaultSendReceiveTimeout

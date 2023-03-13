@@ -171,4 +171,7 @@
   <data name="Reconnected" xml:space="preserve">
     <value>Reconnected</value>
   </data>
+  <data name="ReconnectionFailed" xml:space="preserve">
+    <value>Reconnection failed</value>
+  </data>
 </root>

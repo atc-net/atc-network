@@ -8,11 +8,15 @@ namespace Atc.Network.Udp;
 public partial class UdpServer : IUdpServer
 {
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
-    private readonly UdpServerConfig udpServerConfig;
-    private readonly Socket? socket;
+    private const int TimeToWaitForDataReceiverInMs = 150;
+
+    private readonly UdpServerConfig serverConfig;
     private readonly ArraySegment<byte> receiveBufferSegment;
+
     private readonly Task? receiveListenerTask;
     private readonly CancellationTokenSource cancellationTokenSource = new();
+
+    private readonly Socket? socket;
 
     /// <summary>
     /// Event to raise when data has become available from the server.
@@ -21,12 +25,12 @@ public partial class UdpServer : IUdpServer
 
     private UdpServer(
         ILogger logger,
-        UdpServerConfig? udpServerConfig)
+        UdpServerConfig? serverConfig)
     {
         ArgumentNullException.ThrowIfNull(logger);
 
         this.logger = logger;
-        this.udpServerConfig = udpServerConfig ?? new UdpServerConfig();
+        this.serverConfig = serverConfig ?? new UdpServerConfig();
 
         socket = new Socket(
             AddressFamily.InterNetwork,
@@ -38,7 +42,7 @@ public partial class UdpServer : IUdpServer
             SocketOptionName.ReuseAddress,
             optionValue: true);
 
-        var receiveBuffer = new byte[this.udpServerConfig.ReceiveBufferSize];
+        var receiveBuffer = new byte[this.serverConfig.ReceiveBufferSize];
         receiveBufferSegment = new ArraySegment<byte>(receiveBuffer);
     }
 
@@ -46,8 +50,8 @@ public partial class UdpServer : IUdpServer
         ILogger logger,
         IPAddress ipAddress,
         int port,
-        UdpServerConfig? udpServerConfig = default)
-        : this(logger, udpServerConfig)
+        UdpServerConfig? serverConfig = default)
+        : this(logger, serverConfig)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
@@ -64,24 +68,24 @@ public partial class UdpServer : IUdpServer
     public UdpServer(
         ILogger logger,
         IPEndPoint endpoint,
-        UdpServerConfig? udpServerConfig = default)
-        : this(logger, endpoint.Address, endpoint.Port, udpServerConfig)
+        UdpServerConfig? serverConfig = default)
+        : this(logger, endpoint.Address, endpoint.Port, serverConfig)
     {
     }
 
     public UdpServer(
         IPAddress ipAddress,
         int port,
-        UdpServerConfig? udpServerConfig = default)
-        : this(NullLogger.Instance, ipAddress, port, udpServerConfig)
+        UdpServerConfig? serverConfig = default)
+        : this(NullLogger.Instance, ipAddress, port, serverConfig)
     {
     }
 
     [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
     public UdpServer(
         IPEndPoint endpoint,
-        UdpServerConfig? udpServerConfig = default)
-        : this(NullLogger.Instance, endpoint.Address, endpoint.Port, udpServerConfig)
+        UdpServerConfig? serverConfig = default)
+        : this(NullLogger.Instance, endpoint.Address, endpoint.Port, serverConfig)
     {
     }
 
@@ -90,6 +94,10 @@ public partial class UdpServer : IUdpServer
     /// </summary>
     public bool IsRunning { get; private set; }
 
+    /// <summary>
+    /// Triggered when the application host is ready to start the service.
+    /// </summary>
+    /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
     public Task StartAsync(
         CancellationToken cancellationToken)
     {
@@ -97,6 +105,10 @@ public partial class UdpServer : IUdpServer
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Triggered when the application host is performing a graceful shutdown.
+    /// </summary>
+    /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
     public Task StopAsync(
         CancellationToken cancellationToken)
     {
@@ -121,7 +133,7 @@ public partial class UdpServer : IUdpServer
         EndPoint recipient,
         string data,
         CancellationToken cancellationToken)
-        => Send(recipient, udpServerConfig.DefaultEncoding, data, cancellationToken);
+        => Send(recipient, serverConfig.DefaultEncoding, data, cancellationToken);
 
     /// <summary>
     /// Send data.
@@ -146,7 +158,7 @@ public partial class UdpServer : IUdpServer
         return Send(
             recipient,
             encoding.GetBytes(data),
-            udpServerConfig.TerminationType,
+            serverConfig.TerminationType,
             cancellationToken);
     }
 
@@ -160,7 +172,7 @@ public partial class UdpServer : IUdpServer
         EndPoint recipient,
         byte[] data,
         CancellationToken cancellationToken)
-        => Send(recipient, data, udpServerConfig.TerminationType, cancellationToken);
+        => Send(recipient, data, serverConfig.TerminationType, cancellationToken);
 
     /// <summary>
     /// Send data.
@@ -217,7 +229,7 @@ public partial class UdpServer : IUdpServer
         {
             if (socket.Connected)
             {
-                socket.Disconnect(false);
+                socket.Disconnect(reuseSocket: false);
             }
 
             socket.Dispose();
@@ -252,6 +264,7 @@ public partial class UdpServer : IUdpServer
         {
             if (!IsRunning)
             {
+                await Task.Delay(TimeToWaitForDataReceiverInMs, cancellationToken);
                 continue;
             }
 
@@ -261,12 +274,12 @@ public partial class UdpServer : IUdpServer
 
             DataReceived?.Invoke(receivedBytes);
 
-            var receivedStr = udpServerConfig.DefaultEncoding.GetString(receivedBytes);
+            var receivedStr = serverConfig.DefaultEncoding.GetString(receivedBytes);
             if (receivedStr.StartsWith("ping", StringComparison.OrdinalIgnoreCase))
             {
                 await Send(res.RemoteEndPoint, "pong", cancellationToken);
             }
-            else if (udpServerConfig.EchoOnReceivedData)
+            else if (serverConfig.EchoOnReceivedData)
             {
                 await Send(res.RemoteEndPoint, $"echo: {receivedStr}", cancellationToken);
             }

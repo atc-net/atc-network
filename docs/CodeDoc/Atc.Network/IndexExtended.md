@@ -44,11 +44,14 @@
      - int Disconnecting
      - int Reconnected
      - int Reconnecting
+     - int ReconnectionMaxRetryExceededError
+     - int ReconnectionWarning
      - int ServiceNotRunning
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
   -  Static Methods
+     - DisableKeepAlive(this TcpClient tcpClient)
      - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
 - [TerminationType](Atc.Network.md#terminationtype)
@@ -289,8 +292,6 @@
      - DefaultEncoding
      - ReceiveBufferSize
      - ReceiveTimeout
-     - ReconnectDelay
-     - ReconnectOnSenderSocketClosed
      - SendBufferSize
      - SendTimeout
      - TerminationType
@@ -298,16 +299,25 @@
      - ToString()
 - [TcpClientKeepAliveConfig](Atc.Network.Tcp.md#tcpclientkeepaliveconfig)
   -  Properties
-     - KeepAliveInterval
-     - KeepAliveRetryCount
-     - KeepAliveTime
+     - Enable
+     - Interval
+     - RetryCount
+     - Time
+  -  Methods
+     - ToString()
+- [TcpClientReconnectConfig](Atc.Network.Tcp.md#tcpclientreconnectconfig)
+  -  Properties
+     - Enable
+     - RetryInterval
+     - RetryMaxAttempts
   -  Methods
      - ToString()
 - [TcpConstants](Atc.Network.Tcp.md#tcpconstants)
   -  Static Fields
      - int DefaultBufferSize
      - int DefaultConnectTimeout
-     - int DefaultReconnectDelay
+     - int DefaultReconnectRetryInterval
+     - int DefaultReconnectRetryMaxAttempts
      - int DefaultSendReceiveTimeout
 
 ## [Atc.Network.Udp](Atc.Network.Udp.md)
@@ -358,12 +368,16 @@
 - [UdpClientConfig](Atc.Network.Udp.md#udpclientconfig)
   -  Properties
      - IPProtectionLevel
+  -  Methods
+     - ToString()
 - [UdpConfigBase](Atc.Network.Udp.md#udpconfigbase)
   -  Properties
      - DefaultEncoding
      - ReceiveBufferSize
      - SendBufferSize
      - TerminationType
+  -  Methods
+     - ToString()
 - [UdpServer](Atc.Network.Udp.md#udpserver)
   -  Properties
      - IsRunning
@@ -380,6 +394,8 @@
 - [UdpServerConfig](Atc.Network.Udp.md#udpserverconfig)
   -  Properties
      - EchoOnReceivedData
+  -  Methods
+     - ToString()
 - [UpdConstants](Atc.Network.Udp.md#updconstants)
   -  Static Fields
      - int DefaultBufferSize

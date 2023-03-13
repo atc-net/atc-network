@@ -8,12 +8,17 @@ namespace Atc.Network.Udp;
 public partial class UdpClient : IUdpClient
 {
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
+    private const int TimeToWaitForDataReceiverInMs = 150;
+
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
-    private readonly UdpClientConfig udpClientConfig;
-    private readonly Socket? socket;
+
+    private readonly UdpClientConfig clientConfig;
     private readonly ArraySegment<byte> receiveBufferSegment;
+
     private readonly Task? receiveListenerTask;
     private readonly CancellationTokenSource cancellationTokenSource = new();
+
+    private readonly Socket? socket;
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -37,12 +42,12 @@ public partial class UdpClient : IUdpClient
 
     private UdpClient(
         ILogger logger,
-        UdpClientConfig? udpClientConfig)
+        UdpClientConfig? clientConfig)
     {
         ArgumentNullException.ThrowIfNull(logger);
 
         this.logger = logger;
-        this.udpClientConfig = udpClientConfig ?? new UdpClientConfig();
+        this.clientConfig = clientConfig ?? new UdpClientConfig();
 
         socket = new Socket(
             AddressFamily.InterNetwork,
@@ -59,7 +64,7 @@ public partial class UdpClient : IUdpClient
             socket.SetIPProtectionLevel(IPProtectionLevel.Unrestricted);
         }
 
-        var receiveBuffer = new byte[this.udpClientConfig.ReceiveBufferSize];
+        var receiveBuffer = new byte[this.clientConfig.ReceiveBufferSize];
         receiveBufferSegment = new ArraySegment<byte>(receiveBuffer);
     }
 
@@ -67,8 +72,8 @@ public partial class UdpClient : IUdpClient
         ILogger logger,
         IPAddress ipAddress,
         int port,
-        UdpClientConfig? udpClientConfig = default)
-        : this(logger, udpClientConfig)
+        UdpClientConfig? clientConfig = default)
+        : this(logger, clientConfig)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
@@ -83,24 +88,24 @@ public partial class UdpClient : IUdpClient
     public UdpClient(
         ILogger logger,
         IPEndPoint endpoint,
-        UdpClientConfig? udpClientConfig = default)
-        : this(logger, endpoint.Address, endpoint.Port, udpClientConfig)
+        UdpClientConfig? clientConfig = default)
+        : this(logger, endpoint.Address, endpoint.Port, clientConfig)
     {
     }
 
     public UdpClient(
         IPAddress ipAddress,
         int port,
-        UdpClientConfig? udpClientConfig = default)
-        : this(NullLogger.Instance, ipAddress, port, udpClientConfig)
+        UdpClientConfig? clientConfig = default)
+        : this(NullLogger.Instance, ipAddress, port, clientConfig)
     {
     }
 
     [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
     public UdpClient(
         IPEndPoint endpoint,
-        UdpClientConfig? udpClientConfig = default)
-        : this(NullLogger.Instance, endpoint.Address, endpoint.Port, udpClientConfig)
+        UdpClientConfig? clientConfig = default)
+        : this(NullLogger.Instance, endpoint.Address, endpoint.Port, clientConfig)
     {
     }
 
@@ -136,7 +141,7 @@ public partial class UdpClient : IUdpClient
     public Task Send(
         string data,
         CancellationToken cancellationToken)
-        => Send(udpClientConfig.DefaultEncoding, data, cancellationToken);
+        => Send(clientConfig.DefaultEncoding, data, cancellationToken);
 
     /// <summary>
     /// Send data.
@@ -158,7 +163,7 @@ public partial class UdpClient : IUdpClient
 
         return Send(
             encoding.GetBytes(data),
-            udpClientConfig.TerminationType,
+            clientConfig.TerminationType,
             cancellationToken);
     }
 
@@ -170,7 +175,7 @@ public partial class UdpClient : IUdpClient
     public Task Send(
         byte[] data,
         CancellationToken cancellationToken)
-        => Send(data, udpClientConfig.TerminationType, cancellationToken);
+        => Send(data, clientConfig.TerminationType, cancellationToken);
 
     /// <summary>
     /// Send data.
@@ -356,6 +361,7 @@ public partial class UdpClient : IUdpClient
         {
             if (!IsConnected)
             {
+                await Task.Delay(TimeToWaitForDataReceiverInMs, cancellationToken);
                 continue;
             }
 

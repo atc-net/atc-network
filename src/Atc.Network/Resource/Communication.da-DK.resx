@@ -171,4 +171,7 @@
   <data name="Reconnecting" xml:space="preserve">
     <value>Genopretter forbindelse</value>
   </data>
+  <data name="ReconnectionFailed" xml:space="preserve">
+    <value>Genforbindelsen mislykkedes</value>
+  </data>
 </root>

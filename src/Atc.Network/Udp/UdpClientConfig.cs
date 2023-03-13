@@ -1,5 +1,9 @@
+// ReSharper disable InconsistentNaming
 namespace Atc.Network.Udp;
 
+/// <summary>
+/// Configurations for <see cref="UdpClient"/>.
+/// </summary>
 public class UdpClientConfig : UdpConfigBase
 {
     /// <summary>
@@ -9,4 +13,8 @@ public class UdpClientConfig : UdpConfigBase
     /// Only used for Windows OS.
     /// </remarks>
     public IPProtectionLevel IPProtectionLevel { get; set; } = IPProtectionLevel.Unrestricted;
+
+    /// <inheritdoc />
+    public override string ToString()
+        => $"{base.ToString()}, {nameof(IPProtectionLevel)}: {IPProtectionLevel}";
 }

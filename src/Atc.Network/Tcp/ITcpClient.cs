@@ -1,5 +1,9 @@
+// ReSharper disable InconsistentNaming
 namespace Atc.Network.Tcp;
 
+/// <summary>
+/// This is a interface for <see cref="TcpClient"/>.
+/// </summary>
 public interface ITcpClient
 {
     /// <summary>
