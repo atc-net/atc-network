@@ -48,7 +48,7 @@ public partial class TcpClient
     [LoggerMessage(
         EventId = LoggingEventIdConstants.ReconnectionMaxRetryExceededError,
         Level = LogLevel.Error,
-        Message = "Could not reconnect to '{ipAddressOrHostName}' on port '{port}': max retry attempts have exceeded.")]
+        Message = "Could not reconnect to '{ipAddressOrHostName}' on port '{port}': max retry attempts exceeded.")]
     private partial void LogReconnectionMaxRetryExceededError(string ipAddressOrHostName, int port);
 
     [LoggerMessage(
