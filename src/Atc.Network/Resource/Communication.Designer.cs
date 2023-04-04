@@ -151,7 +151,7 @@ namespace Atc.Network.Resource {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DoConnect.
+        ///   Looks up a localized string similar to Connect.
         /// </summary>
         public static string DoConnect {
             get {
@@ -160,7 +160,7 @@ namespace Atc.Network.Resource {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DoDisconnect.
+        ///   Looks up a localized string similar to Disconnect.
         /// </summary>
         public static string DoDisconnect {
             get {

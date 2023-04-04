@@ -145,10 +145,10 @@
     <value>Disconnection</value>
   </data>
   <data name="DoConnect" xml:space="preserve">
-    <value>DoConnect</value>
+    <value>Connect</value>
   </data>
   <data name="DoDisconnect" xml:space="preserve">
-    <value>DoDisconnect</value>
+    <value>Disconnect</value>
   </data>
   <data name="DoYouWantToDisconnectTheConnection" xml:space="preserve">
     <value>Do you want to disconnect the connection?</value>
