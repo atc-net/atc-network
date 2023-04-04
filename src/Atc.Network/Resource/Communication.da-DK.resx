@@ -148,7 +148,7 @@
     <value>Afbrydelse</value>
   </data>
   <data name="DoConnect" xml:space="preserve">
-    <value>Oprette forbindelse</value>
+    <value>Opret forbindelse</value>
   </data>
   <data name="DoDisconnect" xml:space="preserve">
     <value>Afbryd forbindelse</value>
