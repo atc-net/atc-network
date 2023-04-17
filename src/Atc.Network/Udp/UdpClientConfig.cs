@@ -7,6 +7,14 @@ namespace Atc.Network.Udp;
 public class UdpClientConfig : UdpConfigBase
 {
     /// <summary>
+    /// Gets or sets the connect timeout value of the connection in milliseconds.
+    /// </summary>
+    /// <returns>
+    /// The connect time-out value, in milliseconds. The default is 10000 (10 sec);
+    /// </returns>
+    public int ConnectTimeout { get; set; } = TcpConstants.DefaultConnectTimeout;
+
+    /// <summary>
     /// Gets or sets the IP protection level on the socket.
     /// </summary>
     /// <remarks>
@@ -16,5 +24,5 @@ public class UdpClientConfig : UdpConfigBase
 
     /// <inheritdoc />
     public override string ToString()
-        => $"{base.ToString()}, {nameof(IPProtectionLevel)}: {IPProtectionLevel}";
+        => $"{base.ToString()}, {nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(IPProtectionLevel)}: {IPProtectionLevel}";
 }

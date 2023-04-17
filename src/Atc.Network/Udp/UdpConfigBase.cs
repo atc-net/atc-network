@@ -6,12 +6,28 @@ namespace Atc.Network.Udp;
 public abstract class UdpConfigBase
 {
     /// <summary>
+    /// Gets or sets the send timeout value in milliseconds.
+    /// </summary>
+    /// <returns>
+    /// The send time-out value, in milliseconds. The default is 0;
+    /// </returns>
+    public int SendTimeout { get; set; } = UdpConstants.DefaultSendReceiveTimeout;
+
+    /// <summary>
     /// Gets or sets the size of the send buffer in bytes.
     /// </summary>
     /// <returns>
     /// The size of the send buffer, in bytes. The default value is 8192 bytes.
     /// </returns>
-    public int SendBufferSize { get; set; } = UpdConstants.DefaultBufferSize;
+    public int SendBufferSize { get; set; } = UdpConstants.DefaultBufferSize;
+
+    /// <summary>
+    /// Gets or sets the receive timeout value in milliseconds.
+    /// </summary>
+    /// <returns>
+    /// The receive time-out value, in milliseconds. The default is 0;
+    /// </returns>
+    public int ReceiveTimeout { get; set; } = UdpConstants.DefaultSendReceiveTimeout;
 
     /// <summary>
     ///  Gets or sets the size of the receive buffer in bytes.
@@ -19,7 +35,7 @@ public abstract class UdpConfigBase
     /// <returns>
     /// The size of the receive buffer, in bytes. The default value is 8192 bytes.
     /// </returns>
-    public int ReceiveBufferSize { get; set; } = UpdConstants.DefaultBufferSize;
+    public int ReceiveBufferSize { get; set; } = UdpConstants.DefaultBufferSize;
 
     /// <summary>
     /// Gets or sets the default encoding.
@@ -33,5 +49,5 @@ public abstract class UdpConfigBase
 
     /// <inheritdoc />
     public override string ToString()
-        => $"{nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}";
+        => $"{nameof(SendTimeout)}: {SendTimeout}, {nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}";
 }

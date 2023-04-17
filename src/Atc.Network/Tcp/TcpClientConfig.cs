@@ -6,7 +6,7 @@ namespace Atc.Network.Tcp;
 public class TcpClientConfig
 {
     /// <summary>
-    /// Gets or sets the send timeout value of the connection in milliseconds.
+    /// Gets or sets the connect timeout value of the connection in milliseconds.
     /// </summary>
     /// <returns>
     /// The connect time-out value, in milliseconds. The default is 10000 (10 sec);
@@ -14,7 +14,7 @@ public class TcpClientConfig
     public int ConnectTimeout { get; set; } = TcpConstants.DefaultConnectTimeout;
 
     /// <summary>
-    /// Gets or sets the send timeout value of the connection in milliseconds.
+    /// Gets or sets the send timeout value in milliseconds.
     /// </summary>
     /// <returns>
     /// The send time-out value, in milliseconds. The default is 0;
@@ -30,7 +30,7 @@ public class TcpClientConfig
     public int SendBufferSize { get; set; } = TcpConstants.DefaultBufferSize;
 
     /// <summary>
-    /// Gets or sets the receive timeout value of the connection in milliseconds.
+    /// Gets or sets the receive timeout value in milliseconds.
     /// </summary>
     /// <returns>
     /// The receive time-out value, in milliseconds. The default is 0;

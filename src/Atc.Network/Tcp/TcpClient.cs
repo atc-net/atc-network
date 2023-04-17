@@ -322,14 +322,12 @@ public partial class TcpClient : IDisposable
 
         CleanupIfNeededInDoConnect();
 
-        tcpClient = new System.Net.Sockets.TcpClient();
-
-        SetBufferSizeAndTimeoutsInDoConnect();
+        CreateNewTcpClient();
 
         try
         {
             var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, cancellationToken);
-            var connectTask = tcpClient
+            var connectTask = tcpClient!
                 .ConnectAsync(IPAddressOrHostname, Port, cancellationToken)
                 .AsTask();
 
@@ -351,8 +349,9 @@ public partial class TcpClient : IDisposable
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
             }
 
-            tcpClient.Close();
+            tcpClient!.Close();
             tcpClient.Dispose();
+            tcpClient = null;
 
             return false;
         }
@@ -612,6 +611,19 @@ public partial class TcpClient : IDisposable
         return Array.Empty<byte>();
     }
 
+    private void CreateNewTcpClient()
+    {
+        tcpClient = new System.Net.Sockets.TcpClient();
+
+        tcpClient.LingerState = new LingerOption(enable: true, seconds: 0);
+
+        tcpClient.SetBufferSizeAndTimeouts(
+            clientConfig.SendTimeout,
+            clientConfig.ReceiveTimeout,
+            clientConfig.SendBufferSize,
+            clientConfig.ReceiveBufferSize);
+    }
+
     private void CleanupIfNeededInDoConnect()
     {
         if (cancellationTokenSource is null)
@@ -628,17 +640,6 @@ public partial class TcpClient : IDisposable
         {
             DisposeTcpClientAndStream();
         }
-    }
-
-    private void SetBufferSizeAndTimeoutsInDoConnect()
-    {
-        tcpClient!.LingerState = new LingerOption(enable: true, seconds: 0);
-
-        tcpClient.SetBufferSizeAndTimeouts(
-            clientConfig.SendTimeout,
-            clientConfig.ReceiveTimeout,
-            clientConfig.SendBufferSize,
-            clientConfig.ReceiveBufferSize);
     }
 
     private void PrepareNetworkStreamAndKeepAliveInDoConnect()

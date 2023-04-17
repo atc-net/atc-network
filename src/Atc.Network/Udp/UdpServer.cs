@@ -42,6 +42,11 @@ public partial class UdpServer : IUdpServer
             SocketOptionName.ReuseAddress,
             optionValue: true);
 
+        socket.SendTimeout = serverConfig!.SendTimeout;
+        socket.SendBufferSize = serverConfig.SendBufferSize;
+        socket.ReceiveTimeout = serverConfig.ReceiveTimeout;
+        socket.ReceiveBufferSize = serverConfig.ReceiveBufferSize;
+
         var receiveBuffer = new byte[this.serverConfig.ReceiveBufferSize];
         receiveBufferSegment = new ArraySegment<byte>(receiveBuffer);
     }

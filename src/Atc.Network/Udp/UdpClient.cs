@@ -15,10 +15,10 @@ public partial class UdpClient : IUdpClient
     private readonly UdpClientConfig clientConfig;
     private readonly ArraySegment<byte> receiveBufferSegment;
 
-    private readonly Task? receiveListenerTask;
-    private readonly CancellationTokenSource cancellationTokenSource = new();
-
-    private readonly Socket? socket;
+    private Task? receiveListenerTask;
+    private CancellationTokenSource? cancellationTokenSource;
+    private CancellationTokenRegistration? cancellationTokenRegistration;
+    private Socket? socket;
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -49,21 +49,6 @@ public partial class UdpClient : IUdpClient
         this.logger = logger;
         this.clientConfig = clientConfig ?? new UdpClientConfig();
 
-        socket = new Socket(
-            AddressFamily.InterNetwork,
-            SocketType.Dgram,
-            ProtocolType.Udp);
-
-        socket.SetSocketOption(
-            SocketOptionLevel.IP,
-            SocketOptionName.PacketInformation,
-            optionValue: true);
-
-        if (OperatingSystem.IsWindows())
-        {
-            socket.SetIPProtectionLevel(IPProtectionLevel.Unrestricted);
-        }
-
         var receiveBuffer = new byte[this.clientConfig.ReceiveBufferSize];
         receiveBufferSegment = new ArraySegment<byte>(receiveBuffer);
     }
@@ -78,10 +63,6 @@ public partial class UdpClient : IUdpClient
         ArgumentNullException.ThrowIfNull(ipAddress);
 
         RemoteEndPoint = new IPEndPoint(ipAddress, port);
-
-        receiveListenerTask = Task.Run(
-            async () => await DataReceiver(cancellationTokenSource.Token),
-            cancellationTokenSource.Token);
     }
 
     [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
@@ -222,19 +203,8 @@ public partial class UdpClient : IUdpClient
             return;
         }
 
-        if (!cancellationTokenSource.IsCancellationRequested)
-        {
-            cancellationTokenSource.Cancel();
-        }
-
-        cancellationTokenSource.Dispose();
-
-        if (receiveListenerTask!.Status == TaskStatus.Running)
-        {
-            receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
-        }
-
-        socket?.Dispose();
+        DisposeCancellationTokenAndTask();
+        DisposeSocket();
     }
 
     private async Task<bool> DoConnect(
@@ -252,9 +222,26 @@ public partial class UdpClient : IUdpClient
             ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
         }
 
+        CleanupIfNeededInDoConnect();
+
+        CreateNewSocket();
+
         try
         {
-            await socket!.ConnectAsync(RemoteEndPoint, cancellationToken);
+            var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, cancellationToken);
+            var connectTask = socket!
+                .ConnectAsync(RemoteEndPoint, cancellationToken)
+                .AsTask();
+
+            // Double await so if connectTimeoutTask throws exception, this throws it
+            await await Task.WhenAny(connectTask, connectTimeoutTask);
+
+            if (connectTimeoutTask.IsCompleted)
+            {
+                // If connectTimeoutTask and connectTask both finish at the same time,
+                // we'll consider it to be a timeout.
+                throw new SocketException((int)SocketError.TimedOut);
+            }
         }
         catch (Exception ex)
         {
@@ -263,6 +250,10 @@ public partial class UdpClient : IUdpClient
                 LogConnectionError(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port, ex.Message);
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
             }
+
+            socket!.Close();
+            socket.Dispose();
+            socket = null;
 
             return false;
         }
@@ -336,10 +327,8 @@ public partial class UdpClient : IUdpClient
                     ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
                 }
 
-                socket.Close();
+                DisposeSocket();
             }
-
-            socket?.Dispose();
 
             IsConnected = false;
             if (raiseEvents)
@@ -359,17 +348,116 @@ public partial class UdpClient : IUdpClient
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            if (!IsConnected)
+            if (!IsConnected ||
+                socket is null)
             {
                 await Task.Delay(TimeToWaitForDataReceiverInMs, cancellationToken);
                 continue;
             }
 
-            var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, RemoteEndPoint);
-            var receivedBytes = new byte[res.ReceivedBytes];
-            Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
+            await HandleReceiveMessage();
+        }
+    }
 
-            DataReceived?.Invoke(receivedBytes);
+    private async Task HandleReceiveMessage()
+    {
+        SocketReceiveMessageFromResult? res;
+
+        try
+        {
+            res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, RemoteEndPoint);
+        }
+        catch
+        {
+            return;
+        }
+
+        var receivedBytes = new byte[res.Value.ReceivedBytes];
+        Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.Value.ReceivedBytes);
+
+        DataReceived?.Invoke(receivedBytes);
+    }
+
+    private void CreateNewSocket()
+    {
+        socket = new Socket(
+            AddressFamily.InterNetwork,
+            SocketType.Dgram,
+            ProtocolType.Udp);
+
+        socket.SetSocketOption(
+            SocketOptionLevel.IP,
+            SocketOptionName.PacketInformation,
+            optionValue: true);
+
+        socket.SendTimeout = clientConfig.SendTimeout;
+        socket.SendBufferSize = clientConfig.SendBufferSize;
+        socket.ReceiveTimeout = clientConfig.ReceiveTimeout;
+        socket.ReceiveBufferSize = clientConfig.ReceiveBufferSize;
+
+        if (OperatingSystem.IsWindows())
+        {
+            socket.SetIPProtectionLevel(clientConfig.IPProtectionLevel);
+        }
+    }
+
+    private void CleanupIfNeededInDoConnect()
+    {
+        if (cancellationTokenSource is null)
+        {
+            cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenRegistration = cancellationTokenSource.Token.Register(() => { });
+
+            receiveListenerTask = Task.Run(
+                async () => await DataReceiver(cancellationTokenSource.Token),
+                cancellationTokenSource.Token);
+        }
+
+        if (socket is not null)
+        {
+            DisposeSocket();
+        }
+    }
+
+    private void DisposeCancellationTokenAndTask()
+    {
+        if (cancellationTokenSource is not null)
+        {
+            if (!cancellationTokenSource.IsCancellationRequested)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            cancellationTokenSource.Dispose();
+            cancellationTokenSource = null;
+        }
+
+        if (receiveListenerTask is not null)
+        {
+            if (receiveListenerTask.Status == TaskStatus.Running)
+            {
+                receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
+            }
+
+            receiveListenerTask = null;
+        }
+
+        if (cancellationTokenRegistration is not null)
+        {
+            cancellationTokenRegistration.Value.Dispose();
+            cancellationTokenRegistration = null;
+        }
+    }
+
+    private void DisposeSocket()
+    {
+        IsConnected = false;
+
+        if (socket is not null)
+        {
+            socket.Close();
+            socket.Dispose();
+            socket = null;
         }
     }
 }
