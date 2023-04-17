@@ -246,7 +246,7 @@ Base configurations for `Atc.Network.Tcp.TcpClient`.
 >```csharp
 >ConnectTimeout
 >```
-><b>Summary:</b> Gets or sets the send timeout value of the connection in milliseconds.
+><b>Summary:</b> Gets or sets the connect timeout value of the connection in milliseconds.
 >
 ><b>Returns:</b> The connect time-out value, in milliseconds. The default is 10000 (10 sec);
 #### DefaultEncoding
@@ -265,7 +265,7 @@ Base configurations for `Atc.Network.Tcp.TcpClient`.
 >```csharp
 >ReceiveTimeout
 >```
-><b>Summary:</b> Gets or sets the receive timeout value of the connection in milliseconds.
+><b>Summary:</b> Gets or sets the receive timeout value in milliseconds.
 >
 ><b>Returns:</b> The receive time-out value, in milliseconds. The default is 0;
 #### SendBufferSize
@@ -279,7 +279,7 @@ Base configurations for `Atc.Network.Tcp.TcpClient`.
 >```csharp
 >SendTimeout
 >```
-><b>Summary:</b> Gets or sets the send timeout value of the connection in milliseconds.
+><b>Summary:</b> Gets or sets the send timeout value in milliseconds.
 >
 ><b>Returns:</b> The send time-out value, in milliseconds. The default is 0;
 #### TerminationType
