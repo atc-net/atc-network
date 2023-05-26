@@ -374,8 +374,6 @@ public partial class TcpClient : IDisposable
     {
         if (raiseEventsAndLog)
         {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
-
             LogDisconnecting(IPAddressOrHostname, Port);
         }
 
@@ -594,6 +592,10 @@ public partial class TcpClient : IDisposable
                 cancellationToken);
 
             return memoryStream.ToArray();
+        }
+        catch (OperationCanceledException)
+        {
+            // Skip
         }
         catch (ObjectDisposedException)
         {
