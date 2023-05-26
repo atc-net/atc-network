@@ -595,6 +595,10 @@ public partial class TcpClient : IDisposable
 
             return memoryStream.ToArray();
         }
+        catch (OperationCanceledException)
+        {
+            // Skip
+        }
         catch (ObjectDisposedException)
         {
             // Skip
