@@ -349,12 +349,9 @@ public partial class TcpClient : IDisposable
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
             }
 
-            if (tcpClient is not null)
-            {
-                tcpClient!.Close();
-                tcpClient.Dispose();
-                tcpClient = null;
-            }
+            tcpClient!.Close();
+            tcpClient.Dispose();
+            tcpClient = null;
 
             return false;
         }
