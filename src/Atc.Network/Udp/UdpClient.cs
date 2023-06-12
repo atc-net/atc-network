@@ -251,9 +251,12 @@ public partial class UdpClient : IUdpClient
                 ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
             }
 
-            socket!.Close();
-            socket.Dispose();
-            socket = null;
+            if (socket is not null)
+            {
+                socket!.Close();
+                socket.Dispose();
+                socket = null;
+            }
 
             return false;
         }
