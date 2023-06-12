@@ -1,6 +1,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable InvertIf
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 namespace Atc.Network.Tcp;
 
 /// <summary>
@@ -305,6 +306,7 @@ public partial class TcpClient : IDisposable
         DisposeTcpClientAndStream();
     }
 
+    [SuppressMessage("Design", "MA0051:Method is too long", Justification = "OK.")]
     private async Task<bool> DoConnect(
         bool raiseEventsAndLog,
         CancellationToken cancellationToken = default)
