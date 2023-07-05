@@ -5,6 +5,7 @@ namespace Atc.Network.Udp;
 /// The main UdpClient - Handles call execution.
 /// </summary>
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK")]
+[SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1502:Element should not be on a single line", Justification = "OK.")]
 public partial class UdpClient : IUdpClient
 {
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
@@ -184,6 +185,32 @@ public partial class UdpClient : IUdpClient
         await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
     }
 
+    /// <summary>
+    /// Called when connection is established.
+    /// </summary>
+    protected virtual void OnConnected() { }
+
+    /// <summary>
+    /// Called when connection is destroyed.
+    /// </summary>
+    protected virtual void OnDisconnected() { }
+
+    /// <summary>
+    /// Called when connection state is changed.
+    /// </summary>
+    /// <param name="connectionState">The connection state.</param>
+    /// <param name="errorMessage">The error message.</param>
+    protected virtual void OnConnectionStateChanged(
+        ConnectionState connectionState,
+        string? errorMessage = null) { }
+
+    /// <summary>
+    /// Called when data received.
+    /// </summary>
+    /// <param name="bytes">The received bytes.</param>
+    protected virtual void OnDataReceived(
+        byte[] bytes) { }
+
     /// <inheritdoc />
     public void Dispose()
     {
@@ -207,6 +234,41 @@ public partial class UdpClient : IUdpClient
         DisposeSocket();
     }
 
+    private void InvokeConnected()
+    {
+        Connected?.Invoke();
+        OnConnected();
+    }
+
+    private void InvokeDisconnected()
+    {
+        Disconnected?.Invoke();
+        OnDisconnected();
+    }
+
+    private void InvokeConnectionStateChanged(
+        ConnectionState connectionState,
+        string? errorMessage = null)
+    {
+        if (errorMessage is null)
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState));
+            OnConnectionStateChanged(connectionState);
+        }
+        else
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState, errorMessage));
+            OnConnectionStateChanged(connectionState, errorMessage);
+        }
+    }
+
+    private void InvokeDataReceived(
+        byte[] data)
+    {
+        DataReceived?.Invoke(data);
+        OnDataReceived(data);
+    }
+
     private async Task<bool> DoConnect(
         bool raiseEventsAndLog,
         CancellationToken cancellationToken = default)
@@ -219,7 +281,7 @@ public partial class UdpClient : IUdpClient
         if (raiseEventsAndLog)
         {
             LogConnecting(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
+            InvokeConnectionStateChanged(ConnectionState.Connecting);
         }
 
         CleanupIfNeededInDoConnect();
@@ -248,7 +310,7 @@ public partial class UdpClient : IUdpClient
             if (raiseEventsAndLog)
             {
                 LogConnectionError(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port, ex.Message);
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
+                InvokeConnectionStateChanged(ConnectionState.ConnectionFailed, ex.Message);
             }
 
             if (socket is not null)
@@ -266,7 +328,7 @@ public partial class UdpClient : IUdpClient
         if (raiseEventsAndLog)
         {
             LogConnected(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
+            InvokeConnectionStateChanged(ConnectionState.Connected);
         }
 
         return true;
@@ -277,7 +339,7 @@ public partial class UdpClient : IUdpClient
     {
         if (raiseEventsAndLog)
         {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
+            InvokeConnectionStateChanged(ConnectionState.Disconnecting);
 
             LogDisconnecting(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
         }
@@ -301,7 +363,7 @@ public partial class UdpClient : IUdpClient
             IsConnected = true;
             if (raiseEvents)
             {
-                Connected?.Invoke();
+                InvokeConnected();
             }
         }
         finally
@@ -327,7 +389,7 @@ public partial class UdpClient : IUdpClient
             {
                 if (raiseEvents)
                 {
-                    ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
+                    InvokeConnectionStateChanged(ConnectionState.Disconnecting);
                 }
 
                 DisposeSocket();
@@ -336,8 +398,8 @@ public partial class UdpClient : IUdpClient
             IsConnected = false;
             if (raiseEvents)
             {
-                Disconnected?.Invoke();
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
+                InvokeDisconnected();
+                InvokeConnectionStateChanged(ConnectionState.Disconnected);
             }
         }
         finally
@@ -378,7 +440,7 @@ public partial class UdpClient : IUdpClient
         var receivedBytes = new byte[res.Value.ReceivedBytes];
         Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.Value.ReceivedBytes);
 
-        DataReceived?.Invoke(receivedBytes);
+        InvokeDataReceived(receivedBytes);
     }
 
     private void CreateNewSocket()

@@ -5,6 +5,7 @@ namespace Atc.Network.Udp;
 /// The main UdpServer - Handles call execution.
 /// </summary>
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK")]
+[SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1502:Element should not be on a single line", Justification = "OK.")]
 public partial class UdpServer : IUdpServer
 {
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
@@ -207,6 +208,13 @@ public partial class UdpServer : IUdpServer
     }
 
     /// <summary>
+    /// Called when data received.
+    /// </summary>
+    /// <param name="bytes">The received bytes.</param>
+    protected virtual void OnDataReceived(
+        byte[] bytes) { }
+
+    /// <summary>
     /// Dispose.
     /// </summary>
     /// <param name="disposing">Indicates if we are disposing or not.</param>
@@ -239,6 +247,13 @@ public partial class UdpServer : IUdpServer
 
             socket.Dispose();
         }
+    }
+
+    private void InvokeDataReceived(
+        byte[] data)
+    {
+        DataReceived?.Invoke(data);
+        OnDataReceived(data);
     }
 
     private static void AppendTerminationBytesIfNeeded(
@@ -277,7 +292,7 @@ public partial class UdpServer : IUdpServer
             var receivedBytes = new byte[res.ReceivedBytes];
             Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
 
-            DataReceived?.Invoke(receivedBytes);
+            InvokeDataReceived(receivedBytes);
 
             var receivedStr = serverConfig.DefaultEncoding.GetString(receivedBytes);
             if (receivedStr.StartsWith("ping", StringComparison.OrdinalIgnoreCase))

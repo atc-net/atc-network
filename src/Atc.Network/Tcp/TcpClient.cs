@@ -8,7 +8,8 @@ namespace Atc.Network.Tcp;
 /// The main TcpClient - Handles call execution.
 /// </summary>
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK")]
-public partial class TcpClient : IDisposable
+[SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1502:Element should not be on a single line", Justification = "OK.")]
+public partial class TcpClient : ITcpClient
 {
     private const int TimeToWaitForDisconnectionInMs = 200;
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
@@ -283,6 +284,37 @@ public partial class TcpClient : IDisposable
         await networkStream.FlushAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Called when connection is established.
+    /// </summary>
+    protected virtual void OnConnected() { }
+
+    /// <summary>
+    /// Called when connection is destroyed.
+    /// </summary>
+    protected virtual void OnDisconnected() { }
+
+    /// <summary>
+    /// Called when connection state is changed.
+    /// </summary>
+    /// <param name="connectionState">The connection state.</param>
+    /// <param name="errorMessage">The error message.</param>
+    protected virtual void OnConnectionStateChanged(
+        ConnectionState connectionState,
+        string? errorMessage = null) { }
+
+    /// <summary>
+    /// Called when no data received.
+    /// </summary>
+    protected virtual void OnNoDataReceived() { }
+
+    /// <summary>
+    /// Called when data received.
+    /// </summary>
+    /// <param name="bytes">The received bytes.</param>
+    protected virtual void OnDataReceived(
+        byte[] bytes) { }
+
     /// <inheritdoc />
     public void Dispose()
     {
@@ -306,6 +338,47 @@ public partial class TcpClient : IDisposable
         DisposeTcpClientAndStream();
     }
 
+    private void InvokeConnected()
+    {
+        Connected?.Invoke();
+        OnConnected();
+    }
+
+    private void InvokeDisconnected()
+    {
+        Disconnected?.Invoke();
+        OnDisconnected();
+    }
+
+    private void InvokeConnectionStateChanged(
+        ConnectionState connectionState,
+        string? errorMessage = null)
+    {
+        if (errorMessage is null)
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState));
+            OnConnectionStateChanged(connectionState);
+        }
+        else
+        {
+            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState, errorMessage));
+            OnConnectionStateChanged(connectionState, errorMessage);
+        }
+    }
+
+    private void InvokeNoDataReceived()
+    {
+        NoDataReceived?.Invoke();
+        OnNoDataReceived();
+    }
+
+    private void InvokeDataReceived(
+        byte[] data)
+    {
+        DataReceived?.Invoke(data);
+        OnDataReceived(data);
+    }
+
     [SuppressMessage("Design", "MA0051:Method is too long", Justification = "OK.")]
     private async Task<bool> DoConnect(
         bool raiseEventsAndLog,
@@ -319,7 +392,7 @@ public partial class TcpClient : IDisposable
         if (raiseEventsAndLog)
         {
             LogConnecting(IPAddressOrHostname, Port);
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connecting));
+            InvokeConnectionStateChanged(ConnectionState.Connecting);
         }
 
         CleanupIfNeededInDoConnect();
@@ -348,7 +421,7 @@ public partial class TcpClient : IDisposable
             if (raiseEventsAndLog)
             {
                 LogConnectionError(IPAddressOrHostname, Port, ex.Message);
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ConnectionFailed, ex.Message));
+                InvokeConnectionStateChanged(ConnectionState.ConnectionFailed, ex.Message);
             }
 
             if (tcpClient is not null)
@@ -367,7 +440,7 @@ public partial class TcpClient : IDisposable
         if (raiseEventsAndLog)
         {
             LogConnected(IPAddressOrHostname, Port);
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Connected));
+            InvokeConnectionStateChanged(ConnectionState.Connected);
         }
 
         return true;
@@ -388,7 +461,7 @@ public partial class TcpClient : IDisposable
     private async Task DoReconnect()
     {
         LogReconnecting(IPAddressOrHostname, Port);
-        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnecting));
+        InvokeConnectionStateChanged(ConnectionState.Reconnecting);
 
         await SetDisconnected(raiseEvents: false, dispose: false);
 
@@ -398,14 +471,14 @@ public partial class TcpClient : IDisposable
         {
             reconnectRetryCounter = 0;
             LogReconnected(IPAddressOrHostname, Port);
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Reconnected));
+            InvokeConnectionStateChanged(ConnectionState.Reconnected);
         }
         else
         {
             if (reconnectRetryCounter < clientReconnectConfig.RetryMaxAttempts)
             {
                 LogReconnectionWarning(IPAddressOrHostname, Port, reconnectRetryCounter, clientReconnectConfig.RetryMaxAttempts);
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ReconnectionFailed));
+                InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
 
                 reconnectRetryCounter++;
 
@@ -415,7 +488,7 @@ public partial class TcpClient : IDisposable
             else
             {
                 LogReconnectionMaxRetryExceededError(IPAddressOrHostname, Port);
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.ReconnectionFailed));
+                InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
             }
         }
     }
@@ -436,7 +509,7 @@ public partial class TcpClient : IDisposable
             IsConnected = true;
             if (raiseEvents)
             {
-                Connected?.Invoke();
+                InvokeConnected();
             }
         }
         finally
@@ -463,7 +536,7 @@ public partial class TcpClient : IDisposable
             {
                 if (raiseEvents)
                 {
-                    ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnecting));
+                    InvokeConnectionStateChanged(ConnectionState.Disconnected);
                 }
 
                 if (dispose)
@@ -481,8 +554,8 @@ public partial class TcpClient : IDisposable
             IsConnected = false;
             if (raiseEvents)
             {
-                Disconnected?.Invoke();
-                ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
+                InvokeDisconnected();
+                InvokeConnectionStateChanged(ConnectionState.Disconnected);
             }
         }
         finally
@@ -549,11 +622,11 @@ public partial class TcpClient : IDisposable
                 if (IsConnected)
                 {
                     LogDataReceiveNoData();
-                    NoDataReceived?.Invoke();
+                    InvokeNoDataReceived();
 
                     if (clientReconnectConfig.Enable)
                     {
-                        ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(ConnectionState.Disconnected));
+                        InvokeConnectionStateChanged(ConnectionState.Disconnected);
 
                         await DoReconnect();
                     }
@@ -567,7 +640,7 @@ public partial class TcpClient : IDisposable
         else
         {
             LogDataReceivedByteLength(data.Length);
-            DataReceived?.Invoke(data);
+            InvokeDataReceived(data);
         }
     }
 
