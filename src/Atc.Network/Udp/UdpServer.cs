@@ -207,6 +207,10 @@ public partial class UdpServer : IUdpServer
         await socket!.SendToAsync(buffer, SocketFlags.None, recipient, cancellationToken);
     }
 
+    /// <summary>
+    /// Called when data received.
+    /// </summary>
+    /// <param name="bytes">The received bytes.</param>
     protected virtual void OnDataReceived(
         byte[] bytes) { }
 

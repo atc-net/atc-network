@@ -185,14 +185,29 @@ public partial class UdpClient : IUdpClient
         await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
     }
 
+    /// <summary>
+    /// Called when connection is established.
+    /// </summary>
     protected virtual void OnConnected() { }
 
+    /// <summary>
+    /// Called when connection is destroyed.
+    /// </summary>
     protected virtual void OnDisconnected() { }
 
+    /// <summary>
+    /// Called when connection state is changed.
+    /// </summary>
+    /// <param name="connectionState">The connection state.</param>
+    /// <param name="errorMessage">The error message.</param>
     protected virtual void OnConnectionStateChanged(
         ConnectionState connectionState,
         string? errorMessage = null) { }
 
+    /// <summary>
+    /// Called when data received.
+    /// </summary>
+    /// <param name="bytes">The received bytes.</param>
     protected virtual void OnDataReceived(
         byte[] bytes) { }
 
