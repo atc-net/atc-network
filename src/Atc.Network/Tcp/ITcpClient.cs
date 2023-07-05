@@ -4,7 +4,7 @@ namespace Atc.Network.Tcp;
 /// <summary>
 /// This is a interface for <see cref="TcpClient"/>.
 /// </summary>
-public interface ITcpClient
+public interface ITcpClient : IDisposable
 {
     /// <summary>
     /// Event to raise when connection is established.

@@ -8,7 +8,8 @@ namespace Atc.Network.Tcp;
 /// The main TcpClient - Handles call execution.
 /// </summary>
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK")]
-public partial class TcpClient : IDisposable
+[SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1502:Element should not be on a single line", Justification = "OK.")]
+public partial class TcpClient : ITcpClient
 {
     private const int TimeToWaitForDisconnectionInMs = 200;
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
