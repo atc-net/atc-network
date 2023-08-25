@@ -184,88 +184,6 @@ ConnectionStateEventArgs.
 >public static class LoggingEventIdConstants
 >```
 
-### Static Fields
-
-#### ClientNotConnected
->```csharp
->int ClientNotConnected
->```
-#### Connected
->```csharp
->int Connected
->```
-#### Connecting
->```csharp
->int Connecting
->```
-#### ConnectionError
->```csharp
->int ConnectionError
->```
-#### DataReceiveError
->```csharp
->int DataReceiveError
->```
-#### DataReceiveNoData
->```csharp
->int DataReceiveNoData
->```
-#### DataReceiveTimeout
->```csharp
->int DataReceiveTimeout
->```
-#### DataReceivedByteLength
->```csharp
->int DataReceivedByteLength
->```
-#### DataSendingByteLength
->```csharp
->int DataSendingByteLength
->```
-#### Disconnected
->```csharp
->int Disconnected
->```
-#### Disconnecting
->```csharp
->int Disconnecting
->```
-#### Reconnected
->```csharp
->int Reconnected
->```
-#### Reconnecting
->```csharp
->int Reconnecting
->```
-#### ReconnectionMaxRetryExceededError
->```csharp
->int ReconnectionMaxRetryExceededError
->```
-#### ReconnectionWarning
->```csharp
->int ReconnectionWarning
->```
-#### ServiceNotRunning
->```csharp
->int ServiceNotRunning
->```
-#### ServiceStarted
->```csharp
->int ServiceStarted
->```
-#### ServiceStarting
->```csharp
->int ServiceStarting
->```
-#### ServiceStopped
->```csharp
->int ServiceStopped
->```
-#### ServiceStopping
->```csharp
->int ServiceStopping
->```
 
 <br />
 
@@ -366,10 +284,12 @@ Enumeration: NetworkQualityCategoryType.
 
 | Value | Name | Description | Summary | 
 | --- | --- | --- | --- | 
-| 0 | None | None |  | 
-| 1 | LineFeed | Line Feed |  | 
-| 2 | CarriageReturn | Carriage Return |  | 
-| 3 | CarriageReturnLineFeed | Carriage Return Line Feed |  | 
+| 0 | None | None | The none - known as '\0'. | 
+| 1 | LineFeed | Line Feed | The line feed - know as '\n' (0x0A). | 
+| 2 | CarriageReturn | Carriage Return | The carriage return - know as '\r' (0x0D). | 
+| 3 | CarriageReturnLineFeed | Carriage Return Line Feed | The carriage return line feed - know as '\r\n' (0x0D, 0x0A). | 
+| 4 | EndOfText | End Of Text | The end of transmission - known as ETX (0x03). | 
+| 5 | EndOfTransmission | End Of Transmission | The end of transmission - known as EOT (0x04). | 
 
 
 

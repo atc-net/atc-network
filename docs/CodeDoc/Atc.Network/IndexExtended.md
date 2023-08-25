@@ -30,27 +30,6 @@
 - [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
 - [IPServicePortExaminationLevel](Atc.Network.md#ipserviceportexaminationlevel)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
-  -  Static Fields
-     - int ClientNotConnected
-     - int Connected
-     - int Connecting
-     - int ConnectionError
-     - int DataReceiveError
-     - int DataReceiveNoData
-     - int DataReceiveTimeout
-     - int DataReceivedByteLength
-     - int DataSendingByteLength
-     - int Disconnected
-     - int Disconnecting
-     - int Reconnected
-     - int Reconnecting
-     - int ReconnectionMaxRetryExceededError
-     - int ReconnectionWarning
-     - int ServiceNotRunning
-     - int ServiceStarted
-     - int ServiceStarting
-     - int ServiceStopped
-     - int ServiceStopping
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
@@ -118,6 +97,8 @@
 - [TerminationTypeHelper](Atc.Network.Helpers.md#terminationtypehelper)
   -  Static Fields
      - byte CarriageReturn
+     - byte EndOfText
+     - byte EndOfTransmission
      - byte LineFeed
   -  Static Methods
      - ConvertToBytes(TerminationType terminationType)

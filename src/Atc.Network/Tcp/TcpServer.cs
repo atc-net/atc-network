@@ -168,11 +168,11 @@ public partial class TcpServer : ITcpServer
 
             while (IsRunning)
             {
-                var client = await tcpListener.AcceptTcpClientAsync(cancellationToken);
+                var serverClient = await tcpListener.AcceptTcpClientAsync(cancellationToken);
 
-                while (IsRunning && client.Connected)
+                while (IsRunning && serverClient.Connected)
                 {
-                    await HandleClient(client, cancellationToken);
+                    await HandleServerClientIncomingStream(serverClient, cancellationToken);
                 }
             }
         }
@@ -182,16 +182,18 @@ public partial class TcpServer : ITcpServer
         }
     }
 
-    private async Task HandleClient(
-        System.Net.Sockets.TcpClient client,
+    private async Task HandleServerClientIncomingStream(
+        System.Net.Sockets.TcpClient serverClient,
         CancellationToken cancellationToken)
     {
         var buffer = new byte[serverConfig.ReceiveBufferSize];
         var memoryStream = new MemoryStream();
+        byte[] receivedBuffer;
+        bool messageHasEnded;
 
         do
         {
-            var readCount = await client
+            var readCount = await serverClient
                 .GetStream()
                 .ReadAsync(
                     buffer.AsMemory(0, buffer.Length),
@@ -199,20 +201,26 @@ public partial class TcpServer : ITcpServer
 
             if (readCount == 0)
             {
-                client.Dispose();
+                serverClient.Dispose();
                 return;
             }
+
+            LogDataReceivedChunk(readCount);
 
             await memoryStream.WriteAsync(
                 buffer.AsMemory(0, readCount),
                 cancellationToken);
+
+            receivedBuffer = memoryStream.ToArray();
+
+            messageHasEnded = TerminationTypeHelper.HasTerminationType(
+                serverConfig.TerminationType,
+                receivedBuffer);
         }
-        while (!TerminationTypeHelper.HasTerminationType(
-                   serverConfig.TerminationType,
-                   memoryStream.ToArray()));
+        while (!messageHasEnded);
 
         LogDataReceived((int)memoryStream.Length);
-        InvokeDataReceived(memoryStream.ToArray());
+        InvokeDataReceived(receivedBuffer);
     }
 
     private void InvokeDataReceived(

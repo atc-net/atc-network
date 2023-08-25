@@ -129,6 +129,14 @@
 >```csharp
 >byte CarriageReturn
 >```
+#### EndOfText
+>```csharp
+>byte EndOfText
+>```
+#### EndOfTransmission
+>```csharp
+>byte EndOfTransmission
+>```
 #### LineFeed
 >```csharp
 >byte LineFeed
