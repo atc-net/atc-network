@@ -4,9 +4,11 @@
 
 Atc.Network is a C# library providing robust and flexible tools for network communication and scanning.
 
-- **TcpClient and UdpClient/UdpServer:** Establish and manage TCP and UDP network connections.
+- **TcpClient/TcpServer:** Establish and manage TCP network connections.
 
-- **IPScanner:** A flexible tool to scan a range of IP addresses or a single IP address. It comes with various configuration options such as:
+- **UdpClient/UdpServer:** Establish and manage UDP network connections.
+
+- - **IPScanner:** A flexible tool to scan a range of IP addresses or a single IP address. It comes with various configuration options such as:
   - ICMP Pinging
   - Host Name Resolution
   - MAC Address Resolution

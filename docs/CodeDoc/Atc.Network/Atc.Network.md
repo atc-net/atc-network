@@ -250,6 +250,22 @@ ConnectionStateEventArgs.
 >```csharp
 >int ServiceNotRunning
 >```
+#### ServiceStarted
+>```csharp
+>int ServiceStarted
+>```
+#### ServiceStarting
+>```csharp
+>int ServiceStarting
+>```
+#### ServiceStopped
+>```csharp
+>int ServiceStopped
+>```
+#### ServiceStopping
+>```csharp
+>int ServiceStopping
+>```
 
 <br />
 

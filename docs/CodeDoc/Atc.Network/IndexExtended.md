@@ -47,6 +47,10 @@
      - int ReconnectionMaxRetryExceededError
      - int ReconnectionWarning
      - int ServiceNotRunning
+     - int ServiceStarted
+     - int ServiceStarting
+     - int ServiceStopped
+     - int ServiceStopping
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
@@ -118,6 +122,7 @@
   -  Static Methods
      - ConvertToBytes(TerminationType terminationType)
      - ConvertToString(TerminationType terminationType)
+     - HasTerminationType(TerminationType terminationType, byte[] data)
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
 
@@ -267,6 +272,13 @@
      - Send(byte[] data, CancellationToken cancellationToken = null)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
      - Send(string data, CancellationToken cancellationToken = null)
+- [ITcpServer](Atc.Network.Tcp.md#itcpserver)
+  -  Properties
+     - IpAddress
+     - IsRunning
+     - Port
+  -  Events
+     - DataReceived
 - [TcpClient](Atc.Network.Tcp.md#tcpclient)
   -  Properties
      - IPAddressOrHostname
@@ -312,6 +324,16 @@
      - RetryMaxAttempts
   -  Methods
      - ToString()
+- [TcpConfigBase](Atc.Network.Tcp.md#tcpconfigbase)
+  -  Properties
+     - DefaultEncoding
+     - ReceiveBufferSize
+     - ReceiveTimeout
+     - SendBufferSize
+     - SendTimeout
+     - TerminationType
+  -  Methods
+     - ToString()
 - [TcpConstants](Atc.Network.Tcp.md#tcpconstants)
   -  Static Fields
      - int DefaultBufferSize
@@ -319,6 +341,18 @@
      - int DefaultReconnectRetryInterval
      - int DefaultReconnectRetryMaxAttempts
      - int DefaultSendReceiveTimeout
+- [TcpServer](Atc.Network.Tcp.md#tcpserver)
+  -  Properties
+     - IpAddress
+     - IsRunning
+     - Port
+  -  Events
+     - DataReceived
+  -  Methods
+     - Dispose()
+     - StartAsync(CancellationToken cancellationToken)
+     - StopAsync(CancellationToken cancellationToken)
+- [TcpServerConfig](Atc.Network.Tcp.md#tcpserverconfig)
 
 ## [Atc.Network.Udp](Atc.Network.Udp.md)
 

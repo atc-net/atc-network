@@ -32,4 +32,25 @@ public static class TerminationTypeHelper
             TerminationType.CarriageReturnLineFeed => CarriageReturnLineFeedAsBytes,
             _ => throw new SwitchCaseDefaultException(terminationType),
         };
+
+    public static bool HasTerminationType(
+        TerminationType terminationType,
+        byte[] data)
+    {
+        switch (terminationType)
+        {
+            case TerminationType.None:
+                return true;
+            case TerminationType.LineFeed:
+                return data.Contains((byte)'\n');
+            case TerminationType.CarriageReturn:
+                return data.Contains((byte)'\r');
+            case TerminationType.CarriageReturnLineFeed:
+                var s = Encoding.ASCII.GetString(data);
+                return s.Contains("\r\n", StringComparison.Ordinal) ||
+                       s.Contains("\n\r", StringComparison.Ordinal);
+            default:
+                throw new SwitchCaseDefaultException(terminationType);
+        }
+    }
 }

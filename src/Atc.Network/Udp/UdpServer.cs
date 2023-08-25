@@ -197,7 +197,7 @@ public partial class UdpServer : IUdpServer
 
         if (!IsRunning)
         {
-            LogServiceNotRunning();
+            LogUdpServerNotRunning();
             return;
         }
 
@@ -292,6 +292,7 @@ public partial class UdpServer : IUdpServer
             var receivedBytes = new byte[res.ReceivedBytes];
             Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
 
+            LogDataReceived(receivedBytes.Length);
             InvokeDataReceived(receivedBytes);
 
             var receivedStr = serverConfig.DefaultEncoding.GetString(receivedBytes);

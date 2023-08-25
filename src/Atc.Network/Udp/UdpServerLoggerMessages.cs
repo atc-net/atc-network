@@ -10,8 +10,15 @@ public partial class UdpServer
     private readonly ILogger logger;
 
     [LoggerMessage(
-        EventId = LoggingEventIdConstants.ServiceNotRunning,
+        EventId = LoggingEventIdConstants.UdpServer.NotRunning,
         Level = LogLevel.Trace,
-        Message = "Service is not running.")]
-    private partial void LogServiceNotRunning();
+        Message = "Udp server is not running.")]
+    private partial void LogUdpServerNotRunning();
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpServer.DataReceivedByteLength,
+        Level = LogLevel.Trace,
+        Message = "Received '{byteLength}' bytes.")]
+    private partial void LogDataReceived(
+        int byteLength);
 }
