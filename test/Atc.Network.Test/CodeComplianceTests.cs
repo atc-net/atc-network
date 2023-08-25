@@ -12,6 +12,7 @@ public class CodeComplianceTests
     {
         // TODO: Imp. missing test for:
         typeof(TcpClient),
+        typeof(TcpServer),
         typeof(IPv4AddressHelper),
         typeof(MacAddressVendorLookupHelper),
         typeof(PingHelper),
