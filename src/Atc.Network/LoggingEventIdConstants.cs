@@ -30,6 +30,7 @@ public static class LoggingEventIdConstants
         public const int Stopping = 10123;
         public const int Stopped = 10124;
         public const int DataReceivedByteLength = 10111;
+        public const int DataReceivedChunkByteLength = 10112;
     }
 
     internal static class UdpClient

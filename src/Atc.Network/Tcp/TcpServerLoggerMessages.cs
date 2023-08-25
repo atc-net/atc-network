@@ -50,7 +50,14 @@ public partial class TcpServer
     [LoggerMessage(
         EventId = LoggingEventIdConstants.TcpServer.DataReceivedByteLength,
         Level = LogLevel.Trace,
-        Message = "Received '{byteLength}' bytes.")]
+        Message = "Received message '{byteLength}' bytes.")]
     private partial void LogDataReceived(
+        int byteLength);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpServer.DataReceivedChunkByteLength,
+        Level = LogLevel.Trace,
+        Message = "Received chunk '{byteLength}' bytes.")]
+    private partial void LogDataReceivedChunk(
         int byteLength);
 }
