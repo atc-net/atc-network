@@ -10,38 +10,51 @@ public partial class UdpClient
     private readonly ILogger logger;
 
     [LoggerMessage(
-        EventId = LoggingEventIdConstants.Connecting,
+        EventId = LoggingEventIdConstants.UdpClient.Connecting,
         Level = LogLevel.Trace,
         Message = "Trying to connect to '{ipAddressOrHostName}' on port '{port}'.")]
-    private partial void LogConnecting(string ipAddressOrHostName, int port);
+    private partial void LogConnecting(
+        string ipAddressOrHostName,
+        int port);
 
     [LoggerMessage(
-        EventId = LoggingEventIdConstants.Connected,
+        EventId = LoggingEventIdConstants.UdpClient.Connected,
         Level = LogLevel.Information,
         Message = "Connected to '{ipAddressOrHostName}' on port '{port}'.")]
-    private partial void LogConnected(string ipAddressOrHostName, int port);
+    private partial void LogConnected(
+        string ipAddressOrHostName,
+        int port);
 
     [LoggerMessage(
-        EventId = LoggingEventIdConstants.ConnectionError,
+        EventId = LoggingEventIdConstants.UdpClient.ConnectionError,
         Level = LogLevel.Error,
         Message = "Could not connect to '{ipAddressOrHostName}' on port '{port}': '{errorMessage}'.")]
-    private partial void LogConnectionError(string ipAddressOrHostName, int port, string errorMessage);
+    private partial void LogConnectionError(
+        string ipAddressOrHostName,
+        int port,
+        string errorMessage);
 
     [LoggerMessage(
-        EventId = LoggingEventIdConstants.ClientNotConnected,
+        EventId = LoggingEventIdConstants.UdpClient.ClientNotConnected,
         Level = LogLevel.Error,
         Message = "Client is not connected to '{ipAddressOrHostName}' on port '{port}'.")]
-    private partial void LogClientNotConnected(string ipAddressOrHostName, int port);
+    private partial void LogClientNotConnected(
+        string ipAddressOrHostName,
+        int port);
 
     [LoggerMessage(
-        EventId = LoggingEventIdConstants.Disconnecting,
+        EventId = LoggingEventIdConstants.UdpClient.Disconnecting,
         Level = LogLevel.Trace,
         Message = "Trying to disconnect from '{ipAddressOrHostName}' on port '{port}'.")]
-    private partial void LogDisconnecting(string ipAddressOrHostName, int port);
+    private partial void LogDisconnecting(
+        string ipAddressOrHostName,
+        int port);
 
     [LoggerMessage(
-        EventId = LoggingEventIdConstants.Disconnected,
+        EventId = LoggingEventIdConstants.UdpClient.Disconnected,
         Level = LogLevel.Information,
         Message = "Disconnected from '{ipAddressOrHostName}' on port '{port}'.")]
-    private partial void LogDisconnected(string ipAddressOrHostName, int port);
+    private partial void LogDisconnected(
+        string ipAddressOrHostName,
+        int port);
 }
