@@ -32,12 +32,12 @@ public class IPv4AddressHelperTests
     [InlineData(false, "10.50.31.7", "10.50.30.7")]
     public void ValidateAddresses(bool expected, string ipAddressStart, string ipAddressEnd)
     {
-        // Atc
+        // Act
         var (isValid, _) = IPv4AddressHelper.ValidateAddresses(
             IPAddress.Parse(ipAddressStart),
             IPAddress.Parse(ipAddressEnd));
 
-        // Asset
+        // Assert
         Assert.Equal(expected, isValid);
     }
 
@@ -52,12 +52,12 @@ public class IPv4AddressHelperTests
     [InlineData(320, "10.50.30.7", "10.50.31.70")]
     public void GetAddressesInRange(int expected, string ipAddressStart, string ipAddressEnd)
     {
-        // Atc
+        // Act
         var actual = IPv4AddressHelper.GetAddressesInRange(
             IPAddress.Parse(ipAddressStart),
             IPAddress.Parse(ipAddressEnd));
 
-        // Asset
+        // Assert
         Assert.Equal(expected, actual.Count);
     }
 
@@ -73,12 +73,12 @@ public class IPv4AddressHelperTests
     [InlineData(1, "10.0.0.0", 32)]
     public void GetAddressesInRange_Cidr(int expected, string ipAddress, int cidrMaskLength)
     {
-        // Atc
+        // Act
         var actual = IPv4AddressHelper.GetAddressesInRange(
             IPAddress.Parse(ipAddress),
             cidrMaskLength);
 
-        // Asset
+        // Assert
         Assert.Equal(expected, actual.Count);
     }
 
@@ -95,12 +95,12 @@ public class IPv4AddressHelperTests
     [InlineData("192.168.0.0", "192.168.0.255", "192.168.0.7", 24)]
     public void GetFirstAndLastAddressInRange(string expected1, string expected2, string ipAddress, int cidrMaskLength)
     {
-        // Atc
+        // Act
         var actual = IPv4AddressHelper.GetFirstAndLastAddressInRange(
             IPAddress.Parse(ipAddress),
             cidrMaskLength);
 
-        // Asset
+        // Assert
         Assert.Equal(IPAddress.Parse(expected1), actual.StartIpAddress);
         Assert.Equal(IPAddress.Parse(expected2), actual.EndIpAddress);
     }

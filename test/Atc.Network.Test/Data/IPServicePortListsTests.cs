@@ -5,7 +5,7 @@ public class IPServicePortListsTests
     [Fact]
     public void GetWellKnown()
     {
-        // Atc
+        // Act
         var actual = IPServicePortLists.GetWellKnown();
 
         // Assert
@@ -24,7 +24,7 @@ public class IPServicePortListsTests
     [InlineData(1, ServiceProtocolType.Telnet)]
     public void GetWellKnown_ServiceProtocolType(int expected, ServiceProtocolType serviceProtocolType)
     {
-        // Atc
+        // Act
         var actual = IPServicePortLists.GetWellKnown(serviceProtocolType);
 
         // Assert
@@ -35,7 +35,7 @@ public class IPServicePortListsTests
     [Fact]
     public void GetWellKnownOrCommon()
     {
-        // Atc
+        // Act
         var actual = IPServicePortLists.GetWellKnownOrCommon();
 
         // Assert
@@ -54,7 +54,7 @@ public class IPServicePortListsTests
     [InlineData(1, ServiceProtocolType.Telnet)]
     public void GetWellKnownOrCommon_ServiceProtocolType(int expected, ServiceProtocolType serviceProtocolType)
     {
-        // Atc
+        // Act
         var actual = IPServicePortLists.GetWellKnownOrCommon(serviceProtocolType);
 
         // Assert

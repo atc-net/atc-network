@@ -39,7 +39,7 @@ public class IPScannerConfigExtensionsTests
             ipScannerConfig.PortNumbers.Add((ushort)(i + 10));
         }
 
-        // Atc
+        // Act
         var actual = ipScannerConfig.GetTasksToProcessCount();
 
         // Assert

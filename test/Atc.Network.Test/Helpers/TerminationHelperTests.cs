@@ -14,7 +14,7 @@ public class TerminationHelperTests
         // Arrange
         var bytes = Encoding.ASCII.GetBytes(value);
 
-        // Atc
+        // Act
         TerminationHelper.AppendTerminationBytesIfNeeded(ref bytes, terminationType);
 
         // Assert
