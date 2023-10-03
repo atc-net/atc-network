@@ -11,7 +11,7 @@ public static class IPv4AddressHelper
         ArgumentNullException.ThrowIfNull(ipAddress);
 
         var isValid = IPAddress.TryParse(ipAddress, out var address) &&
-                       address.AddressFamily == AddressFamily.InterNetwork;
+                      address.AddressFamily == AddressFamily.InterNetwork;
 
         if (!isValid)
         {
