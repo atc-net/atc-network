@@ -4,6 +4,27 @@ namespace Atc.Network.Test.Helpers;
 public class IPv4AddressHelperTests
 {
     [Theory]
+    [InlineData(false, "")] // Empty string
+    [InlineData(false, "192.168")] // Missing octets
+    [InlineData(false, "192.168.1")] // Missing one octet
+    [InlineData(true, "192.168.1.1")] // Valid IP
+    [InlineData(false, "192.168.1.256")] // Octet above 255
+    [InlineData(false, "192.168.1.-1")] // Negative octet
+    [InlineData(false, "abc.def.ghi.jkl")] // Non-numeric octets
+    [InlineData(true, "0.0.0.0")] // Valid, all zeros
+    [InlineData(false, "256.256.256.256")] // All octets above 255
+    [InlineData(true, "255.255.255.255")] // All octets at max value 255
+
+    public void IsValid(bool expected, string ipAddress)
+    {
+        // Act
+        var isValid = IPv4AddressHelper.IsValid(ipAddress);
+
+        // Assert
+        Assert.Equal(expected, isValid);
+    }
+
+    [Theory]
     [InlineData(true, "10.50.30.7", "10.50.30.7")]
     [InlineData(true, "10.50.30.7", "10.50.30.70")]
     [InlineData(false, "10.50.30.7", "10.50.30.6")]
