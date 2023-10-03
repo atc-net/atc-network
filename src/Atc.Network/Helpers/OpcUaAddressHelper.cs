@@ -2,6 +2,9 @@ namespace Atc.Network.Helpers;
 
 public static class OpcUaAddressHelper
 {
+    private const int MinPortNumber = 1;
+    private const int MaxPortNumber = ushort.MaxValue;
+
     public static bool IsValid(
         string url,
         bool restrictToIp4Address = false)
@@ -38,6 +41,6 @@ public static class OpcUaAddressHelper
             }
         }
 
-        return uri.Port is >= 1 and <= ushort.MaxValue;
+        return uri.Port is >= MinPortNumber and <= MaxPortNumber;
     }
 }
