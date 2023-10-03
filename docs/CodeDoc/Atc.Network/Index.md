@@ -32,6 +32,7 @@
 - [DnsLookupHelper](Atc.Network.Helpers.md#dnslookuphelper)
 - [IPv4AddressHelper](Atc.Network.Helpers.md#ipv4addresshelper)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
+- [OpcUaAddressHelper](Atc.Network.Helpers.md#opcuaaddresshelper)
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
 - [TerminationHelper](Atc.Network.Helpers.md#terminationhelper)
 - [TerminationTypeHelper](Atc.Network.Helpers.md#terminationtypehelper)
