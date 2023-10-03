@@ -61,6 +61,10 @@
 >```csharp
 >IPAddress GetLocalAddress()
 >```
+#### IsValid
+>```csharp
+>bool IsValid(string ipAddress)
+>```
 #### ValidateAddresses
 >```csharp
 >ValueTuple<bool, string> ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
@@ -79,6 +83,25 @@
 #### LookupVendorNameFromMacAddress
 >```csharp
 >Task<string> LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
+>```
+
+<br />
+
+## OpcUaAddressHelper
+
+>```csharp
+>public static class OpcUaAddressHelper
+>```
+
+### Static Methods
+
+#### IsValid
+>```csharp
+>bool IsValid(string url, bool restrictToIp4Address = False)
+>```
+#### IsValid
+>```csharp
+>bool IsValid(Uri uri, bool restrictToIp4Address = False)
 >```
 
 <br />

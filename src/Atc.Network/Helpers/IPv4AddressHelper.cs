@@ -5,6 +5,23 @@ namespace Atc.Network.Helpers;
 
 public static class IPv4AddressHelper
 {
+    public static bool IsValid(
+        string ipAddress)
+    {
+        ArgumentNullException.ThrowIfNull(ipAddress);
+
+        var isValid = IPAddress.TryParse(ipAddress, out var address) &&
+                      address.AddressFamily == AddressFamily.InterNetwork;
+
+        if (!isValid)
+        {
+            return false;
+        }
+
+        var octetCount = ipAddress.Split('.').Length;
+        return octetCount == 4;
+    }
+
     public static (bool IsValid, string? ErrorMessage) ValidateAddresses(
         IPAddress startIpAddress,
         IPAddress endIpAddress)

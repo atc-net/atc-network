@@ -83,10 +83,15 @@
      - GetAddressesInRange(IPAddress startIpAddress, IPAddress endIpAddress)
      - GetFirstAndLastAddressInRange(IPAddress ipAddress, int cidrLength)
      - GetLocalAddress()
+     - IsValid(string ipAddress)
      - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
+- [OpcUaAddressHelper](Atc.Network.Helpers.md#opcuaaddresshelper)
+  -  Static Methods
+     - IsValid(Uri uri, bool restrictToIp4Address = False)
+     - IsValid(string url, bool restrictToIp4Address = False)
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
   -  Static Methods
      - GetStatus(IPAddress ipAddress, TimeSpan timeout)

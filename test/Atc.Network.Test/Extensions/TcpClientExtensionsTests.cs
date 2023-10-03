@@ -19,7 +19,7 @@ public class TcpClientExtensionsTests
         // Arrange
         var tcpClient = new System.Net.Sockets.TcpClient();
 
-        // Atc
+        // Act
         tcpClient.SetBufferSizeAndTimeouts(sendTimeout, sendBufferSize, receiveTimeout, receiveBufferSize);
 
         // Assert
@@ -38,7 +38,7 @@ public class TcpClientExtensionsTests
         // Arrange
         var tcpClient = new System.Net.Sockets.TcpClient();
 
-        // Atc
+        // Act
         bool? result = null;
         if (expected)
         {
@@ -67,7 +67,7 @@ public class TcpClientExtensionsTests
         // Arrange
         var tcpClient = new System.Net.Sockets.TcpClient();
 
-        // Atc
+        // Act
         const bool result = true;
         tcpClient.DisableKeepAlive();
 
