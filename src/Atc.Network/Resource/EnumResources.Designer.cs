@@ -70,6 +70,213 @@ namespace Atc.Network.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bad destination.
+        /// </summary>
+        public static string IPStatusBadDestination {
+            get {
+                return ResourceManager.GetString("IPStatusBadDestination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bad header.
+        /// </summary>
+        public static string IPStatusBadHeader {
+            get {
+                return ResourceManager.GetString("IPStatusBadHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bad option.
+        /// </summary>
+        public static string IPStatusBadOption {
+            get {
+                return ResourceManager.GetString("IPStatusBadOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bad route.
+        /// </summary>
+        public static string IPStatusBadRoute {
+            get {
+                return ResourceManager.GetString("IPStatusBadRoute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination host unreachable.
+        /// </summary>
+        public static string IPStatusDestinationHostUnreachable {
+            get {
+                return ResourceManager.GetString("IPStatusDestinationHostUnreachable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination network unreachable.
+        /// </summary>
+        public static string IPStatusDestinationNetworkUnreachable {
+            get {
+                return ResourceManager.GetString("IPStatusDestinationNetworkUnreachable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination port unreachable.
+        /// </summary>
+        public static string IPStatusDestinationPortUnreachable {
+            get {
+                return ResourceManager.GetString("IPStatusDestinationPortUnreachable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination prohibited.
+        /// </summary>
+        public static string IPStatusDestinationProhibited {
+            get {
+                return ResourceManager.GetString("IPStatusDestinationProhibited", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination scope mismatch.
+        /// </summary>
+        public static string IPStatusDestinationScopeMismatch {
+            get {
+                return ResourceManager.GetString("IPStatusDestinationScopeMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination unreachable.
+        /// </summary>
+        public static string IPStatusDestinationUnreachable {
+            get {
+                return ResourceManager.GetString("IPStatusDestinationUnreachable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hardware error.
+        /// </summary>
+        public static string IPStatusHardwareError {
+            get {
+                return ResourceManager.GetString("IPStatusHardwareError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ICMP error.
+        /// </summary>
+        public static string IPStatusIcmpError {
+            get {
+                return ResourceManager.GetString("IPStatusIcmpError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No resources.
+        /// </summary>
+        public static string IPStatusNoResources {
+            get {
+                return ResourceManager.GetString("IPStatusNoResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packet is too big.
+        /// </summary>
+        public static string IPStatusPacketTooBig {
+            get {
+                return ResourceManager.GetString("IPStatusPacketTooBig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter problem.
+        /// </summary>
+        public static string IPStatusParameterProblem {
+            get {
+                return ResourceManager.GetString("IPStatusParameterProblem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source quench.
+        /// </summary>
+        public static string IPStatusSourceQuench {
+            get {
+                return ResourceManager.GetString("IPStatusSourceQuench", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        public static string IPStatusSuccess {
+            get {
+                return ResourceManager.GetString("IPStatusSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timed out.
+        /// </summary>
+        public static string IPStatusTimedOut {
+            get {
+                return ResourceManager.GetString("IPStatusTimedOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time exceeded.
+        /// </summary>
+        public static string IPStatusTimeExceeded {
+            get {
+                return ResourceManager.GetString("IPStatusTimeExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TTL expired.
+        /// </summary>
+        public static string IPStatusTtlExpired {
+            get {
+                return ResourceManager.GetString("IPStatusTtlExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TTL reassembly time exceeded.
+        /// </summary>
+        public static string IPStatusTtlReassemblyTimeExceeded {
+            get {
+                return ResourceManager.GetString("IPStatusTtlReassemblyTimeExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string IPStatusUnknown {
+            get {
+                return ResourceManager.GetString("IPStatusUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unrecognized next header.
+        /// </summary>
+        public static string IPStatusUnrecognizedNextHeader {
+            get {
+                return ResourceManager.GetString("IPStatusUnrecognizedNextHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Excellent.
         /// </summary>
         public static string NetworkQualityCategoryTypeExcellent {

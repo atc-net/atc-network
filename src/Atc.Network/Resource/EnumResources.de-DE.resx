@@ -144,4 +144,73 @@
   <data name="None" xml:space="preserve">
     <value>Keine</value>
   </data>
+  <data name="IPStatusBadDestination" xml:space="preserve">
+    <value>Schlechtes Ziel</value>
+  </data>
+  <data name="IPStatusBadHeader" xml:space="preserve">
+    <value>Schlechter Header</value>
+  </data>
+  <data name="IPStatusBadOption" xml:space="preserve">
+    <value>Schlechte Option</value>
+  </data>
+  <data name="IPStatusBadRoute" xml:space="preserve">
+    <value>Schlechte Route</value>
+  </data>
+  <data name="IPStatusDestinationHostUnreachable" xml:space="preserve">
+    <value>Ziel-Host nicht erreichbar</value>
+  </data>
+  <data name="IPStatusDestinationNetworkUnreachable" xml:space="preserve">
+    <value>Zielnetzwerk nicht erreichbar</value>
+  </data>
+  <data name="IPStatusDestinationPortUnreachable" xml:space="preserve">
+    <value>Zielport nicht erreichbar</value>
+  </data>
+  <data name="IPStatusDestinationProhibited" xml:space="preserve">
+    <value>Ziel verboten</value>
+  </data>
+  <data name="IPStatusDestinationScopeMismatch" xml:space="preserve">
+    <value>Nichtübereinstimmung des Zielbereichs</value>
+  </data>
+  <data name="IPStatusDestinationUnreachable" xml:space="preserve">
+    <value>Ziel unerreichbar</value>
+  </data>
+  <data name="IPStatusHardwareError" xml:space="preserve">
+    <value>Hardwarefehler</value>
+  </data>
+  <data name="IPStatusIcmpError" xml:space="preserve">
+    <value>ICMP-Fehler</value>
+  </data>
+  <data name="IPStatusNoResources" xml:space="preserve">
+    <value>Keine Ressourcen</value>
+  </data>
+  <data name="IPStatusPacketTooBig" xml:space="preserve">
+    <value>Paket ist zu groß</value>
+  </data>
+  <data name="IPStatusParameterProblem" xml:space="preserve">
+    <value>Parameterproblem</value>
+  </data>
+  <data name="IPStatusSourceQuench" xml:space="preserve">
+    <value>Quellenlöschung</value>
+  </data>
+  <data name="IPStatusSuccess" xml:space="preserve">
+    <value>Erfolg</value>
+  </data>
+  <data name="IPStatusTimedOut" xml:space="preserve">
+    <value>Zeitüberschreitung</value>
+  </data>
+  <data name="IPStatusTimeExceeded" xml:space="preserve">
+    <value>Zeit überschritten</value>
+  </data>
+  <data name="IPStatusUnknown" xml:space="preserve">
+    <value>Unbekannt</value>
+  </data>
+  <data name="IPStatusTtlExpired" xml:space="preserve">
+    <value>TTL abgelaufen</value>
+  </data>
+  <data name="IPStatusTtlReassemblyTimeExceeded" xml:space="preserve">
+    <value>Die Zeit für den Zusammenbau des TTL wurde überschritten</value>
+  </data>
+  <data name="IPStatusUnrecognizedNextHeader" xml:space="preserve">
+    <value>Nächster Header nicht erkannt</value>
+  </data>
 </root>
