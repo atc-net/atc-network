@@ -178,6 +178,38 @@ ConnectionStateEventArgs.
 
 <br />
 
+## IPStatusExtensions
+Provides extension methods for the `System.Net.NetworkInformation.IPStatus` enumeration.
+><b>Remarks:</b> This static class extends the `System.Net.NetworkInformation.IPStatus` enumeration, allowing for easy retrieval of localized string descriptions for each IP status value. This can be particularly useful for displaying user-friendly status messages in applications that perform network operations and diagnostics.
+
+>```csharp
+>public static class IPStatusExtensions
+>```
+
+### Static Methods
+
+#### GetLocalizedDescription
+>```csharp
+>string GetLocalizedDescription(this IPStatus ipStatus)
+>```
+><b>Summary:</b> Retrieves a localized description for a specified `System.Net.NetworkInformation.IPStatus` value.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ipStatus`&nbsp;&nbsp;-&nbsp;&nbsp;The  value for which a localized description is needed.<br />
+>
+><b>Returns:</b> A localized string representation of the specified `System.Net.NetworkInformation.IPStatus` value.
+>
+><b>Code example:</b>
+>```csharp
+>This example shows how to call the  method on an instance of the  enumeration:
+>
+>var status = IPStatus.TimedOut;
+>var description = status.GetLocalizedDescription();
+>Console.WriteLine(description); // Outputs the localized description for the IPStatus.TimedOut
+>```
+
+<br />
+
 ## LoggingEventIdConstants
 
 >```csharp
