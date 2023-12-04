@@ -29,6 +29,9 @@
      - GetTasksToProcessCount(this IPScannerConfig ipScannerConfig)
 - [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
 - [IPServicePortExaminationLevel](Atc.Network.md#ipserviceportexaminationlevel)
+- [IPStatusExtensions](Atc.Network.md#ipstatusextensions)
+  -  Static Methods
+     - GetLocalizedDescription(this IPStatus ipStatus)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)

@@ -120,6 +120,75 @@
   <data name="All" xml:space="preserve">
     <value>All</value>
   </data>
+  <data name="IPStatusBadDestination" xml:space="preserve">
+    <value>Bad destination</value>
+  </data>
+  <data name="IPStatusBadHeader" xml:space="preserve">
+    <value>Bad header</value>
+  </data>
+  <data name="IPStatusBadOption" xml:space="preserve">
+    <value>Bad option</value>
+  </data>
+  <data name="IPStatusBadRoute" xml:space="preserve">
+    <value>Bad route</value>
+  </data>
+  <data name="IPStatusDestinationHostUnreachable" xml:space="preserve">
+    <value>Destination host unreachable</value>
+  </data>
+  <data name="IPStatusDestinationNetworkUnreachable" xml:space="preserve">
+    <value>Destination network unreachable</value>
+  </data>
+  <data name="IPStatusDestinationPortUnreachable" xml:space="preserve">
+    <value>Destination port unreachable</value>
+  </data>
+  <data name="IPStatusDestinationProhibited" xml:space="preserve">
+    <value>Destination prohibited</value>
+  </data>
+  <data name="IPStatusDestinationScopeMismatch" xml:space="preserve">
+    <value>Destination scope mismatch</value>
+  </data>
+  <data name="IPStatusDestinationUnreachable" xml:space="preserve">
+    <value>Destination unreachable</value>
+  </data>
+  <data name="IPStatusHardwareError" xml:space="preserve">
+    <value>Hardware error</value>
+  </data>
+  <data name="IPStatusIcmpError" xml:space="preserve">
+    <value>ICMP error</value>
+  </data>
+  <data name="IPStatusNoResources" xml:space="preserve">
+    <value>No resources</value>
+  </data>
+  <data name="IPStatusPacketTooBig" xml:space="preserve">
+    <value>Packet is too big</value>
+  </data>
+  <data name="IPStatusParameterProblem" xml:space="preserve">
+    <value>Parameter problem</value>
+  </data>
+  <data name="IPStatusSourceQuench" xml:space="preserve">
+    <value>Source quench</value>
+  </data>
+  <data name="IPStatusSuccess" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="IPStatusTimedOut" xml:space="preserve">
+    <value>Timed out</value>
+  </data>
+  <data name="IPStatusTimeExceeded" xml:space="preserve">
+    <value>Time exceeded</value>
+  </data>
+  <data name="IPStatusTtlExpired" xml:space="preserve">
+    <value>TTL expired</value>
+  </data>
+  <data name="IPStatusTtlReassemblyTimeExceeded" xml:space="preserve">
+    <value>TTL reassembly time exceeded</value>
+  </data>
+  <data name="IPStatusUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="IPStatusUnrecognizedNextHeader" xml:space="preserve">
+    <value>Unrecognized next header</value>
+  </data>
   <data name="NetworkQualityCategoryTypeExcellent" xml:space="preserve">
     <value>Excellent</value>
   </data>

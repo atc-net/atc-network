@@ -144,4 +144,73 @@
   <data name="None" xml:space="preserve">
     <value>Ingen</value>
   </data>
+  <data name="IPStatusBadDestination" xml:space="preserve">
+    <value>Dårlig destination</value>
+  </data>
+  <data name="IPStatusBadHeader" xml:space="preserve">
+    <value>Dårligt header</value>
+  </data>
+  <data name="IPStatusBadOption" xml:space="preserve">
+    <value>Dårlig indstilling</value>
+  </data>
+  <data name="IPStatusBadRoute" xml:space="preserve">
+    <value>Dårlig rute</value>
+  </data>
+  <data name="IPStatusDestinationHostUnreachable" xml:space="preserve">
+    <value>Destination er ikke til at få fat på</value>
+  </data>
+  <data name="IPStatusDestinationNetworkUnreachable" xml:space="preserve">
+    <value>Destinations netværket er ikke tilgængeligt</value>
+  </data>
+  <data name="IPStatusDestinationPortUnreachable" xml:space="preserve">
+    <value>Destination kan ikke nås på port</value>
+  </data>
+  <data name="IPStatusDestinationProhibited" xml:space="preserve">
+    <value>Destination forbudt</value>
+  </data>
+  <data name="IPStatusDestinationScopeMismatch" xml:space="preserve">
+    <value>Destinations scope stemmer ikke overens</value>
+  </data>
+  <data name="IPStatusDestinationUnreachable" xml:space="preserve">
+    <value>Destination uopnåelig</value>
+  </data>
+  <data name="IPStatusHardwareError" xml:space="preserve">
+    <value>Hardware fejl</value>
+  </data>
+  <data name="IPStatusIcmpError" xml:space="preserve">
+    <value>ICMP fejl</value>
+  </data>
+  <data name="IPStatusNoResources" xml:space="preserve">
+    <value>Ingen ressourcer</value>
+  </data>
+  <data name="IPStatusPacketTooBig" xml:space="preserve">
+    <value>Pakken er for stor</value>
+  </data>
+  <data name="IPStatusParameterProblem" xml:space="preserve">
+    <value>Parameter problem</value>
+  </data>
+  <data name="IPStatusSourceQuench" xml:space="preserve">
+    <value>Kildeslukning</value>
+  </data>
+  <data name="IPStatusSuccess" xml:space="preserve">
+    <value>Succes</value>
+  </data>
+  <data name="IPStatusTimedOut" xml:space="preserve">
+    <value>Timeout</value>
+  </data>
+  <data name="IPStatusTimeExceeded" xml:space="preserve">
+    <value>Tiden er overskredet</value>
+  </data>
+  <data name="IPStatusUnknown" xml:space="preserve">
+    <value>Ukendt</value>
+  </data>
+  <data name="IPStatusTtlExpired" xml:space="preserve">
+    <value>TTL udløb</value>
+  </data>
+  <data name="IPStatusTtlReassemblyTimeExceeded" xml:space="preserve">
+    <value>TTL gensamlingstiden er overskredet</value>
+  </data>
+  <data name="IPStatusUnrecognizedNextHeader" xml:space="preserve">
+    <value>Næste header er ikke genkendt</value>
+  </data>
 </root>

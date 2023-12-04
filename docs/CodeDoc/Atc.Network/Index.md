@@ -14,6 +14,7 @@
 - [IPScannerConfigExtensions](Atc.Network.md#ipscannerconfigextensions)
 - [IPScannerProgressReportingType](Atc.Network.md#ipscannerprogressreportingtype)
 - [IPServicePortExaminationLevel](Atc.Network.md#ipserviceportexaminationlevel)
+- [IPStatusExtensions](Atc.Network.md#ipstatusextensions)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
