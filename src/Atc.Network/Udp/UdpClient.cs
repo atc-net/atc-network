@@ -181,8 +181,33 @@ public partial class UdpClient : IUdpClient
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
         var buffer = new ArraySegment<byte>(data);
-        await socket!.SendToAsync(buffer, SocketFlags.None, RemoteEndPoint, cancellationToken);
-        await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
+        await SyncLock.WaitAsync(cancellationToken);
+        var disconnectDueToException = false;
+
+        try
+        {
+            await socket!.SendToAsync(buffer, SocketFlags.None, RemoteEndPoint, cancellationToken);
+            await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
+        }
+        catch (SocketException ex)
+        {
+            LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
+            disconnectDueToException = true;
+        }
+        catch (Exception ex)
+        {
+            LogDataSendingError(ex.Message);
+            disconnectDueToException = true;
+        }
+        finally
+        {
+            SyncLock.Release();
+        }
+
+        if (disconnectDueToException)
+        {
+            await DoDisconnect(raiseEventsAndLog: true);
+        }
     }
 
     /// <summary>
@@ -351,10 +376,10 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
+        await SyncLock.WaitAsync(cancellationToken);
+
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
-
             if (IsConnected)
             {
                 return;
@@ -376,10 +401,10 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents = true,
         CancellationToken cancellationToken = default)
     {
+        await SyncLock.WaitAsync(cancellationToken);
+
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
-
             if (!IsConnected)
             {
                 return;

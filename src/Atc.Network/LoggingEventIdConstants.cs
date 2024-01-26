@@ -43,6 +43,8 @@ public static class LoggingEventIdConstants
         public const int ClientNotConnected = 10207;
         public const int Disconnecting = 10208;
         public const int Disconnected = 10209;
+        public const int DataSendingSocketError = 10210;
+        public const int DataSendingError = 10211;
     }
 
     internal static class UdpServer
