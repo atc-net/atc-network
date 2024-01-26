@@ -51,5 +51,7 @@ public static class LoggingEventIdConstants
     {
         public const int DataReceivedByteLength = 10311;
         public const int NotRunning = 10320;
+        public const int DataSendingSocketError = 10321;
+        public const int DataSendingError = 10322;
     }
 }
