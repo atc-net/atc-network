@@ -16,10 +16,12 @@ public static class LoggingEventIdConstants
         public const int Disconnected = 10009;
 
         public const int DataSendingByteLength = 10010;
-        public const int DataReceivedByteLength = 10011;
-        public const int DataReceiveTimeout = 10012;
-        public const int DataReceiveNoData = 10013;
-        public const int DataReceiveError = 10014;
+        public const int DataSendingSocketError = 10011;
+        public const int DataSendingError = 10012;
+        public const int DataReceivedByteLength = 10013;
+        public const int DataReceiveTimeout = 10014;
+        public const int DataReceiveNoData = 10015;
+        public const int DataReceiveError = 10016;
     }
 
     internal static class TcpServer

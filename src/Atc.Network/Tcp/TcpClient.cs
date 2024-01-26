@@ -280,8 +280,33 @@ public partial class TcpClient : ITcpClient
 
         LogDataSendingByteLength(data.Length);
 
-        await networkStream!.WriteAsync(data.AsMemory(0, data.Length), cancellationToken);
-        await networkStream.FlushAsync(cancellationToken);
+        await SyncLock.WaitAsync(cancellationToken);
+        var disconnectDueToException = false;
+
+        try
+        {
+            await networkStream!.WriteAsync(data.AsMemory(0, data.Length), cancellationToken);
+            await networkStream.FlushAsync(cancellationToken);
+        }
+        catch (SocketException ex)
+        {
+            LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
+            disconnectDueToException = true;
+        }
+        catch (Exception ex)
+        {
+            LogDataSendingError(ex.Message);
+            disconnectDueToException = true;
+        }
+        finally
+        {
+            SyncLock.Release();
+        }
+
+        if (disconnectDueToException)
+        {
+            await DoDisconnect(raiseEventsAndLog: true, dispose: true);
+        }
     }
 
     /// <summary>
@@ -497,10 +522,10 @@ public partial class TcpClient : ITcpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
+        await SyncLock.WaitAsync(cancellationToken);
+
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
-
             if (IsConnected)
             {
                 return;
@@ -523,10 +548,10 @@ public partial class TcpClient : ITcpClient
         bool dispose,
         CancellationToken cancellationToken = default)
     {
+        await SyncLock.WaitAsync(cancellationToken);
+
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
-
             if (!IsConnected)
             {
                 return;
