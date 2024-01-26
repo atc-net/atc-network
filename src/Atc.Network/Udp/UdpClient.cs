@@ -182,7 +182,7 @@ public partial class UdpClient : IUdpClient
 
         var buffer = new ArraySegment<byte>(data);
         await SyncLock.WaitAsync(cancellationToken);
-        var disconnectDueToException = false;
+        var disconnectedDueToException = false;
 
         try
         {
@@ -192,19 +192,19 @@ public partial class UdpClient : IUdpClient
         catch (SocketException ex)
         {
             LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
-            disconnectDueToException = true;
+            disconnectedDueToException = true;
         }
         catch (Exception ex)
         {
             LogDataSendingError(ex.Message);
-            disconnectDueToException = true;
+            disconnectedDueToException = true;
         }
         finally
         {
             SyncLock.Release();
         }
 
-        if (disconnectDueToException)
+        if (disconnectedDueToException)
         {
             await DoDisconnect(raiseEventsAndLog: true);
         }

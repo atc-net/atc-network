@@ -281,7 +281,7 @@ public partial class TcpClient : ITcpClient
         LogDataSendingByteLength(data.Length);
 
         await SyncLock.WaitAsync(cancellationToken);
-        var disconnectDueToException = false;
+        var disconnectedDueToException = false;
 
         try
         {
@@ -291,19 +291,19 @@ public partial class TcpClient : ITcpClient
         catch (SocketException ex)
         {
             LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
-            disconnectDueToException = true;
+            disconnectedDueToException = true;
         }
         catch (Exception ex)
         {
             LogDataSendingError(ex.Message);
-            disconnectDueToException = true;
+            disconnectedDueToException = true;
         }
         finally
         {
             SyncLock.Release();
         }
 
-        if (disconnectDueToException)
+        if (disconnectedDueToException)
         {
             await DoDisconnect(raiseEventsAndLog: true, dispose: true);
         }
