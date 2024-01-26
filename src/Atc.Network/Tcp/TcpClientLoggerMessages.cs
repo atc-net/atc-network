@@ -100,6 +100,21 @@ public partial class TcpClient
         int byteLength);
 
     [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpClient.DataSendingSocketError,
+        Level = LogLevel.Error,
+        Message = "Received error when sending data - {socketError}: {errorMessage}.")]
+    private partial void LogDataSendingSocketError(
+        string socketError,
+        string errorMessage);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpClient.DataSendingError,
+        Level = LogLevel.Error,
+        Message = "Received error when sending data: {errorMessage}.")]
+    private partial void LogDataSendingError(
+        string errorMessage);
+
+    [LoggerMessage(
         EventId = LoggingEventIdConstants.TcpClient.DataReceivedByteLength,
         Level = LogLevel.Trace,
         Message = "Received '{byteLength}' bytes.")]

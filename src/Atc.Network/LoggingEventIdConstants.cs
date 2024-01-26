@@ -16,10 +16,12 @@ public static class LoggingEventIdConstants
         public const int Disconnected = 10009;
 
         public const int DataSendingByteLength = 10010;
-        public const int DataReceivedByteLength = 10011;
-        public const int DataReceiveTimeout = 10012;
-        public const int DataReceiveNoData = 10013;
-        public const int DataReceiveError = 10014;
+        public const int DataSendingSocketError = 10011;
+        public const int DataSendingError = 10012;
+        public const int DataReceivedByteLength = 10013;
+        public const int DataReceiveTimeout = 10014;
+        public const int DataReceiveNoData = 10015;
+        public const int DataReceiveError = 10016;
     }
 
     internal static class TcpServer
@@ -41,11 +43,15 @@ public static class LoggingEventIdConstants
         public const int ClientNotConnected = 10207;
         public const int Disconnecting = 10208;
         public const int Disconnected = 10209;
+        public const int DataSendingSocketError = 10210;
+        public const int DataSendingError = 10211;
     }
 
     internal static class UdpServer
     {
         public const int DataReceivedByteLength = 10311;
         public const int NotRunning = 10320;
+        public const int DataSendingSocketError = 10321;
+        public const int DataSendingError = 10322;
     }
 }

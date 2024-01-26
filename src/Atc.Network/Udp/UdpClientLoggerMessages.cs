@@ -57,4 +57,19 @@ public partial class UdpClient
     private partial void LogDisconnected(
         string ipAddressOrHostName,
         int port);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpClient.DataSendingSocketError,
+        Level = LogLevel.Error,
+        Message = "Received error when sending data - {socketError}: {errorMessage}.")]
+    private partial void LogDataSendingSocketError(
+        string socketError,
+        string errorMessage);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpClient.DataSendingError,
+        Level = LogLevel.Error,
+        Message = "Received error when sending data: {errorMessage}.")]
+    private partial void LogDataSendingError(
+        string errorMessage);
 }

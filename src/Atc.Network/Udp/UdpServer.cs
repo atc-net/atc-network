@@ -204,7 +204,19 @@ public partial class UdpServer : IUdpServer
         AppendTerminationBytesIfNeeded(ref data, terminationType);
 
         var buffer = new ArraySegment<byte>(data);
-        await socket!.SendToAsync(buffer, SocketFlags.None, recipient, cancellationToken);
+
+        try
+        {
+            await socket!.SendToAsync(buffer, SocketFlags.None, recipient, cancellationToken);
+        }
+        catch (SocketException ex)
+        {
+            LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
+        }
+        catch (Exception ex)
+        {
+            LogDataSendingError(ex.Message);
+        }
     }
 
     /// <summary>

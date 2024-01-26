@@ -21,4 +21,19 @@ public partial class UdpServer
         Message = "Received '{byteLength}' bytes.")]
     private partial void LogDataReceived(
         int byteLength);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpServer.DataSendingSocketError,
+        Level = LogLevel.Error,
+        Message = "Received error when sending data - {socketError}: {errorMessage}.")]
+    private partial void LogDataSendingSocketError(
+        string socketError,
+        string errorMessage);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpServer.DataSendingError,
+        Level = LogLevel.Error,
+        Message = "Received error when sending data: {errorMessage}.")]
+    private partial void LogDataSendingError(
+        string errorMessage);
 }
