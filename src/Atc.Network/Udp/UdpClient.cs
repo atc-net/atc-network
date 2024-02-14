@@ -256,6 +256,8 @@ public partial class UdpClient : IUdpClient
 
         DisposeCancellationTokenAndTask();
         DisposeSocket();
+
+        syncLock.Dispose();
     }
 
     private void InvokeConnected()
@@ -548,7 +550,5 @@ public partial class UdpClient : IUdpClient
             socket.Dispose();
             socket = null;
         }
-
-        syncLock.Dispose();
     }
 }
