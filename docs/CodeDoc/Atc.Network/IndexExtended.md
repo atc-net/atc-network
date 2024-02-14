@@ -88,6 +88,10 @@
      - GetLocalAddress()
      - IsValid(string ipAddress)
      - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
+- [InternetWorldTimeHelper](Atc.Network.Helpers.md#internetworldtimehelper)
+  -  Static Methods
+     - GetTimeForEuropeBerlin(CancellationToken cancellationToken)
+     - GetTimeForWorldTimezone(string worldTimezone, CancellationToken cancellationToken)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
@@ -138,6 +142,7 @@
      - CanConnectWithHttpOrHttps(int portNumber = 80, bool useHttps = False, CancellationToken cancellationToken = null)
      - CanConnectWithHttps(int portNumber = 443, CancellationToken cancellationToken = null)
      - CanConnectWithTcp(int portNumber, CancellationToken cancellationToken = null)
+     - Dispose()
      - SetIPAddress(IPAddress value)
      - SetTimeout(TimeSpan value)
 - [IPScanner](Atc.Network.Internet.md#ipscanner)

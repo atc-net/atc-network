@@ -19,6 +19,7 @@ public class CodeComplianceTests
         typeof(IPPortScan),
         typeof(IPScanner),
         typeof(DnsLookupHelper),
+        typeof(InternetWorldTimeHelper),
         typeof(IPAddressExtensions),
         typeof(UshortExtensions),
         typeof(UdpClient),

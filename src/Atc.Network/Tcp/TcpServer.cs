@@ -103,7 +103,7 @@ public partial class TcpServer : ITcpServer
     {
         if (!IsRunning)
         {
-            LogTcpServerNotRunning();
+            LogTcpServerNotRunning(IpAddress.ToString(), Port);
             return Task.CompletedTask;
         }
 
@@ -205,7 +205,7 @@ public partial class TcpServer : ITcpServer
                 return;
             }
 
-            LogDataReceivedChunk(readCount);
+            LogDataReceivedChunk(IpAddress.ToString(), Port, readCount);
 
             await memoryStream.WriteAsync(
                 buffer.AsMemory(0, readCount),
@@ -219,7 +219,7 @@ public partial class TcpServer : ITcpServer
         }
         while (!messageHasEnded);
 
-        LogDataReceived((int)memoryStream.Length);
+        LogDataReceived(IpAddress.ToString(), Port, (int)memoryStream.Length);
         InvokeDataReceived(receivedBuffer);
     }
 

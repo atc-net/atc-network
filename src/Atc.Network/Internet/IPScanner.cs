@@ -2,21 +2,34 @@
 // ReSharper disable LocalizableElement
 namespace Atc.Network.Internet;
 
+/// <summary>
+/// Provides functionality for scanning IP addresses and ranges to determine open ports,
+/// resolve hostnames, MAC addresses, and vendor information.
+/// </summary>
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1601:Partial elements should be documented", Justification = "OK.")]
 [SuppressMessage("Major Code Smell", "S108:Nested blocks of code should not be left empty", Justification = "OK.")]
 [SuppressMessage("Minor Code Smell", "S2486:Generic exceptions should not be ignored", Justification = "OK.")]
 public partial class IPScanner : IIPScanner, IDisposable
 {
-    private static readonly SemaphoreSlim SyncLock = new(1, 1);
+    private const int SyncLockTimeoutInMs = 30_000;
+
+    private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly ConcurrentBag<IPScanResult> processedScanResults = new();
     private readonly IPScannerProgressReport progressReporting = new();
     private ArpEntity[]? arpEntities;
     private int tasksToProcessCount;
     private int tasksProcessedCount;
 
+    /// <summary>
+    /// Occurs when there is progress to report during a scan operation.
+    /// </summary>
     public event EventHandler<IPScannerProgressReport>? ProgressReporting;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IPScanner"/> class with various configuration options.
+    /// </summary>
+    /// <param name="logger">The logger to use for logging information and errors during scan operations.</param>
     public IPScanner(
         ILogger logger)
     {
@@ -24,6 +37,11 @@ public partial class IPScanner : IIPScanner, IDisposable
         this.Configuration = new IPScannerConfig();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IPScanner"/> class with a specified logger and optional configuration settings.
+    /// </summary>
+    /// <param name="logger">The logger to use for logging information and errors during scan operations.</param>
+    /// <param name="ipScannerConfig">Optional configuration settings for the scanner. If not provided, default settings are used.</param>
     public IPScanner(
         ILogger logger,
         IPScannerConfig? ipScannerConfig)
@@ -32,24 +50,56 @@ public partial class IPScanner : IIPScanner, IDisposable
         this.Configuration = ipScannerConfig ?? new IPScannerConfig();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IPScanner"/> class using a default logger instance.
+    /// </summary>
     public IPScanner()
         : this(NullLogger.Instance)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IPScanner"/> class with optional configuration settings using a default logger instance.
+    /// </summary>
+    /// <param name="ipScannerConfig">Optional configuration settings for the scanner. If not provided, default settings are used.</param>
     public IPScanner(
         IPScannerConfig? ipScannerConfig)
         : this(NullLogger.Instance, ipScannerConfig)
     {
     }
 
+    /// <summary>
+    /// Gets or sets the configuration settings for the IP scanner.
+    /// </summary>
+    /// <value>The configuration settings used by the scanner.</value>
+    /// <remarks>
+    /// This property allows for the dynamic adjustment of the scanner's settings after initialization,
+    /// providing flexibility to change scanning behavior at runtime.
+    /// </remarks>
     public IPScannerConfig Configuration { get; set; }
 
+    /// <summary>
+    /// Initiates an asynchronous scan for the specified IP address.
+    /// </summary>
+    /// <param name="ipAddress">The IP address to scan.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation, resulting in the scan results.
+    /// </returns>
     public Task<IPScanResults> Scan(
         IPAddress ipAddress,
         CancellationToken cancellationToken = default)
         => ScanRange(ipAddress, ipAddress, cancellationToken);
 
+    /// <summary>
+    /// Initiates an asynchronous scan for a range of IP addresses specified by a CIDR notation.
+    /// </summary>
+    /// <param name="ipAddress">The starting IP address of the CIDR range.</param>
+    /// <param name="cidrLength">The CIDR length that specifies the range of IP addresses to scan.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the operation.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation, resulting in the scan results.
+    /// </returns>
     public Task<IPScanResults> ScanCidrRange(
         IPAddress ipAddress,
         byte cidrLength,
@@ -69,6 +119,15 @@ public partial class IPScanner : IIPScanner, IDisposable
         return ScanRange(startIpAddress, endIpAddress, cancellationToken);
     }
 
+    /// <summary>
+    /// Scans a specified range of IP addresses for open ports and services.
+    /// </summary>
+    /// <param name="startIpAddress">The starting IP address of the range to scan.</param>
+    /// <param name="endIpAddress">The ending IP address of the range to scan.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation, resulting in a collection of scan results.
+    /// </returns>
     public async Task<IPScanResults> ScanRange(
         IPAddress startIpAddress,
         IPAddress endIpAddress,
@@ -85,7 +144,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         }
 
         var ipAddresses = IPv4AddressHelper.GetAddressesInRange(startIpAddress, endIpAddress);
-        if (!ipAddresses.Any())
+        if (ipAddresses.Count == 0)
         {
             scanResults.ErrorMessage = "Nothing to process";
             scanResults.End = DateTime.Now;
@@ -94,7 +153,7 @@ public partial class IPScanner : IIPScanner, IDisposable
 
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
+            await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
             if (Configuration.ResolveMacAddress)
             {
@@ -130,7 +189,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
     }
 
@@ -154,8 +213,12 @@ public partial class IPScanner : IIPScanner, IDisposable
         }
 
         processedScanResults.Clear();
+        syncLock.Dispose();
     }
 
+    /// <summary>
+    /// Raises the <see cref="ProgressReporting"/> event with current progress information.
+    /// </summary>
     private void RaiseProgressReporting(
         IPScannerProgressReportingType reportingType,
         IPScanResult? ipScanResult)
@@ -190,13 +253,12 @@ public partial class IPScanner : IIPScanner, IDisposable
             HandleResolveMacAddress(ipScanResult, ipAddress);
         }
 
-        if (Configuration.ResolveMacAddress &&
-            Configuration.ResolveVendorFromMacAddress)
+        if (Configuration is { ResolveMacAddress: true, ResolveVendorFromMacAddress: true })
         {
             await HandleResolveVendorFromMacAddress(ipScanResult, cancellationToken);
         }
 
-        if (Configuration.PortNumbers.Any())
+        if (Configuration.PortNumbers.Count != 0)
         {
             foreach (var portNumber in Configuration.PortNumbers)
             {
@@ -237,7 +299,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         IPAddress ipAddress)
     {
         arpEntities ??= ArpHelper.GetArpResult();
-        if (arpEntities.Any())
+        if (arpEntities.Length != 0)
         {
             var arpEntity = arpEntities.FirstOrDefault(x => x.IPAddress.Equals(ipAddress));
             if (arpEntity is not null)
@@ -276,7 +338,8 @@ public partial class IPScanner : IIPScanner, IDisposable
         ushort portNumber,
         CancellationToken cancellationToken)
     {
-        var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutTcp.TotalMilliseconds);
+        using var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutTcp.TotalMilliseconds);
+
         var canConnect = await ipPortScan.CanConnectWithTcp(
             portNumber,
             cancellationToken);
@@ -344,7 +407,8 @@ public partial class IPScanner : IIPScanner, IDisposable
             return;
         }
 
-        var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutHttp.TotalMilliseconds);
+        using var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutHttp.TotalMilliseconds);
+
         var canConnectHttp = await ipPortScan.CanConnectWithHttp(
             portNumber,
             cancellationToken);

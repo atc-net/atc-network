@@ -18,7 +18,7 @@ public partial class UdpServer
     [LoggerMessage(
         EventId = LoggingEventIdConstants.UdpServer.DataReceivedByteLength,
         Level = LogLevel.Trace,
-        Message = "Received '{byteLength}' bytes.")]
+        Message = "Received {byteLength} bytes.")]
     private partial void LogDataReceived(
         int byteLength);
 
