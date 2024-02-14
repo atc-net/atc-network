@@ -277,7 +277,7 @@ public partial class TcpClient : ITcpClient
 
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
-        LogDataSendingByteLength(data.Length);
+        LogDataSendingByteLength(IPAddressOrHostname, Port, data.Length);
 
         await syncLock.WaitAsync(cancellationToken);
         var disconnectedDueToException = false;
@@ -289,12 +289,12 @@ public partial class TcpClient : ITcpClient
         }
         catch (SocketException ex)
         {
-            LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
+            LogDataSendingSocketError(IPAddressOrHostname, Port, ex.SocketErrorCode.ToString(), ex.Message);
             disconnectedDueToException = true;
         }
         catch (Exception ex)
         {
-            LogDataSendingError(ex.Message);
+            LogDataSendingError(IPAddressOrHostname, Port, ex.Message);
             disconnectedDueToException = true;
         }
         finally
@@ -609,7 +609,7 @@ public partial class TcpClient : ITcpClient
     {
         if (readDataTask.IsCanceled)
         {
-            LogDataReceiveTimeout();
+            LogDataReceiveTimeout(IPAddressOrHostname, Port);
         }
 
         if (readDataTask.IsFaulted)
@@ -619,12 +619,12 @@ public partial class TcpClient : ITcpClient
                 var (isKnownException, socketError) = readDataTask.Exception.IsKnownExceptionForNetworkCableUnplugged();
                 if (isKnownException)
                 {
-                    LogDataReceiveError($"SocketErrorCode = {socketError?.GetDescription()}");
+                    LogDataReceiveError(IPAddressOrHostname, Port, $"SocketErrorCode = {socketError?.GetDescription()}");
                 }
             }
             else
             {
-                LogDataReceiveError("Unknown error");
+                LogDataReceiveError(IPAddressOrHostname, Port, "Unknown error");
             }
 
             if (clientReconnectConfig.Enable)
@@ -645,7 +645,7 @@ public partial class TcpClient : ITcpClient
                 await Task.Delay(TimeToWaitForDisconnectionInMs, CancellationToken.None);
                 if (IsConnected)
                 {
-                    LogDataReceiveNoData();
+                    LogDataReceiveNoData(IPAddressOrHostname, Port);
                     InvokeNoDataReceived();
 
                     if (clientReconnectConfig.Enable)
@@ -663,7 +663,7 @@ public partial class TcpClient : ITcpClient
         }
         else
         {
-            LogDataReceivedByteLength(data.Length);
+            LogDataReceivedByteLength(IPAddressOrHostname, Port, data.Length);
             InvokeDataReceived(data);
         }
     }
@@ -708,7 +708,7 @@ public partial class TcpClient : ITcpClient
             var (isKnownException, _) = ex.IsKnownExceptionForConsumerDisposed();
             if (!isKnownException)
             {
-                LogDataReceiveError(ex.Message);
+                LogDataReceiveError(IPAddressOrHostname, Port, ex.Message);
             }
         }
 
