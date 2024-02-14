@@ -3,10 +3,10 @@
 namespace Atc.Network.Internet;
 
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
-public class IPPortScan : IIPPortScan
+public class IPPortScan : IIPPortScan, IDisposable
 {
     private const int InternalDelayInMs = 5;
-    private static readonly SemaphoreSlim SyncLock = new(1, 1);
+    private readonly SemaphoreSlim syncLock = new(1, 1);
 
     private IPAddress? ipAddress;
     private int timeoutInMs = 100;
@@ -42,7 +42,7 @@ public class IPPortScan : IIPPortScan
 
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
+            await syncLock.WaitAsync(cancellationToken);
 
             await Task.Delay(InternalDelayInMs, cancellationToken);
             var cancellationCompletionSource = new TaskCompletionSource<bool>();
@@ -73,7 +73,7 @@ public class IPPortScan : IIPPortScan
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
     }
 
@@ -99,7 +99,7 @@ public class IPPortScan : IIPPortScan
 
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
+            await syncLock.WaitAsync(cancellationToken);
 
             await Task.Delay(InternalDelayInMs, cancellationToken);
             var cancellationCompletionSource = new TaskCompletionSource<bool>();
@@ -128,7 +128,29 @@ public class IPPortScan : IIPPortScan
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        this.Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Dispose.
+    /// </summary>
+    /// <param name="disposing">Indicates if we are disposing or not.</param>
+    protected virtual void Dispose(
+        bool disposing)
+    {
+        if (!disposing)
+        {
+            return;
+        }
+
+        syncLock.Dispose();
     }
 }

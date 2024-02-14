@@ -8,6 +8,7 @@ public static class MacAddressVendorLookupHelper
     private const string NotFound = "NotFound";
     private const string AtcCacheFolder = "AtcCache";
     private const string AtcCacheFile = "macvendors.txt";
+
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
     private static readonly Uri MacVendorsApiUrl = new("http://api.macvendors.com/");
     private static DateTimeOffset lastLookup = DateTimeOffset.MinValue;

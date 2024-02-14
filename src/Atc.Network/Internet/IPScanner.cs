@@ -8,7 +8,7 @@ namespace Atc.Network.Internet;
 [SuppressMessage("Minor Code Smell", "S2486:Generic exceptions should not be ignored", Justification = "OK.")]
 public partial class IPScanner : IIPScanner, IDisposable
 {
-    private static readonly SemaphoreSlim SyncLock = new(1, 1);
+    private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly ConcurrentBag<IPScanResult> processedScanResults = new();
     private readonly IPScannerProgressReport progressReporting = new();
     private ArpEntity[]? arpEntities;
@@ -94,7 +94,7 @@ public partial class IPScanner : IIPScanner, IDisposable
 
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
+            await syncLock.WaitAsync(cancellationToken);
 
             if (Configuration.ResolveMacAddress)
             {
@@ -130,7 +130,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
     }
 
@@ -154,6 +154,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         }
 
         processedScanResults.Clear();
+        syncLock.Dispose();
     }
 
     private void RaiseProgressReporting(
@@ -276,7 +277,8 @@ public partial class IPScanner : IIPScanner, IDisposable
         ushort portNumber,
         CancellationToken cancellationToken)
     {
-        var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutTcp.TotalMilliseconds);
+        using var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutTcp.TotalMilliseconds);
+
         var canConnect = await ipPortScan.CanConnectWithTcp(
             portNumber,
             cancellationToken);
@@ -344,7 +346,8 @@ public partial class IPScanner : IIPScanner, IDisposable
             return;
         }
 
-        var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutHttp.TotalMilliseconds);
+        using var ipPortScan = new IPPortScan(ipAddress, (int)Configuration.TimeoutHttp.TotalMilliseconds);
+
         var canConnectHttp = await ipPortScan.CanConnectWithHttp(
             portNumber,
             cancellationToken);

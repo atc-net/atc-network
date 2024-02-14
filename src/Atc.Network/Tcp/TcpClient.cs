@@ -15,8 +15,7 @@ public partial class TcpClient : ITcpClient
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
     private const int TimeToWaitForDataReceiverInMs = 150;
 
-    private static readonly SemaphoreSlim SyncLock = new(1, 1);
-
+    private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly TcpClientConfig clientConfig;
     private readonly TcpClientReconnectConfig clientReconnectConfig;
     private readonly TcpClientKeepAliveConfig clientKeepAliveConfig;
@@ -280,7 +279,7 @@ public partial class TcpClient : ITcpClient
 
         LogDataSendingByteLength(data.Length);
 
-        await SyncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(cancellationToken);
         var disconnectedDueToException = false;
 
         try
@@ -300,7 +299,7 @@ public partial class TcpClient : ITcpClient
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
 
         if (disconnectedDueToException)
@@ -522,7 +521,7 @@ public partial class TcpClient : ITcpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
-        await SyncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(cancellationToken);
 
         try
         {
@@ -539,7 +538,7 @@ public partial class TcpClient : ITcpClient
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
     }
 
@@ -548,7 +547,7 @@ public partial class TcpClient : ITcpClient
         bool dispose,
         CancellationToken cancellationToken = default)
     {
-        await SyncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(cancellationToken);
 
         try
         {
@@ -585,7 +584,7 @@ public partial class TcpClient : ITcpClient
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
     }
 
@@ -823,6 +822,8 @@ public partial class TcpClient : ITcpClient
             tcpClient.Dispose();
             tcpClient = null;
         }
+
+        syncLock.Dispose();
     }
 
     private void CancellationTokenCallback()

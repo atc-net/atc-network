@@ -11,8 +11,7 @@ public partial class UdpClient : IUdpClient
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
     private const int TimeToWaitForDataReceiverInMs = 150;
 
-    private static readonly SemaphoreSlim SyncLock = new(1, 1);
-
+    private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly UdpClientConfig clientConfig;
     private readonly ArraySegment<byte> receiveBufferSegment;
 
@@ -181,7 +180,7 @@ public partial class UdpClient : IUdpClient
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
         var buffer = new ArraySegment<byte>(data);
-        await SyncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(cancellationToken);
         var disconnectedDueToException = false;
 
         try
@@ -201,7 +200,7 @@ public partial class UdpClient : IUdpClient
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
 
         if (disconnectedDueToException)
@@ -376,7 +375,7 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
-        await SyncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(cancellationToken);
 
         try
         {
@@ -393,7 +392,7 @@ public partial class UdpClient : IUdpClient
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
     }
 
@@ -401,7 +400,7 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents = true,
         CancellationToken cancellationToken = default)
     {
-        await SyncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(cancellationToken);
 
         try
         {
@@ -429,7 +428,7 @@ public partial class UdpClient : IUdpClient
         }
         finally
         {
-            SyncLock.Release();
+            syncLock.Release();
         }
     }
 
@@ -549,5 +548,7 @@ public partial class UdpClient : IUdpClient
             socket.Dispose();
             socket = null;
         }
+
+        syncLock.Dispose();
     }
 }
