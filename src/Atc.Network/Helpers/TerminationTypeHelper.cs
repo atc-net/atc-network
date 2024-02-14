@@ -2,6 +2,9 @@
 // ReSharper disable StaticMemberInitializerReferesToMemberBelow
 namespace Atc.Network.Helpers;
 
+/// <summary>
+/// Provides utilities for handling different types of message termination characters and sequences.
+/// </summary>
 public static class TerminationTypeHelper
 {
     public const byte LineFeed = 0x0A;
@@ -15,6 +18,13 @@ public static class TerminationTypeHelper
     private static readonly byte[] EndOfTextAsBytes = { EndOfText };
     private static readonly byte[] EndOfTransmissionAsBytes = { EndOfTransmission };
 
+    /// <summary>
+    /// Converts a termination type to its string representation.
+    /// </summary>
+    /// <param name="terminationType">The termination type to convert.</param>
+    /// <returns>
+    /// A string representation of the specified termination type.
+    /// </returns>
     public static string ConvertToString(
         TerminationType terminationType)
         => terminationType switch
@@ -28,6 +38,13 @@ public static class TerminationTypeHelper
             _ => throw new SwitchCaseDefaultException(terminationType),
         };
 
+    /// <summary>
+    /// Converts a termination type to its byte array representation.
+    /// </summary>
+    /// <param name="terminationType">The termination type to convert.</param>
+    /// <returns>
+    /// A byte array representation of the specified termination type.
+    /// </returns>
     public static byte[] ConvertToBytes(
         TerminationType terminationType)
         => terminationType switch
@@ -41,6 +58,14 @@ public static class TerminationTypeHelper
             _ => throw new SwitchCaseDefaultException(terminationType),
         };
 
+    /// <summary>
+    /// Checks if the specified data contains the termination sequence for the given termination type.
+    /// </summary>
+    /// <param name="terminationType">The termination type to check for.</param>
+    /// <param name="data">The data to search within.</param>
+    /// <returns>
+    /// True if the data contains the termination sequence; otherwise, false.
+    /// </returns>
     public static bool HasTerminationType(
         TerminationType terminationType,
         byte[] data)

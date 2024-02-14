@@ -3,8 +3,22 @@
 // ReSharper disable SwitchStatementHandlesSomeKnownEnumValuesWithDefault
 namespace Atc.Network.Helpers;
 
+/// <summary>
+/// Provides utilities for validating and working with IPv4 addresses.
+/// </summary>
 public static class IPv4AddressHelper
 {
+    /// <summary>
+    /// Validates if a string is a valid IPv4 address.
+    /// </summary>
+    /// <param name="ipAddress">The IP address in string format to validate.</param>
+    /// <returns>
+    /// True if the IP address is valid; otherwise, false.
+    /// </returns>
+    /// <remarks>
+    /// This method checks if the string can be parsed into an IPAddress object and belongs to the IPv4 address family.
+    /// It also ensures that the IP address string has exactly four octets.
+    /// </remarks>
     public static bool IsValid(
         string ipAddress)
     {
@@ -22,6 +36,14 @@ public static class IPv4AddressHelper
         return octetCount == 4;
     }
 
+    /// <summary>
+    /// Validates that two IP addresses are valid IPv4 addresses and that the start IP is less than or equal to the end IP.
+    /// </summary>
+    /// <param name="startIpAddress">The starting IP address of the range.</param>
+    /// <param name="endIpAddress">The ending IP address of the range.</param>
+    /// <returns>
+    /// A tuple containing a boolean indicating if the addresses are valid and an error message if they are not.
+    /// </returns>
     public static (bool IsValid, string? ErrorMessage) ValidateAddresses(
         IPAddress startIpAddress,
         IPAddress endIpAddress)
@@ -44,6 +66,12 @@ public static class IPv4AddressHelper
             : (true, null);
     }
 
+    /// <summary>
+    /// Retrieves the local machine's IPv4 address.
+    /// </summary>
+    /// <returns>
+    /// The local IPv4 address, or null if not found.
+    /// </returns>
     public static IPAddress? GetLocalAddress()
     {
         var hostName = Dns.GetHostName();
@@ -51,6 +79,14 @@ public static class IPv4AddressHelper
         return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
     }
 
+    /// <summary>
+    /// Generates a collection of IPv4 addresses within a specified range.
+    /// </summary>
+    /// <param name="startIpAddress">The starting IP address of the range.</param>
+    /// <param name="endIpAddress">The ending IP address of the range.</param>
+    /// <returns>
+    /// A read-only collection of IP addresses within the specified range.
+    /// </returns>
     public static IReadOnlyCollection<IPAddress> GetAddressesInRange(
         IPAddress startIpAddress,
         IPAddress endIpAddress)
@@ -72,6 +108,18 @@ public static class IPv4AddressHelper
         return list;
     }
 
+    /// <summary>
+    /// Generates a collection of IPv4 addresses within a subnet defined by an IP address and CIDR notation length.
+    /// </summary>
+    /// <param name="ipAddress">The IP address within the subnet.</param>
+    /// <param name="cidrLength">The CIDR notation length of the subnet mask.</param>
+    /// <returns>
+    /// A read-only collection of IP addresses within the specified subnet.
+    /// </returns>
+    /// <remarks>
+    /// This method calculates the first and last IP addresses in the subnet range based on the provided IP address and CIDR length.
+    /// It then generates all IP addresses within this range. This is particularly useful for subnet exploration and network analysis tasks.
+    /// </remarks>
     public static IReadOnlyCollection<IPAddress> GetAddressesInRange(
         IPAddress ipAddress,
         int cidrLength)
@@ -82,6 +130,14 @@ public static class IPv4AddressHelper
         return GetAddressesInRange(startIpAddress, endIpAddress);
     }
 
+    /// <summary>
+    /// Calculates the first and last IP addresses in a subnet given an IP address and CIDR length.
+    /// </summary>
+    /// <param name="ipAddress">The IP address within the subnet.</param>
+    /// <param name="cidrLength">The CIDR notation length of the subnet mask.</param>
+    /// <returns>
+    /// A tuple containing the first and last IP addresses in the subnet range.
+    /// </returns>
     public static (IPAddress StartIpAddress, IPAddress EndIpAddress) GetFirstAndLastAddressInRange(
         IPAddress ipAddress,
         int cidrLength)

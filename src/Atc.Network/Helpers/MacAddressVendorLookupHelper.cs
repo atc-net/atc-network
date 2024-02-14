@@ -8,6 +8,8 @@ public static class MacAddressVendorLookupHelper
     private const string NotFound = "NotFound";
     private const string AtcCacheFolder = "AtcCache";
     private const string AtcCacheFile = "macvendors.txt";
+    private const int MinimumCallDelay = 1_200;
+    private const int SyncLockTimeout = 3_000;
 
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
     private static readonly Uri MacVendorsApiUrl = new("http://api.macvendors.com/");
@@ -22,7 +24,7 @@ public static class MacAddressVendorLookupHelper
 
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
+            await SyncLock.WaitAsync(SyncLockTimeout, cancellationToken);
 
             macAddress = macAddress.ToUpper(GlobalizationConstants.EnglishCultureInfo);
             var cacheVendorName = GetVendorFromCacheFileLines(macAddress);
@@ -52,7 +54,7 @@ public static class MacAddressVendorLookupHelper
                 }
             }
 
-            var vendorName = await CallMacVendorAsync(macAddress, cancellationToken);
+            var vendorName = await CallMacVendor(macAddress, cancellationToken);
 
             cacheFileLines.Add($"{macAddress}={vendorName}");
             await File.WriteAllLinesAsync(cacheFile, cacheFileLines, cancellationToken);
@@ -68,7 +70,7 @@ public static class MacAddressVendorLookupHelper
     private static string? GetVendorFromCacheFileLines(
         string macAddress)
     {
-        if (!cacheFileLines.Any())
+        if (cacheFileLines.Count == 0)
         {
             return null;
         }
@@ -91,14 +93,14 @@ public static class MacAddressVendorLookupHelper
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
-    private static async Task<string?> CallMacVendorAsync(
+    private static async Task<string?> CallMacVendor(
         string macAddress,
         CancellationToken cancellationToken)
     {
         var timeSpan = DateTimeOffset.Now - lastLookup;
-        if (timeSpan.TotalMilliseconds < 1200)
+        if (timeSpan.TotalMilliseconds < MinimumCallDelay)
         {
-            await Task.Delay(1200 - (int)timeSpan.TotalMilliseconds, cancellationToken);
+            await Task.Delay(MinimumCallDelay - (int)timeSpan.TotalMilliseconds, cancellationToken);
         }
 
         lastLookup = DateTimeOffset.Now;
