@@ -9,8 +9,9 @@ namespace Atc.Network.Internet;
 public class IPPortScan : IIPPortScan, IDisposable
 {
     private const int InternalDelayInMs = 5;
-    private readonly SemaphoreSlim syncLock = new(1, 1);
+    private const int SyncLockTimeoutInMs = 30_000;
 
+    private readonly SemaphoreSlim syncLock = new(1, 1);
     private IPAddress? ipAddress;
     private int timeoutInMs = 100;
 
@@ -69,7 +70,7 @@ public class IPPortScan : IIPPortScan, IDisposable
 
         try
         {
-            await syncLock.WaitAsync(cancellationToken);
+            await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
             await Task.Delay(InternalDelayInMs, cancellationToken);
             var cancellationCompletionSource = new TaskCompletionSource<bool>();
@@ -151,7 +152,7 @@ public class IPPortScan : IIPPortScan, IDisposable
 
         try
         {
-            await syncLock.WaitAsync(cancellationToken);
+            await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
             await Task.Delay(InternalDelayInMs, cancellationToken);
             var cancellationCompletionSource = new TaskCompletionSource<bool>();

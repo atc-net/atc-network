@@ -9,7 +9,7 @@ public static class MacAddressVendorLookupHelper
     private const string AtcCacheFolder = "AtcCache";
     private const string AtcCacheFile = "macvendors.txt";
     private const int MinimumCallDelay = 1_200;
-    private const int SyncLockTimeout = 3_000;
+    private const int SyncLockTimeoutInMs = 30_000;
 
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
     private static readonly Uri MacVendorsApiUrl = new("http://api.macvendors.com/");
@@ -24,7 +24,7 @@ public static class MacAddressVendorLookupHelper
 
         try
         {
-            await SyncLock.WaitAsync(SyncLockTimeout, cancellationToken);
+            await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
             macAddress = macAddress.ToUpper(GlobalizationConstants.EnglishCultureInfo);
             var cacheVendorName = GetVendorFromCacheFileLines(macAddress);

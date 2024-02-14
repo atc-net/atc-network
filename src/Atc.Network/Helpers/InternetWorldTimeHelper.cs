@@ -6,7 +6,7 @@ namespace Atc.Network.Helpers;
 public static class InternetWorldTimeHelper
 {
     private const string WorldTimeBaseApi = "https://worldtimeapi.org/api/timezone/";
-    private const int SyncLockTimeout = 3_000;
+    private const int SyncLockTimeoutInMs = 30_000;
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
 
     /// <summary>
@@ -40,7 +40,7 @@ public static class InternetWorldTimeHelper
 
         try
         {
-            await SyncLock.WaitAsync(SyncLockTimeout, cancellationToken);
+            await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
             if (!NetworkInformationHelper.HasConnection())
             {

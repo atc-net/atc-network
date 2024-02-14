@@ -5,6 +5,8 @@ namespace Atc.Network.Helpers;
 /// </summary>
 public static class DnsLookupHelper
 {
+    private const int SyncLockTimeoutInMs = 30_000;
+
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
     private static string? hostname;
     private static IPAddress[]? hostAddresses;
@@ -34,7 +36,7 @@ public static class DnsLookupHelper
 
         try
         {
-            await SyncLock.WaitAsync(cancellationToken);
+            await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
             if (ipAddress.IsPrivate())
             {

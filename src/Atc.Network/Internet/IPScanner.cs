@@ -8,6 +8,8 @@ namespace Atc.Network.Internet;
 [SuppressMessage("Minor Code Smell", "S2486:Generic exceptions should not be ignored", Justification = "OK.")]
 public partial class IPScanner : IIPScanner, IDisposable
 {
+    private const int SyncLockTimeoutInMs = 30_000;
+
     private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly ConcurrentBag<IPScanResult> processedScanResults = new();
     private readonly IPScannerProgressReport progressReporting = new();
@@ -85,7 +87,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         }
 
         var ipAddresses = IPv4AddressHelper.GetAddressesInRange(startIpAddress, endIpAddress);
-        if (!ipAddresses.Any())
+        if (ipAddresses.Count == 0)
         {
             scanResults.ErrorMessage = "Nothing to process";
             scanResults.End = DateTime.Now;
@@ -94,7 +96,7 @@ public partial class IPScanner : IIPScanner, IDisposable
 
         try
         {
-            await syncLock.WaitAsync(cancellationToken);
+            await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
             if (Configuration.ResolveMacAddress)
             {
@@ -191,13 +193,12 @@ public partial class IPScanner : IIPScanner, IDisposable
             HandleResolveMacAddress(ipScanResult, ipAddress);
         }
 
-        if (Configuration.ResolveMacAddress &&
-            Configuration.ResolveVendorFromMacAddress)
+        if (Configuration is { ResolveMacAddress: true, ResolveVendorFromMacAddress: true })
         {
             await HandleResolveVendorFromMacAddress(ipScanResult, cancellationToken);
         }
 
-        if (Configuration.PortNumbers.Any())
+        if (Configuration.PortNumbers.Count != 0)
         {
             foreach (var portNumber in Configuration.PortNumbers)
             {
@@ -238,7 +239,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         IPAddress ipAddress)
     {
         arpEntities ??= ArpHelper.GetArpResult();
-        if (arpEntities.Any())
+        if (arpEntities.Length != 0)
         {
             var arpEntity = arpEntities.FirstOrDefault(x => x.IPAddress.Equals(ipAddress));
             if (arpEntity is not null)
