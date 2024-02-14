@@ -360,6 +360,8 @@ public partial class TcpClient : ITcpClient
 
         DisposeCancellationTokenAndTask();
         DisposeTcpClientAndStream();
+
+        syncLock.Dispose();
     }
 
     private void InvokeConnected()
@@ -822,8 +824,6 @@ public partial class TcpClient : ITcpClient
             tcpClient.Dispose();
             tcpClient = null;
         }
-
-        syncLock.Dispose();
     }
 
     private void CancellationTokenCallback()
