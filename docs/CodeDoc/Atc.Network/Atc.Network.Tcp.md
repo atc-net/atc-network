@@ -499,7 +499,12 @@ This class contains default constant for `Atc.Network.Tcp.TcpClient` and `Atc.Ne
 >```csharp
 >int DefaultSendReceiveTimeout
 >```
-><b>Summary:</b> The send/receive time-out value, in milliseconds.
+><b>Summary:</b> The send/receive time-out value, in milliseconds (5 min.).
+#### GracePeriodTimeout
+>```csharp
+>int GracePeriodTimeout
+>```
+><b>Summary:</b> The grace period timeout, in milliseconds (1 sec).
 
 <br />
 

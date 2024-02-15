@@ -365,11 +365,21 @@ This class contains default constant for `Atc.Network.Udp.UdpClient` and `Atc.Ne
 >int DefaultBufferSize
 >```
 ><b>Summary:</b> The send/receive buffer value, in bytes. The default is 8192 (8 Kb);
+#### DefaultConnectTimeout
+>```csharp
+>int DefaultConnectTimeout
+>```
+><b>Summary:</b> The connect time-out value, in milliseconds (10 sec).
 #### DefaultSendReceiveTimeout
 >```csharp
 >int DefaultSendReceiveTimeout
 >```
-><b>Summary:</b> The send/receive time-out value, in milliseconds.
+><b>Summary:</b> The send/receive time-out value, in milliseconds (5 min.).
+#### GracePeriodTimeout
+>```csharp
+>int GracePeriodTimeout
+>```
+><b>Summary:</b> The grace period timeout, in milliseconds (1 sec).
 
 <br />
 

@@ -38,7 +38,7 @@
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
   -  Static Methods
      - DisableKeepAlive(this TcpClient tcpClient)
-     - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)
+     - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 600000, int sendBufferSize = 8192, int receiveTimeout = 600000, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
 - [TerminationType](Atc.Network.md#terminationtype)
 - [TransportProtocolType](Atc.Network.md#transportprotocoltype)
@@ -335,6 +335,7 @@
      - int DefaultReconnectRetryInterval
      - int DefaultReconnectRetryMaxAttempts
      - int DefaultSendReceiveTimeout
+     - int GracePeriodTimeout
 - [TcpServer](Atc.Network.Tcp.md#tcpserver)
   -  Properties
      - IpAddress
@@ -412,7 +413,9 @@
 - [UdpConstants](Atc.Network.Udp.md#udpconstants)
   -  Static Fields
      - int DefaultBufferSize
+     - int DefaultConnectTimeout
      - int DefaultSendReceiveTimeout
+     - int GracePeriodTimeout
 - [UdpServer](Atc.Network.Udp.md#udpserver)
   -  Properties
      - IsRunning
