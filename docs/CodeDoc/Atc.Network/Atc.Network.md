@@ -283,7 +283,7 @@ Enumeration: NetworkQualityCategoryType.
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`tcpClient`&nbsp;&nbsp;-&nbsp;&nbsp;The TCP client.<br />
 #### SetBufferSizeAndTimeouts
 >```csharp
->void SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 0, int sendBufferSize = 8192, int receiveTimeout = 0, int receiveBufferSize = 8192)
+>void SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 600000, int sendBufferSize = 8192, int receiveTimeout = 600000, int receiveBufferSize = 8192)
 >```
 ><b>Summary:</b> Sets the buffer size and timeouts.
 >

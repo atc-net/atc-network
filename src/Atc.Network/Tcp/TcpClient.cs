@@ -21,6 +21,8 @@ public partial class TcpClient : ITcpClient
     private readonly TcpClientKeepAliveConfig clientKeepAliveConfig;
     private readonly byte[] receiveBuffer;
 
+    private readonly int syncLockConnectTimeoutInMs;
+    private readonly int syncLockSendTimeoutInMs;
     private int reconnectRetryCounter;
     private CancellationTokenSource? cancellationTokenSource;
     private CancellationTokenRegistration? cancellationTokenRegistration;
@@ -61,10 +63,18 @@ public partial class TcpClient : ITcpClient
     {
         this.logger = logger;
         this.clientConfig = clientConfig ?? new TcpClientConfig();
-        this.clientReconnectConfig = reconnectConfig ?? new TcpClientReconnectConfig();
-        this.clientKeepAliveConfig = keepAliveConfig ?? new TcpClientKeepAliveConfig();
+        clientReconnectConfig = reconnectConfig ?? new TcpClientReconnectConfig();
+        clientKeepAliveConfig = keepAliveConfig ?? new TcpClientKeepAliveConfig();
 
         receiveBuffer = new byte[this.clientConfig.ReceiveBufferSize];
+
+        syncLockConnectTimeoutInMs = this.clientConfig.ConnectTimeout <= 0
+                ? TcpConstants.DefaultConnectTimeout
+                : this.clientConfig.ConnectTimeout + TcpConstants.GracePeriodTimeout;
+
+        syncLockSendTimeoutInMs = this.clientConfig.SendTimeout <= 0
+            ? TcpConstants.DefaultSendReceiveTimeout
+            : this.clientConfig.SendTimeout + TcpConstants.GracePeriodTimeout;
     }
 
     public TcpClient(
@@ -279,7 +289,8 @@ public partial class TcpClient : ITcpClient
 
         LogDataSendingByteLength(IPAddressOrHostname, Port, data.Length);
 
-        await syncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(syncLockSendTimeoutInMs, cancellationToken);
+
         var disconnectedDueToException = false;
 
         try
@@ -523,7 +534,7 @@ public partial class TcpClient : ITcpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
 
         try
         {
@@ -549,7 +560,7 @@ public partial class TcpClient : ITcpClient
         bool dispose,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
 
         try
         {
