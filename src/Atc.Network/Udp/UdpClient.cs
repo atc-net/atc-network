@@ -11,6 +11,8 @@ public partial class UdpClient : IUdpClient
     private const int TimeToWaitForDisposeDisconnectionInMs = 50;
     private const int TimeToWaitForDataReceiverInMs = 150;
 
+    private readonly int syncLockConnectTimeoutInMs;
+    private readonly int syncLockSendTimeoutInMs;
     private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly UdpClientConfig clientConfig;
     private readonly ArraySegment<byte> receiveBufferSegment;
@@ -51,6 +53,14 @@ public partial class UdpClient : IUdpClient
 
         var receiveBuffer = new byte[this.clientConfig.ReceiveBufferSize];
         receiveBufferSegment = new ArraySegment<byte>(receiveBuffer);
+
+        syncLockConnectTimeoutInMs = this.clientConfig.ConnectTimeout <= 0
+            ? UdpConstants.DefaultConnectTimeout
+            : this.clientConfig.ConnectTimeout + UdpConstants.GracePeriodTimeout;
+
+        syncLockSendTimeoutInMs = this.clientConfig.SendTimeout <= 0
+            ? UdpConstants.DefaultSendReceiveTimeout
+            : this.clientConfig.SendTimeout + UdpConstants.GracePeriodTimeout;
     }
 
     public UdpClient(
@@ -179,8 +189,9 @@ public partial class UdpClient : IUdpClient
 
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
+        await syncLock.WaitAsync(syncLockSendTimeoutInMs, cancellationToken);
+
         var buffer = new ArraySegment<byte>(data);
-        await syncLock.WaitAsync(cancellationToken);
         var disconnectedDueToException = false;
 
         try
@@ -377,7 +388,7 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
 
         try
         {
@@ -402,7 +413,7 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents = true,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(cancellationToken);
+        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
 
         try
         {
