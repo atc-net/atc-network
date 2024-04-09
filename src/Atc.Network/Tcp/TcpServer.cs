@@ -136,6 +136,7 @@ public partial class TcpServer : ITcpServer
         }
 
         tcpListener?.Server.Dispose();
+        tcpListener?.Dispose();
     }
 
     /// <inheritdoc />
