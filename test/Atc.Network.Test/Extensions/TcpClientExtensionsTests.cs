@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace Atc.Network.Test.Extensions;
 
 [SuppressMessage("Blocker Bug", "S2930:\"IDisposables\" should be disposed", Justification = "OK.")]
