@@ -4,11 +4,10 @@ public static class IPServicePortLists
 {
     public static IReadOnlyCollection<ushort> GetWellKnown()
     {
-        var serviceProtocolTypes = Enum.GetValues(typeof(ServiceProtocolType));
         var portNumbers = new List<ushort>();
-        foreach (var item in serviceProtocolTypes)
+
+        foreach (var serviceProtocolType in Enum.GetValues<ServiceProtocolType>())
         {
-            var serviceProtocolType = (ServiceProtocolType)item;
             if (serviceProtocolType is ServiceProtocolType.None or ServiceProtocolType.Unknown)
             {
                 continue;
@@ -40,11 +39,10 @@ public static class IPServicePortLists
 
     public static IReadOnlyCollection<ushort> GetWellKnownOrCommon()
     {
-        var serviceProtocolTypes = Enum.GetValues(typeof(ServiceProtocolType));
         var portNumbers = new List<ushort>();
-        foreach (var item in serviceProtocolTypes)
+
+        foreach (var serviceProtocolType in Enum.GetValues<ServiceProtocolType>())
         {
-            var serviceProtocolType = (ServiceProtocolType)item;
             if (serviceProtocolType is ServiceProtocolType.None or ServiceProtocolType.Unknown)
             {
                 continue;
