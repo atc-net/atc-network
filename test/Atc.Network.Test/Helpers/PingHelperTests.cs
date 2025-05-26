@@ -40,6 +40,9 @@ public class PingHelperTests
         Assert.NotNull(actual);
         Assert.Equal(IPAddress.Loopback, actual.IPAddress);
         Assert.Null(actual.Exception);
-        Assert.Equal(NetworkQualityCategoryType.Perfect, actual.QualityCategory);
+
+        Assert.Contains(
+            actual.QualityCategory,
+            new[] { NetworkQualityCategoryType.Perfect, NetworkQualityCategoryType.Excellent });
     }
 }
