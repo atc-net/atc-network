@@ -75,8 +75,15 @@
 ## [Atc.Network.Helpers](Atc.Network.Helpers.md)
 
 - [ArpHelper](Atc.Network.Helpers.md#arphelper)
+  -  Static Fields
+     - string LoopbackMacAddress
+     - string LoopbackType
   -  Static Methods
      - GetArpResult()
+     - GetLocalMachineArpEntity(IPAddress ipAddress)
+     - GetLoopbackArpEntity(IPAddress ipAddress)
+     - IsLocalMachineAddress(IPAddress ipAddress)
+     - IsLoopbackAddress(IPAddress ipAddress)
 - [DnsLookupHelper](Atc.Network.Helpers.md#dnslookuphelper)
   -  Static Methods
      - GetHostname(IPAddress ipAddress, CancellationToken cancellationToken)

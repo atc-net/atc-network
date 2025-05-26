@@ -14,6 +14,18 @@ Provides utilities for fetching and parsing ARP (Address Resolution Protocol) ta
 >public static class ArpHelper
 >```
 
+### Static Fields
+
+#### LoopbackMacAddress
+>```csharp
+>string LoopbackMacAddress
+>```
+><b>Summary:</b> Well-known MAC address for loopback interface.
+#### LoopbackType
+>```csharp
+>string LoopbackType
+>```
+><b>Summary:</b> Type used for loopback interface entries.
 ### Static Methods
 
 #### GetArpResult
@@ -25,6 +37,46 @@ Provides utilities for fetching and parsing ARP (Address Resolution Protocol) ta
 ><b>Returns:</b> An array of `Atc.Network.Models.ArpEntity` representing the current ARP table entries. Returns an empty array if no connection is available or if the ARP lookup fails.
 >
 ><b>Remarks:</b> This method first checks if the results are cached and valid (less than 90 seconds old). If valid, cached results are returned. Otherwise, it performs a new ARP lookup using the system's 'arp' command. The results are parsed, cached, and then returned. If there's no network connection, an empty array is returned.
+#### GetLocalMachineArpEntity
+>```csharp
+>ArpEntity GetLocalMachineArpEntity(IPAddress ipAddress)
+>```
+><b>Summary:</b> Creates an ArpEntity for the local machine's IP address.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ipAddress`&nbsp;&nbsp;-&nbsp;&nbsp;The local machine's IP address.<br />
+>
+><b>Returns:</b> An ArpEntity for the local machine with a standard MAC address.
+#### GetLoopbackArpEntity
+>```csharp
+>ArpEntity GetLoopbackArpEntity(IPAddress ipAddress)
+>```
+><b>Summary:</b> Creates an ArpEntity for a loopback address (127.0.0.1).
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ipAddress`&nbsp;&nbsp;-&nbsp;&nbsp;The loopback IP address.<br />
+>
+><b>Returns:</b> An ArpEntity with a standard loopback MAC address (00-00-00-00-00-00).
+#### IsLocalMachineAddress
+>```csharp
+>bool IsLocalMachineAddress(IPAddress ipAddress)
+>```
+><b>Summary:</b> Checks if the provided IP address is the local machine's IP address.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ipAddress`&nbsp;&nbsp;-&nbsp;&nbsp;The IP address to check.<br />
+>
+><b>Returns:</b> True if the IP address is the local machine's IP address, otherwise false.
+#### IsLoopbackAddress
+>```csharp
+>bool IsLoopbackAddress(IPAddress ipAddress)
+>```
+><b>Summary:</b> Checks if the provided IP address is a loopback address (127.x.x.x).
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ipAddress`&nbsp;&nbsp;-&nbsp;&nbsp;The IP address to check.<br />
+>
+><b>Returns:</b> True if the IP address is a loopback address, otherwise false.
 
 <br />
 

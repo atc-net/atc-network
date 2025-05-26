@@ -38,6 +38,7 @@ public static class DnsLookupHelper
         {
             await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
 
+            // First attempt: Check if the IP address matches the local machine
             if (ipAddress.IsPrivate())
             {
                 if (hostname is null &&
@@ -47,17 +48,14 @@ public static class DnsLookupHelper
                     hostAddresses = await Dns.GetHostAddressesAsync(hostname, cancellationToken);
                 }
 
-                if (hostAddresses is null)
+                var hostAddress = hostAddresses?.FirstOrDefault(x => x.Equals(ipAddress));
+                if (hostAddress is not null)
                 {
-                    return null;
+                    return hostname;
                 }
-
-                var hostAddress = hostAddresses.FirstOrDefault(x => x.Equals(ipAddress));
-                return hostAddress is null
-                    ? null
-                    : hostname;
             }
 
+            // Second attempt: Try direct DNS lookup for all IP addresses (both private and public)
             var result = await Dns.GetHostEntryAsync(ipAddress.ToString(), cancellationToken);
             return result.HostName;
         }
