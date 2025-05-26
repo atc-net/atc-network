@@ -30,7 +30,7 @@ public static class ArpHelper
 
         if (!NetworkInformationHelper.HasConnection())
         {
-            return Array.Empty<ArpEntity>();
+            return [];
         }
 
         lastLookup = DateTimeOffset.Now;
@@ -47,7 +47,7 @@ public static class ArpHelper
 
         if (string.IsNullOrEmpty(output))
         {
-            return arpEntities ?? Array.Empty<ArpEntity>();
+            return arpEntities ?? [];
         }
 
         return ParseArpResult(output).ToArray();
@@ -65,8 +65,7 @@ public static class ArpHelper
     /// It expects each line to have exactly three parts: IP address, physical address, and type. Lines not matching this format are ignored.
     /// Parsed entries are cached for use by subsequent calls to GetArpResult within the cache period.
     /// </remarks>
-    private static IEnumerable<ArpEntity> ParseArpResult(
-        string output)
+    private static IEnumerable<ArpEntity> ParseArpResult(string output)
     {
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
