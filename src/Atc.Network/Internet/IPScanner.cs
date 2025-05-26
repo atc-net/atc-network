@@ -298,6 +298,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         IPScanResult ipScanResult,
         IPAddress ipAddress)
     {
+        // First try ARP lookup for all addresses as it's most reliable
         arpEntities ??= ArpHelper.GetArpResult();
         if (arpEntities.Length != 0)
         {
@@ -305,7 +306,28 @@ public partial class IPScanner : IIPScanner, IDisposable
             if (arpEntity is not null)
             {
                 ipScanResult.MacAddress = arpEntity.MacAddress;
+                return;
             }
+        }
+
+        // If ARP lookup failed, check special cases
+
+        // Check if this is a loopback address (127.x.x.x)
+        if (ArpHelper.IsLoopbackAddress(ipAddress))
+        {
+            // Handle loopback address separately since it won't appear in ARP table
+            var loopbackEntity = ArpHelper.GetLoopbackArpEntity(ipAddress);
+            ipScanResult.MacAddress = loopbackEntity.MacAddress;
+            return;
+        }
+
+        // Check if this is the local machine's IP address
+        if (ArpHelper.IsLocalMachineAddress(ipAddress))
+        {
+            // Handle local machine IP separately as it might not appear in ARP table
+            var localEntity = ArpHelper.GetLocalMachineArpEntity(ipAddress);
+            ipScanResult.MacAddress = localEntity.MacAddress;
+            return;
         }
 
         Interlocked.Increment(ref tasksProcessedCount);
@@ -318,13 +340,29 @@ public partial class IPScanner : IIPScanner, IDisposable
     {
         if (!string.IsNullOrEmpty(ipScanResult.MacAddress))
         {
-            var vendorName = await MacAddressVendorLookupHelper.LookupVendorNameFromMacAddress(
-                ipScanResult.MacAddress,
-                cancellationToken);
-
-            if (!string.IsNullOrEmpty(vendorName))
+            // Check if this is the loopback MAC address
+            if (ipScanResult.MacAddress == ArpHelper.LoopbackMacAddress)
             {
-                ipScanResult.MacVendor = vendorName;
+                // Set a specific vendor name for loopback addresses
+                ipScanResult.MacVendor = "Loopback Interface";
+            }
+
+            // Check if this is the local machine IP
+            else if (ArpHelper.IsLocalMachineAddress(ipScanResult.IPAddress))
+            {
+                // Set the vendor name to indicate it's the local machine
+                ipScanResult.MacVendor = "Local Machine";
+            }
+            else
+            {
+                var vendorName = await MacAddressVendorLookupHelper.LookupVendorNameFromMacAddress(
+                    ipScanResult.MacAddress,
+                    cancellationToken);
+
+                if (!string.IsNullOrEmpty(vendorName))
+                {
+                    ipScanResult.MacVendor = vendorName;
+                }
             }
         }
 
