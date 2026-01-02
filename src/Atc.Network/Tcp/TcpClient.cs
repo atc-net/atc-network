@@ -289,12 +289,19 @@ public partial class TcpClient : ITcpClient
 
         LogDataSendingByteLength(IPAddressOrHostname, Port, data.Length);
 
-        await syncLock.WaitAsync(syncLockSendTimeoutInMs, cancellationToken);
-
         var disconnectedDueToException = false;
+
+        var lockAcquired = false;
 
         try
         {
+            lockAcquired = await syncLock.WaitAsync(syncLockSendTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return;
+            }
+
             await networkStream!.WriteAsync(data.AsMemory(0, data.Length), cancellationToken);
             await networkStream.FlushAsync(cancellationToken);
         }
@@ -310,7 +317,10 @@ public partial class TcpClient : ITcpClient
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
 
         if (disconnectedDueToException)
@@ -534,10 +544,17 @@ public partial class TcpClient : ITcpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
+        var lockAcquired = false;
 
         try
         {
+            lockAcquired = await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return;
+            }
+
             if (IsConnected)
             {
                 return;
@@ -551,7 +568,10 @@ public partial class TcpClient : ITcpClient
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
     }
 
@@ -560,10 +580,17 @@ public partial class TcpClient : ITcpClient
         bool dispose,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
+        var lockAcquired = false;
 
         try
         {
+            lockAcquired = await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return;
+            }
+
             if (!IsConnected)
             {
                 return;
@@ -597,7 +624,10 @@ public partial class TcpClient : ITcpClient
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
     }
 

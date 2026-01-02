@@ -189,13 +189,19 @@ public partial class UdpClient : IUdpClient
 
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
-        await syncLock.WaitAsync(syncLockSendTimeoutInMs, cancellationToken);
-
         var buffer = new ArraySegment<byte>(data);
         var disconnectedDueToException = false;
+        var lockAcquired = false;
 
         try
         {
+            lockAcquired = await syncLock.WaitAsync(syncLockSendTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return;
+            }
+
             await socket!.SendToAsync(buffer, SocketFlags.None, RemoteEndPoint, cancellationToken);
             await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
         }
@@ -211,7 +217,10 @@ public partial class UdpClient : IUdpClient
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
 
         if (disconnectedDueToException)
@@ -388,10 +397,16 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
-
+        var lockAcquired = false;
         try
         {
+            lockAcquired = await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return;
+            }
+
             if (IsConnected)
             {
                 return;
@@ -405,7 +420,10 @@ public partial class UdpClient : IUdpClient
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
     }
 
@@ -413,10 +431,17 @@ public partial class UdpClient : IUdpClient
         bool raiseEvents = true,
         CancellationToken cancellationToken = default)
     {
-        await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
+        var lockAcquired = false;
 
         try
         {
+            lockAcquired = await syncLock.WaitAsync(syncLockConnectTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return;
+            }
+
             if (!IsConnected)
             {
                 return;
@@ -441,7 +466,10 @@ public partial class UdpClient : IUdpClient
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
     }
 

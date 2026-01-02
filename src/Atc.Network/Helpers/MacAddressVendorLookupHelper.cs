@@ -22,9 +22,16 @@ public static class MacAddressVendorLookupHelper
     {
         ArgumentNullException.ThrowIfNull(macAddress);
 
+        var lockAcquired = false;
+
         try
         {
-            await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+            lockAcquired = await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return null;
+            }
 
             macAddress = macAddress.ToUpper(GlobalizationConstants.EnglishCultureInfo);
             var cacheVendorName = GetVendorFromCacheFileLines(macAddress);
@@ -63,7 +70,10 @@ public static class MacAddressVendorLookupHelper
         }
         finally
         {
-            SyncLock.Release();
+            if (lockAcquired)
+            {
+                SyncLock.Release();
+            }
         }
     }
 

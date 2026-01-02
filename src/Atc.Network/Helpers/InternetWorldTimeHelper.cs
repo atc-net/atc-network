@@ -38,9 +38,16 @@ public static class InternetWorldTimeHelper
     {
         ArgumentException.ThrowIfNullOrEmpty(worldTimezone);
 
+        var lockAcquired = false;
+
         try
         {
-            await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+            lockAcquired = await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return null;
+            }
 
             if (!NetworkInformationHelper.HasConnection())
             {
@@ -61,7 +68,10 @@ public static class InternetWorldTimeHelper
         }
         finally
         {
-            SyncLock.Release();
+            if (lockAcquired)
+            {
+                SyncLock.Release();
+            }
         }
     }
 
