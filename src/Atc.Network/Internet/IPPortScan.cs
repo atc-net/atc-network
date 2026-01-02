@@ -68,9 +68,16 @@ public class IPPortScan : IIPPortScan, IDisposable
             throw new TcpException("IPAddress is not set.");
         }
 
+        var lockAcquired = false;
+
         try
         {
-            await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+            lockAcquired = await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return false;
+            }
 
             await Task.Delay(InternalDelayInMs, cancellationToken);
             var cancellationCompletionSource = new TaskCompletionSource<bool>();
@@ -101,7 +108,10 @@ public class IPPortScan : IIPPortScan, IDisposable
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
     }
 
@@ -150,9 +160,16 @@ public class IPPortScan : IIPPortScan, IDisposable
             throw new TcpException("IPAddress is not set.");
         }
 
+        var lockAcquired = false;
+
         try
         {
-            await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+            lockAcquired = await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return false;
+            }
 
             await Task.Delay(InternalDelayInMs, cancellationToken);
             var cancellationCompletionSource = new TaskCompletionSource<bool>();
@@ -181,7 +198,10 @@ public class IPPortScan : IIPPortScan, IDisposable
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
     }
 

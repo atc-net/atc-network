@@ -34,9 +34,16 @@ public static class DnsLookupHelper
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
+        var lockAcquired = false;
+
         try
         {
-            await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+            lockAcquired = await SyncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                return null;
+            }
 
             // First attempt: Check if the IP address matches the local machine
             if (ipAddress.IsPrivate())
@@ -65,7 +72,10 @@ public static class DnsLookupHelper
         }
         finally
         {
-            SyncLock.Release();
+            if (lockAcquired)
+            {
+                SyncLock.Release();
+            }
         }
     }
 }

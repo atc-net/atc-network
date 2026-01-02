@@ -1,3 +1,4 @@
+// ReSharper disable DuplicatedStatements
 // ReSharper disable EmptyGeneralCatchClause
 // ReSharper disable LocalizableElement
 namespace Atc.Network.Internet;
@@ -128,6 +129,7 @@ public partial class IPScanner : IIPScanner, IDisposable
     /// <returns>
     /// A task that represents the asynchronous operation, resulting in a collection of scan results.
     /// </returns>
+    [SuppressMessage("Design", "MA0051:Method is too long", Justification = "OK.")]
     public async Task<IPScanResults> ScanRange(
         IPAddress startIpAddress,
         IPAddress endIpAddress,
@@ -151,9 +153,18 @@ public partial class IPScanner : IIPScanner, IDisposable
             return scanResults;
         }
 
+        var lockAcquired = false;
+
         try
         {
-            await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+            lockAcquired = await syncLock.WaitAsync(SyncLockTimeoutInMs, cancellationToken);
+
+            if (!lockAcquired)
+            {
+                scanResults.ErrorMessage = "Another scan is already in progress";
+                scanResults.End = DateTime.Now;
+                return scanResults;
+            }
 
             if (Configuration.ResolveMacAddress)
             {
@@ -164,17 +175,26 @@ public partial class IPScanner : IIPScanner, IDisposable
             tasksProcessedCount = 0;
             processedScanResults.Clear();
 
-            var tasks = ipAddresses.Select(
-                async ipAddress =>
-                {
-                    await DoScan(ipAddress, cancellationToken);
-                });
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
+                CancellationToken = cancellationToken,
+            };
 
-            var timeoutTask = Task.Delay((int)Configuration.Timeout.TotalMilliseconds, cancellationToken);
-
-            await Task.WhenAny(
-                TaskHelper.WhenAll(tasks),
-                timeoutTask);
+            try
+            {
+                await Parallel.ForEachAsync(
+                    ipAddresses,
+                    parallelOptions,
+                    async (ipAddress, ct) =>
+                    {
+                        await DoScan(ipAddress, ct);
+                    });
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when cancelled
+            }
 
             foreach (var processedScanResult in processedScanResults)
             {
@@ -189,7 +209,10 @@ public partial class IPScanner : IIPScanner, IDisposable
         }
         finally
         {
-            syncLock.Release();
+            if (lockAcquired)
+            {
+                syncLock.Release();
+            }
         }
     }
 
@@ -299,13 +322,14 @@ public partial class IPScanner : IIPScanner, IDisposable
         IPAddress ipAddress)
     {
         // First try ARP lookup for all addresses as it's most reliable
-        arpEntities ??= ArpHelper.GetArpResult();
-        if (arpEntities.Length != 0)
+        if (arpEntities is not null && arpEntities.Length != 0)
         {
             var arpEntity = arpEntities.FirstOrDefault(x => x.IPAddress.Equals(ipAddress));
             if (arpEntity is not null)
             {
                 ipScanResult.MacAddress = arpEntity.MacAddress;
+                Interlocked.Increment(ref tasksProcessedCount);
+                RaiseProgressReporting(IPScannerProgressReportingType.MacAddress, ipScanResult);
                 return;
             }
         }
@@ -318,6 +342,8 @@ public partial class IPScanner : IIPScanner, IDisposable
             // Handle loopback address separately since it won't appear in ARP table
             var loopbackEntity = ArpHelper.GetLoopbackArpEntity(ipAddress);
             ipScanResult.MacAddress = loopbackEntity.MacAddress;
+            Interlocked.Increment(ref tasksProcessedCount);
+            RaiseProgressReporting(IPScannerProgressReportingType.MacAddress, ipScanResult);
             return;
         }
 
@@ -327,6 +353,8 @@ public partial class IPScanner : IIPScanner, IDisposable
             // Handle local machine IP separately as it might not appear in ARP table
             var localEntity = ArpHelper.GetLocalMachineArpEntity(ipAddress);
             ipScanResult.MacAddress = localEntity.MacAddress;
+            Interlocked.Increment(ref tasksProcessedCount);
+            RaiseProgressReporting(IPScannerProgressReportingType.MacAddress, ipScanResult);
             return;
         }
 
