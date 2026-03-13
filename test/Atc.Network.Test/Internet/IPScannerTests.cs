@@ -76,8 +76,7 @@ public class IPScannerTests
         return localAddress ?? IPAddress.Parse("8.8.8.8");
     }
 
-    private static IPAddress GetTestIpAddress(
-        int i)
+    private static IPAddress GetTestIpAddress(int i)
     {
         var bytes = GetTestIpAddress().GetAddressBytes();
         return IPAddress.Parse($"{(int)bytes[0]}.{(int)bytes[1]}.{(int)bytes[2]}.{(int)bytes[3] + i}");

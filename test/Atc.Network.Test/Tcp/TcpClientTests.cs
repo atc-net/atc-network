@@ -271,8 +271,7 @@ public class TcpClientTests
         isDisconnectedRaised = true;
     }
 
-    private void OnDataReceived(
-        byte[] data)
+    private void OnDataReceived(byte[] data)
     {
         receivedData.AddRange(data);
     }

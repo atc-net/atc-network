@@ -1,5 +1,4 @@
-void OnServerDataReceived(
-    byte[] data)
+void OnServerDataReceived(byte[] data)
 {
     Console.WriteLine($"Server received Data Length: {data.Length}");
     var dataStr = Encoding.ASCII
@@ -8,8 +7,7 @@ void OnServerDataReceived(
     Console.WriteLine($"Server received Data: {dataStr}");
 }
 
-void OnClientDataReceived(
-    byte[] data)
+void OnClientDataReceived(byte[] data)
 {
     Console.WriteLine($"Client received Data Length: {data.Length}");
     var dataStr = Encoding.ASCII

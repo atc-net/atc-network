@@ -39,16 +39,14 @@ public class IPPortScan : IIPPortScan, IDisposable
     /// Sets the IP address to scan.
     /// </summary>
     /// <param name="value">The IP address.</param>
-    public void SetIPAddress(
-        IPAddress value)
+    public void SetIPAddress(IPAddress value)
         => ipAddress = value;
 
     /// <summary>
     /// Sets the timeout for connection attempts.
     /// </summary>
     /// <param name="value">The timeout as a <see cref="TimeSpan"/>.</param>
-    public void SetTimeout(
-        TimeSpan value)
+    public void SetTimeout(TimeSpan value)
         => timeoutInMs = (int)value.TotalMilliseconds;
 
     /// <summary>
@@ -216,8 +214,7 @@ public class IPPortScan : IIPPortScan, IDisposable
     /// Dispose.
     /// </summary>
     /// <param name="disposing">Indicates if we are disposing or not.</param>
-    protected virtual void Dispose(
-        bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!disposing)
         {

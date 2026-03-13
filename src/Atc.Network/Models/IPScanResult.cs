@@ -2,8 +2,7 @@ namespace Atc.Network.Models;
 
 public class IPScanResult
 {
-    public IPScanResult(
-        IPAddress ipAddress)
+    public IPScanResult(IPAddress ipAddress)
     {
         this.IPAddress = ipAddress;
     }

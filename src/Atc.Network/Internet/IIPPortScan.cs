@@ -9,15 +9,13 @@ public interface IIPPortScan
     /// Sets the IP address to be used for scanning operations.
     /// </summary>
     /// <param name="value">The IP address to scan.</param>
-    void SetIPAddress(
-        IPAddress value);
+    void SetIPAddress(IPAddress value);
 
     /// <summary>
     /// Sets the timeout period for connection attempts.
     /// </summary>
     /// <param name="value">The maximum amount of time to wait for a connection attempt before timing out.</param>
-    void SetTimeout(
-        TimeSpan value);
+    void SetTimeout(TimeSpan value);
 
     /// <summary>
     /// Checks if a TCP connection can be established on the specified port.

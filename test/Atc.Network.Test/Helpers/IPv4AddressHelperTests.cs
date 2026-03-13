@@ -15,7 +15,9 @@ public class IPv4AddressHelperTests
     [InlineData(false, "256.256.256.256")] // All octets above 255
     [InlineData(true, "255.255.255.255")] // All octets at max value 255
 
-    public void IsValid(bool expected, string ipAddress)
+    public void IsValid(
+        bool expected,
+        string ipAddress)
     {
         // Act
         var isValid = IPv4AddressHelper.IsValid(ipAddress);
@@ -30,7 +32,10 @@ public class IPv4AddressHelperTests
     [InlineData(false, "10.50.30.7", "10.50.30.6")]
     [InlineData(true, "10.50.30.7", "10.50.31.7")]
     [InlineData(false, "10.50.31.7", "10.50.30.7")]
-    public void ValidateAddresses(bool expected, string ipAddressStart, string ipAddressEnd)
+    public void ValidateAddresses(
+        bool expected,
+        string ipAddressStart,
+        string ipAddressEnd)
     {
         // Act
         var (isValid, _) = IPv4AddressHelper.ValidateAddresses(
@@ -50,7 +55,10 @@ public class IPv4AddressHelperTests
     [InlineData(64, "10.50.30.7", "10.50.30.70")]
     [InlineData(255, "10.50.30.1", "10.50.30.255")]
     [InlineData(320, "10.50.30.7", "10.50.31.70")]
-    public void GetAddressesInRange(int expected, string ipAddressStart, string ipAddressEnd)
+    public void GetAddressesInRange(
+        int expected,
+        string ipAddressStart,
+        string ipAddressEnd)
     {
         // Act
         var actual = IPv4AddressHelper.GetAddressesInRange(
@@ -71,7 +79,10 @@ public class IPv4AddressHelperTests
     [InlineData(4, "10.0.0.0", 30)]
     [InlineData(2, "10.0.0.0", 31)]
     [InlineData(1, "10.0.0.0", 32)]
-    public void GetAddressesInRange_Cidr(int expected, string ipAddress, int cidrMaskLength)
+    public void GetAddressesInRange_Cidr(
+        int expected,
+        string ipAddress,
+        int cidrMaskLength)
     {
         // Act
         var actual = IPv4AddressHelper.GetAddressesInRange(
@@ -93,7 +104,11 @@ public class IPv4AddressHelperTests
     [InlineData("10.0.0.0", "10.0.0.1", "10.0.0.0", 31)]
     [InlineData("10.0.0.0", "10.0.0.0", "10.0.0.0", 32)]
     [InlineData("192.168.0.0", "192.168.0.255", "192.168.0.7", 24)]
-    public void GetFirstAndLastAddressInRange(string expected1, string expected2, string ipAddress, int cidrMaskLength)
+    public void GetFirstAndLastAddressInRange(
+        string expected1,
+        string expected2,
+        string ipAddress,
+        int cidrMaskLength)
     {
         // Act
         var actual = IPv4AddressHelper.GetFirstAndLastAddressInRange(

@@ -31,8 +31,7 @@ public partial class IPScanner : IIPScanner, IDisposable
     /// Initializes a new instance of the <see cref="IPScanner"/> class with various configuration options.
     /// </summary>
     /// <param name="logger">The logger to use for logging information and errors during scan operations.</param>
-    public IPScanner(
-        ILogger logger)
+    public IPScanner(ILogger logger)
     {
         this.logger = logger;
         this.Configuration = new IPScannerConfig();
@@ -63,8 +62,7 @@ public partial class IPScanner : IIPScanner, IDisposable
     /// Initializes a new instance of the <see cref="IPScanner"/> class with optional configuration settings using a default logger instance.
     /// </summary>
     /// <param name="ipScannerConfig">Optional configuration settings for the scanner. If not provided, default settings are used.</param>
-    public IPScanner(
-        IPScannerConfig? ipScannerConfig)
+    public IPScanner(IPScannerConfig? ipScannerConfig)
         : this(NullLogger.Instance, ipScannerConfig)
     {
     }
@@ -227,8 +225,7 @@ public partial class IPScanner : IIPScanner, IDisposable
     /// Dispose.
     /// </summary>
     /// <param name="disposing">Indicates if we are disposing or not.</param>
-    protected virtual void Dispose(
-        bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!disposing)
         {

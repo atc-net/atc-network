@@ -11,8 +11,7 @@ public class ConnectionStateEventArgs : EventArgs
     /// Initializes a new instance of the <see cref="ConnectionStateEventArgs"/> class.
     /// </summary>
     /// <param name="state">The state of the connection.</param>
-    public ConnectionStateEventArgs(
-        ConnectionState state)
+    public ConnectionStateEventArgs(ConnectionState state)
     {
         this.State = state;
         this.ErrorMessage = null;

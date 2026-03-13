@@ -54,4 +54,29 @@ public static class LoggingEventIdConstants
         public const int DataSendingSocketError = 10321;
         public const int DataSendingError = 10322;
     }
+
+    internal static class VncClient
+    {
+        public const int Connecting = 10400;
+        public const int Connected = 10401;
+        public const int ConnectionError = 10402;
+        public const int ClientNotConnected = 10403;
+        public const int Disconnecting = 10404;
+        public const int Disconnected = 10405;
+        public const int Authenticating = 10406;
+        public const int Authenticated = 10407;
+        public const int AuthenticationFailed = 10408;
+        public const int Initializing = 10409;
+        public const int Initialized = 10410;
+        public const int FramebufferUpdateReceived = 10411;
+        public const int FramebufferUpdateError = 10412;
+        public const int ServerMessageError = 10413;
+        public const int BellReceived = 10414;
+        public const int ServerCutTextReceived = 10415;
+        public const int ProtocolVersionError = 10416;
+        public const int Reconnecting = 10417;
+        public const int Reconnected = 10418;
+        public const int ReconnectionWarning = 10419;
+        public const int ReconnectionMaxRetryExceededError = 10420;
+    }
 }

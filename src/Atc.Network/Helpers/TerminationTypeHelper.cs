@@ -25,8 +25,7 @@ public static class TerminationTypeHelper
     /// <returns>
     /// A string representation of the specified termination type.
     /// </returns>
-    public static string ConvertToString(
-        TerminationType terminationType)
+    public static string ConvertToString(TerminationType terminationType)
         => terminationType switch
         {
             TerminationType.None => string.Empty,
@@ -45,8 +44,7 @@ public static class TerminationTypeHelper
     /// <returns>
     /// A byte array representation of the specified termination type.
     /// </returns>
-    public static byte[] ConvertToBytes(
-        TerminationType terminationType)
+    public static byte[] ConvertToBytes(TerminationType terminationType)
         => terminationType switch
         {
             TerminationType.None => Array.Empty<byte>(),

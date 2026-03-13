@@ -73,7 +73,10 @@ public class IPStatusExtensionsTests
     [InlineData(GlobalizationLcidConstants.Germany, "ICMP-Fehler", IPStatus.IcmpError)]
     [InlineData(GlobalizationLcidConstants.Germany, "Nichtübereinstimmung des Zielbereichs", IPStatus.DestinationScopeMismatch)]
     [InlineData(GlobalizationLcidConstants.Germany, "Unbekannt", IPStatus.Unknown)]
-    public void GetDescription(int arrangeUiLcid, string expected, IPStatus input)
+    public void GetDescription(
+        int arrangeUiLcid,
+        string expected,
+        IPStatus input)
     {
         // Arrange
         if (arrangeUiLcid > 0)
