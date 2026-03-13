@@ -442,4 +442,165 @@
   -  Methods
      - ToString()
 
+## [Atc.Network.Vnc](Atc.Network.Vnc.md)
+
+- [IVncClient](Atc.Network.Vnc.md#ivncclient)
+  -  Properties
+     - Framebuffer
+     - IPAddressOrHostname
+     - IsConnected
+     - Port
+     - ViewOnly
+  -  Events
+     - BellReceived
+     - Connected
+     - ConnectionLost
+     - ConnectionStateChanged
+     - Disconnected
+     - FramebufferUpdated
+     - ServerCutText
+  -  Methods
+     - Authenticate(string password, CancellationToken cancellationToken = null)
+     - Connect(CancellationToken cancellationToken = null)
+     - Disconnect()
+     - Initialize(CancellationToken cancellationToken = null)
+     - RequestFullScreenUpdate(CancellationToken cancellationToken = null)
+     - SendClientCutText(string text, CancellationToken cancellationToken = null)
+     - SendKeyEvent(uint keysym, bool pressed, CancellationToken cancellationToken = null)
+     - SendPointerEvent(byte buttonMask, int x, int y, CancellationToken cancellationToken = null)
+     - StartUpdates(CancellationToken cancellationToken = null)
+- [IVncInputPolicy](Atc.Network.Vnc.md#ivncinputpolicy)
+  -  Properties
+     - AllowClipboardTransfer
+     - AllowKeyboardInput
+     - AllowPointerInput
+- [VncClient](Atc.Network.Vnc.md#vncclient)
+  -  Properties
+     - Framebuffer
+     - IPAddressOrHostname
+     - IsConnected
+     - Port
+     - ViewOnly
+  -  Events
+     - BellReceived
+     - Connected
+     - ConnectionLost
+     - ConnectionStateChanged
+     - Disconnected
+     - FramebufferUpdated
+     - ServerCutText
+  -  Methods
+     - Authenticate(string password, CancellationToken cancellationToken = null)
+     - Connect(CancellationToken cancellationToken = null)
+     - Disconnect()
+     - Dispose()
+     - Initialize(CancellationToken cancellationToken = null)
+     - RequestFullScreenUpdate(CancellationToken cancellationToken = null)
+     - SendClientCutText(string text, CancellationToken cancellationToken = null)
+     - SendKeyEvent(uint keysym, bool pressed, CancellationToken cancellationToken = null)
+     - SendPointerEvent(byte buttonMask, int x, int y, CancellationToken cancellationToken = null)
+     - StartUpdates(CancellationToken cancellationToken = null)
+- [VncClientConfig](Atc.Network.Vnc.md#vncclientconfig)
+  -  Properties
+     - BitsPerPixel
+     - ConnectTimeout
+     - Depth
+     - Port
+     - ReceiveTimeout
+     - SendTimeout
+     - SharedDesktop
+     - ViewOnly
+  -  Methods
+     - ToString()
+- [VncClientKeepAliveConfig](Atc.Network.Vnc.md#vncclientkeepaliveconfig)
+  -  Properties
+     - Enable
+     - Interval
+     - RetryCount
+     - Time
+  -  Methods
+     - ToString()
+- [VncClientReconnectConfig](Atc.Network.Vnc.md#vncclientreconnectconfig)
+  -  Properties
+     - Enable
+     - RetryInterval
+     - RetryMaxAttempts
+  -  Methods
+     - ToString()
+- [VncConstants](Atc.Network.Vnc.md#vncconstants)
+  -  Static Fields
+     - int ChallengeLength
+     - int DefaultBitsPerPixel
+     - int DefaultBufferSize
+     - int DefaultConnectTimeout
+     - int DefaultDepth
+     - int DefaultPort
+     - int DefaultReceiveTimeout
+     - int DefaultReconnectRetryInterval
+     - int DefaultReconnectRetryMaxAttempts
+     - int DefaultSendTimeout
+     - int GracePeriodTimeout
+     - string RfbVersion
+- [VncDefaultInputPolicy](Atc.Network.Vnc.md#vncdefaultinputpolicy)
+  -  Properties
+     - AllowClipboardTransfer
+     - AllowKeyboardInput
+     - AllowPointerInput
+- [VncFramebuffer](Atc.Network.Vnc.md#vncframebuffer)
+  -  Properties
+     - DesktopName
+     - Height
+     - Item
+     - PixelData
+     - PixelFormat
+     - Width
+  -  Methods
+     - FillRectangle(VncRectangle rectangle, int pixel)
+     - ToString()
+- [VncFramebufferUpdateEventArgs](Atc.Network.Vnc.md#vncframebufferupdateeventargs)
+  -  Properties
+     - Framebuffer
+     - Rectangle
+  -  Methods
+     - ToString()
+- [VncPixelFormat](Atc.Network.Vnc.md#vncpixelformat)
+  -  Static Methods
+     - Create(int bitsPerPixel, int depth)
+  -  Properties
+     - BigEndian
+     - BitsPerPixel
+     - BlueMax
+     - BlueShift
+     - Depth
+     - GreenMax
+     - GreenShift
+     - RedMax
+     - RedShift
+     - TrueColour
+  -  Methods
+     - ToString()
+- [VncRectangle](Atc.Network.Vnc.md#vncrectangle)
+  -  Properties
+     - Height
+     - Width
+     - X
+     - Y
+  -  Methods
+     - Deconstruct(out int X, out int Y, out int Width, out int Height)
+     - Equals(VncRectangle other)
+     - Equals(object obj)
+     - GetHashCode()
+     - ToString()
+- [VncViewInputPolicy](Atc.Network.Vnc.md#vncviewinputpolicy)
+  -  Properties
+     - AllowClipboardTransfer
+     - AllowKeyboardInput
+     - AllowPointerInput
+
+## [Atc.Network.Vnc.Enums](Atc.Network.Vnc.Enums.md)
+
+- [VncEncoding](Atc.Network.Vnc.Enums.md#vncencoding)
+- [VncSecurityType](Atc.Network.Vnc.Enums.md#vncsecuritytype)
+- [VncServerMessageType](Atc.Network.Vnc.Enums.md#vncservermessagetype)
+
 <hr /><div style='text-align: right'><i>Generated by MarkdownCodeDoc version 1.2</i></div>

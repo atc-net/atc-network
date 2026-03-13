@@ -19,8 +19,7 @@ public static class IPv4AddressHelper
     /// This method checks if the string can be parsed into an IPAddress object and belongs to the IPv4 address family.
     /// It also ensures that the IP address string has exactly four octets.
     /// </remarks>
-    public static bool IsValid(
-        string ipAddress)
+    public static bool IsValid(string ipAddress)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 

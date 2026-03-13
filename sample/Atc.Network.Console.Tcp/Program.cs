@@ -1,7 +1,5 @@
 // ReSharper disable LocalizableElement
-
-void OnDataReceived(
-    byte[] data)
+void OnDataReceived(byte[] data)
 {
     Console.WriteLine($"Received Data Length: {data.Length}");
     var dataStr = Encoding.ASCII

@@ -17,7 +17,9 @@ public class IPAddressExtensionsTests
     [InlineData(false, "198.19.255.255")]
     [InlineData(true, "172.32.0.0")]
     [InlineData(true, "192.169.0.0")]
-    public void IsPublic(bool expected, string ipAddress)
+    public void IsPublic(
+        bool expected,
+        string ipAddress)
         => Assert.Equal(
             expected,
             IPAddress.Parse(ipAddress).IsPublic());
@@ -37,7 +39,9 @@ public class IPAddressExtensionsTests
     [InlineData(true, "198.19.255.255")]
     [InlineData(false, "172.32.0.0")]
     [InlineData(false, "192.169.0.0")]
-    public void IsPrivate(bool expected, string ipAddress)
+    public void IsPrivate(
+        bool expected,
+        string ipAddress)
         => Assert.Equal(
             expected,
             IPAddress.Parse(ipAddress).IsPrivate());
@@ -51,14 +55,19 @@ public class IPAddressExtensionsTests
     [InlineData(3232301055, "192.168.255.255")]
     [InlineData(2887778304, "172.32.0.0")]
     [InlineData(3232301056, "192.169.0.0")]
-    public void ToUnsignedInt(uint expected, string ipAddress)
+    public void ToUnsignedInt(
+        uint expected,
+        string ipAddress)
         => Assert.Equal(
             expected,
             IPAddress.Parse(ipAddress).ToUnsignedInt());
 
     [Theory]
     [InlineData(true, "10.50.30.7", "10.0.0.0/8")]
-    public void IsInRange(bool expected, string ipAddress, string cidrNotation)
+    public void IsInRange(
+        bool expected,
+        string ipAddress,
+        string cidrNotation)
         => Assert.Equal(
             expected,
             IPAddress.Parse(ipAddress).IsInRange(cidrNotation));

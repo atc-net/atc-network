@@ -9,7 +9,9 @@ public class TerminationTypeHelperTests
     [InlineData("\r\n", TerminationType.CarriageReturnLineFeed)]
     [InlineData("", TerminationType.EndOfText)]
     [InlineData("", TerminationType.EndOfTransmission)]
-    public void ConvertToString(string expected, TerminationType value)
+    public void ConvertToString(
+        string expected,
+        TerminationType value)
         => Assert.Equal(expected, TerminationTypeHelper.ConvertToString(value));
 
     [Theory]
@@ -19,7 +21,9 @@ public class TerminationTypeHelperTests
     [InlineData(new byte[] { 0x0A, 0x0D }, TerminationType.CarriageReturnLineFeed)]
     [InlineData(new byte[] { 0x03 }, TerminationType.EndOfText)]
     [InlineData(new byte[] { 0x04 }, TerminationType.EndOfTransmission)]
-    public void ConvertToBytes(byte[] expected, TerminationType value)
+    public void ConvertToBytes(
+        byte[] expected,
+        TerminationType value)
         => Assert.Equal(expected, TerminationTypeHelper.ConvertToBytes(value));
 
     [Theory]
@@ -40,6 +44,9 @@ public class TerminationTypeHelperTests
     [InlineData(false, new byte[] { 0xAA }, TerminationType.CarriageReturnLineFeed)]
     [InlineData(false, new byte[] { 0x0A }, TerminationType.EndOfText)]
     [InlineData(false, new byte[] { 0x0A }, TerminationType.EndOfTransmission)]
-    public void HasTerminationType(bool expected, byte[] data, TerminationType terminationType)
+    public void HasTerminationType(
+        bool expected,
+        byte[] data,
+        TerminationType terminationType)
         => Assert.Equal(expected, TerminationTypeHelper.HasTerminationType(terminationType, data));
 }

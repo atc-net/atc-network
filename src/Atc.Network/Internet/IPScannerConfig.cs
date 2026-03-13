@@ -54,7 +54,8 @@ public class IPScannerConfig
 
     public IPServicePortExaminationLevel TreatOpenPortsAsWebServices { get; set; } = IPServicePortExaminationLevel.WellKnownAndCommon;
 
-    public void SetPortNumbers(IPServicePortExaminationLevel ipServicePortExaminationLevel)
+    public void SetPortNumbers(
+        IPServicePortExaminationLevel ipServicePortExaminationLevel)
     {
         var serviceProtocolTypes = Enum.GetValues<ServiceProtocolType>()
             .Where(x => x is not ServiceProtocolType.None and not ServiceProtocolType.Unknown)

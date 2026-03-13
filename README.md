@@ -1,103 +1,96 @@
 [![NuGet Version](https://img.shields.io/nuget/v/atc.network.svg?logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/atc.network)
 
-# Atc.Network
+# 🌐 Atc.Network
 
-Atc.Network is a C# library providing robust and flexible tools for network communication and scanning.
+A .NET 8 library for network communication, scanning, and remote desktop — batteries included, zero external dependencies.
 
-- **TcpClient/TcpServer:** Establish and manage TCP network connections.
+---
 
-- **UdpClient/UdpServer:** Establish and manage UDP network connections.
+## 🤔 Why Atc.Network?
 
-- - **IPScanner:** A flexible tool to scan a range of IP addresses or a single IP address. It comes with various configuration options such as:
-  - ICMP Pinging
-  - Host Name Resolution
-  - MAC Address Resolution
-  - Vendor Identification from MAC Address
-  - Port Number Testing (None, Well-Known, Well-Known and Common, All)
+| | |
+|---|---|
+| 🔌 **TCP & UDP** | Event-driven clients and servers with auto-reconnect, keep-alive, and configurable timeouts |
+| 🖥️ **VNC Client** | Cross-platform RFB protocol client — Raw, CopyRect, RRE, CoRRE, Hextile, ZRLE encodings |
+| 🔍 **IP Scanning** | Scan ranges or CIDR blocks with ICMP ping, hostname/MAC resolution, vendor lookup, and port scanning |
+| 🧩 **Interface-first** | Every component has an `I*` interface — built for DI and unit testing |
+| 📝 **Structured Logging** | `[LoggerMessage]` source generators throughout — zero-allocation, high-performance logging |
+| 🐧 **Cross-platform** | Windows, Linux, macOS — no `System.Drawing`, no P/Invoke, no WinForms |
 
-## Using the TcpClient
+---
 
-A sample reference implementation can be found [`here`](sample/Atc.Network.Console.Tcp/Program.cs)
+## 📦 Installation
 
-## Using the UdpClient and UdpServer
-
-A sample reference implementation can be found [`here`](sample/Atc.Network.Console.Udp/Program.cs)
-
-## Using the IPScanner
-
-The IPScanner can scan a range of IPAddresses or just a single IPAddress as specified in the IPScannerConfig.
-
-- If `IcmpPing` is enabled the result for given IPAddress will contain a PingResult with network quality information.
-- If `ResolveHostName` is enabled the result for given IPAddress will contain the hostname if possible to resolve.
-- If `ResolveMacAddress` is enabled the result for given IPAddress will contain the mac-address if possible to resolve.
-- If `ResolveVendorFromMacAddress` is enabled the result for given IPAddress will contain the vendor name from the mac-address if possible to resolve.
-- `TreatOpenPortsAsWebServices` defines what kind of port numbers should be tested, the options are: `None`, `WellKnown`, `WellKnownAndCommon`, `All`
-
-### Example on ScanRange based on WellKnown port numbers
-
-```csharp
-    var ipScannerConfig = new IPScannerConfig
-    {
-        IcmpPing = true,
-        ResolveHostName = true,
-        ResolveMacAddress = true,
-        ResolveVendorFromMacAddress = true,
-        TreatOpenPortsAsWebServices = IPServicePortExaminationLevel.WellKnown,
-    };
-
-    var ipScanner = new IPScanner(ipScannerConfig);
-    ipScanner.ProgressReporting += IpScannerOnProgressReporting;
-
-    var ipScanResults = await ipScanner.ScanRange(
-        IPAddress.Parse("192.168.0.1"),
-        IPAddress.Parse("192.168.0.254"),
-        CancellationToken.None);
+```bash
+dotnet add package Atc.Network
 ```
 
-### Example on ScanRange based on specified port numbers
+---
+
+## ⚡ See It In Action
+
+### 🔌 TCP Client
 
 ```csharp
-    var ipScannerConfig = new IPScannerConfig
-    {
-        IcmpPing = true,
-        ResolveHostName = true,
-        ResolveMacAddress = true,
-        ResolveVendorFromMacAddress = true,
-        TreatOpenPortsAsWebServices = IPServicePortExaminationLevel.None,
-    };
+var tcpClient = new TcpClient(logger, "myserver.example.com", 4242);
+tcpClient.DataReceived += data => Console.WriteLine($"📥 {Encoding.ASCII.GetString(data)}");
 
-    ipScannerConfig.PortNumbers = new List<ushort> { 21, 80, 8080 };
-
-    var ipScanner = new IPScanner(ipScannerConfig);
-    ipScanner.ProgressReporting += IpScannerOnProgressReporting;
-
-    var ipScanResults = await ipScanner.ScanRange(
-        IPAddress.Parse("192.168.0.1"),
-        IPAddress.Parse("192.168.0.254"),
-        CancellationToken.None);
+if (await tcpClient.Connect())
+{
+    await tcpClient.Send("Hello!");
+}
 ```
 
-## Using the IPPortScan
-
-### Example on CanConnectWithTcp
+### 🖥️ VNC Remote Desktop
 
 ```csharp
-    var ipPortScan = new IPPortScan(IPAddress.Parse("192.168.0.27"));
-    var ipPortScanResult = await ipPortScan.CanConnectWithTcp(
-        80,
-        CancellationToken.None);
+var vnc = new VncClient("192.168.1.50", 5900);
+vnc.FramebufferUpdated += (_, e) => RenderRegion(e.Rectangle, e.Framebuffer);
+
+await vnc.Connect();
+await vnc.Authenticate("my-password");
+await vnc.Initialize();
+await vnc.StartUpdates();
 ```
 
-### Example on CanConnectWithHttp
+### 🔍 IP Range Scan
 
 ```csharp
-    var ipPortScan = new IPPortScan(IPAddress.Parse("192.168.0.27"));
-    var ipPortScanResult = await ipPortScan.CanConnectWithHttp(
-        80,
-        CancellationToken.None);
+var scanner = new IPScanner(new IPScannerConfig
+{
+    IcmpPing = true,
+    ResolveHostName = true,
+    ResolveMacAddress = true,
+    ResolveVendorFromMacAddress = true,
+});
+
+var results = await scanner.ScanRange(
+    IPAddress.Parse("192.168.0.1"),
+    IPAddress.Parse("192.168.0.254"),
+    CancellationToken.None);
 ```
 
-## How to contribute
+---
+
+## 📚 Documentation
+
+| Topic | Description |
+|-------|-------------|
+| [🔌 TCP Client & Server](docs/tcp.md) | Connections, reconnection, keep-alive, events |
+| [📡 UDP Client & Server](docs/udp.md) | Datagram communication, hosted server |
+| [🖥️ VNC Client](docs/vnc.md) | Remote desktop, encodings, pixel data, input forwarding |
+| [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, ARP, MAC vendor lookup |
+
+---
+
+## 🔧 Requirements
+
+- .NET 8.0+
+- No additional NuGet dependencies beyond the .NET SDK
+
+---
+
+## 🤝 How to contribute
 
 [Contribution Guidelines](https://atc-net.github.io/introduction/about-atc#how-to-contribute)
 

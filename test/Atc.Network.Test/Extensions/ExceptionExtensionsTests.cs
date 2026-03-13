@@ -1,3 +1,5 @@
+#pragma warning disable ATC220 // Use global usings for all namespaces
+#pragma warning disable ATC221 // Use global usings for all namespaces
 using System.Net.Sockets;
 
 namespace Atc.Network.Test.Extensions;
@@ -9,7 +11,9 @@ public class ExceptionExtensionsTests
     [InlineData(true, SocketError.TimedOut)]
     [InlineData(true, SocketError.ConnectionReset)]
     [InlineData(false, SocketError.OperationAborted)]
-    public void IsKnownExceptionForNetworkCableUnplugged(bool expected, SocketError socketError)
+    public void IsKnownExceptionForNetworkCableUnplugged(
+        bool expected,
+        SocketError socketError)
     {
         // Arrange
         var ex = GenerateExceptionForTest(socketError);
@@ -35,7 +39,9 @@ public class ExceptionExtensionsTests
     [InlineData(false, SocketError.TimedOut)]
     [InlineData(false, SocketError.ConnectionReset)]
     [InlineData(true, SocketError.OperationAborted)]
-    public void IsKnownExceptionForConsumerDisposed(bool expected, SocketError socketError)
+    public void IsKnownExceptionForConsumerDisposed(
+        bool expected,
+        SocketError socketError)
     {
         // Arrange
         var ex = GenerateExceptionForTest(socketError);
@@ -56,8 +62,7 @@ public class ExceptionExtensionsTests
         }
     }
 
-    private static Exception GenerateExceptionForTest(
-        SocketError socketError)
+    private static Exception GenerateExceptionForTest(SocketError socketError)
     {
         var ex = new Exception("Test-Exception");
         if (socketError == SocketError.Success)

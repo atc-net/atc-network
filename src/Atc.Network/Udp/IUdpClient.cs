@@ -39,8 +39,7 @@ public interface IUdpClient : IDisposable
     /// Connect.
     /// </summary>
     /// <param name="cancellationToken">The cancellationToken.</param>
-    Task<bool> Connect(
-        CancellationToken cancellationToken = default);
+    Task<bool> Connect(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Disconnect.

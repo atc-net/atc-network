@@ -11,6 +11,7 @@ public partial class TcpServer : ITcpServer
 
     private readonly TcpServerConfig serverConfig;
     private readonly TcpListener? tcpListener;
+    private readonly string ipAddressStr;
 
     public event Action<byte[]>? DataReceived;
 
@@ -25,8 +26,10 @@ public partial class TcpServer : ITcpServer
 
         IpAddress = IPAddress.Any;
         Port = -1;
+        ipAddressStr = string.Empty;
     }
 
+    [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
     public TcpServer(
         ILogger logger,
         IPAddress ipAddress,
@@ -36,6 +39,7 @@ public partial class TcpServer : ITcpServer
     {
         IpAddress = ipAddress;
         Port = port;
+        ipAddressStr = ipAddress.ToString();
 
         tcpListener = new TcpListener(IpAddress, Port)
         {
@@ -87,8 +91,7 @@ public partial class TcpServer : ITcpServer
     /// Triggered when the application host is ready to start the service.
     /// </summary>
     /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-    public Task StartAsync(
-        CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         _ = Task.Run(StartTcpListener, cancellationToken);
         return Task.Delay(TimeToWaitForStartTcpListenerInMs, cancellationToken);
@@ -98,19 +101,18 @@ public partial class TcpServer : ITcpServer
     /// Triggered when the application host is performing a graceful shutdown.
     /// </summary>
     /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
-    public Task StopAsync(
-        CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken)
     {
         if (!IsRunning)
         {
-            LogTcpServerNotRunning(IpAddress.ToString(), Port);
+            LogTcpServerNotRunning(ipAddressStr, Port);
             return Task.CompletedTask;
         }
 
-        LogStopping(IpAddress.ToString(), Port);
+        LogStopping(ipAddressStr, Port);
         tcpListener?.Stop();
         IsRunning = false;
-        LogStopped(IpAddress.ToString(), Port);
+        LogStopped(ipAddressStr, Port);
 
         return Task.CompletedTask;
     }
@@ -119,16 +121,14 @@ public partial class TcpServer : ITcpServer
     /// Called when data received.
     /// </summary>
     /// <param name="bytes">The received bytes.</param>
-    protected virtual void OnDataReceived(
-        byte[] bytes)
+    protected virtual void OnDataReceived(byte[] bytes)
     { }
 
     /// <summary>
     /// Dispose.
     /// </summary>
     /// <param name="disposing">Indicates if we are disposing or not.</param>
-    protected virtual void Dispose(
-        bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!disposing)
         {
@@ -153,7 +153,7 @@ public partial class TcpServer : ITcpServer
             return;
         }
 
-        LogStarting(IpAddress.ToString(), Port);
+        LogStarting(ipAddressStr, Port);
         if (tcpListener is null)
         {
             return;
@@ -165,7 +165,7 @@ public partial class TcpServer : ITcpServer
         {
             tcpListener.Start();
             IsRunning = true;
-            LogStarted(IpAddress.ToString(), Port);
+            LogStarted(ipAddressStr, Port);
 
             while (IsRunning)
             {
@@ -206,7 +206,7 @@ public partial class TcpServer : ITcpServer
                 return;
             }
 
-            LogDataReceivedChunk(IpAddress.ToString(), Port, readCount);
+            LogDataReceivedChunk(ipAddressStr, Port, readCount);
 
             await memoryStream.WriteAsync(
                 buffer.AsMemory(0, readCount),
@@ -220,12 +220,11 @@ public partial class TcpServer : ITcpServer
         }
         while (!messageHasEnded);
 
-        LogDataReceived(IpAddress.ToString(), Port, (int)memoryStream.Length);
+        LogDataReceived(ipAddressStr, Port, (int)memoryStream.Length);
         InvokeDataReceived(receivedBuffer);
     }
 
-    private void InvokeDataReceived(
-        byte[] data)
+    private void InvokeDataReceived(byte[] data)
     {
         DataReceived?.Invoke(data);
         OnDataReceived(data);

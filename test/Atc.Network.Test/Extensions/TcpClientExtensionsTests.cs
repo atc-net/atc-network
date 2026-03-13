@@ -12,7 +12,11 @@ public class TcpClientExtensionsTests
     [InlineData(0, 100, 0, 0)]
     [InlineData(0, 0, 100, 0)]
     [InlineData(0, 0, 0, 100)]
-    public void SetBufferSizeAndTimeouts(int sendTimeout, int sendBufferSize, int receiveTimeout, int receiveBufferSize)
+    public void SetBufferSizeAndTimeouts(
+        int sendTimeout,
+        int sendBufferSize,
+        int receiveTimeout,
+        int receiveBufferSize)
     {
         // Arrange
         var tcpClient = new System.Net.Sockets.TcpClient();
@@ -31,7 +35,11 @@ public class TcpClientExtensionsTests
     [InlineData(true, 0, 0, 0)]
     [InlineData(true, 1, 1, 1)]
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
-    public void SetKeepAlive(bool expected, int tcpKeepAliveTime, int tcpKeepAliveInterval, int tcpKeepAliveRetryCount)
+    public void SetKeepAlive(
+        bool expected,
+        int tcpKeepAliveTime,
+        int tcpKeepAliveInterval,
+        int tcpKeepAliveRetryCount)
     {
         // Arrange
         var tcpClient = new System.Net.Sockets.TcpClient();

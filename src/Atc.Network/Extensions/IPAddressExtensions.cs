@@ -4,8 +4,7 @@ namespace Atc.Network;
 
 public static class IPAddressExtensions
 {
-    public static bool IsPublic(
-        this IPAddress ipAddress)
+    public static bool IsPublic(this IPAddress ipAddress)
         => !IsPrivate(ipAddress);
 
     /// <summary>
@@ -16,8 +15,7 @@ public static class IPAddressExtensions
     /// https://en.wikipedia.org/wiki/Reserved_IP_addresses
     /// </remarks>
     [SuppressMessage("Design", "MA0051:Method is too long", Justification = "OK.")]
-    public static bool IsPrivate(
-        this IPAddress ipAddress)
+    public static bool IsPrivate(this IPAddress ipAddress)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
@@ -108,8 +106,7 @@ public static class IPAddressExtensions
         return false;
     }
 
-    public static uint ToUnsignedInt(
-        this IPAddress ipAddress)
+    public static uint ToUnsignedInt(this IPAddress ipAddress)
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 

@@ -24,6 +24,7 @@ public class CodeComplianceTests
         typeof(UshortExtensions),
         typeof(UdpClient),
         typeof(UdpServer),
+        typeof(VncClient),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

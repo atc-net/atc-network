@@ -22,7 +22,9 @@ public class IPServicePortListsTests
     [InlineData(2, ServiceProtocolType.Ftp)]
     [InlineData(1, ServiceProtocolType.Ssh)]
     [InlineData(1, ServiceProtocolType.Telnet)]
-    public void GetWellKnown_ServiceProtocolType(int expected, ServiceProtocolType serviceProtocolType)
+    public void GetWellKnown_ServiceProtocolType(
+        int expected,
+        ServiceProtocolType serviceProtocolType)
     {
         // Act
         var actual = IPServicePortLists.GetWellKnown(serviceProtocolType);
@@ -52,7 +54,9 @@ public class IPServicePortListsTests
     [InlineData(2, ServiceProtocolType.Ftp)]
     [InlineData(1, ServiceProtocolType.Ssh)]
     [InlineData(1, ServiceProtocolType.Telnet)]
-    public void GetWellKnownOrCommon_ServiceProtocolType(int expected, ServiceProtocolType serviceProtocolType)
+    public void GetWellKnownOrCommon_ServiceProtocolType(
+        int expected,
+        ServiceProtocolType serviceProtocolType)
     {
         // Act
         var actual = IPServicePortLists.GetWellKnownOrCommon(serviceProtocolType);

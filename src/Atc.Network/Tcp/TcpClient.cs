@@ -203,8 +203,7 @@ public partial class TcpClient : ITcpClient
     /// Connect.
     /// </summary>
     /// <param name="cancellationToken">The cancellationToken.</param>
-    public Task<bool> Connect(
-        CancellationToken cancellationToken = default)
+    public Task<bool> Connect(CancellationToken cancellationToken = default)
         => DoConnect(raiseEventsAndLog: true, cancellationToken);
 
     /// <summary>
@@ -357,8 +356,7 @@ public partial class TcpClient : ITcpClient
     /// Called when data received.
     /// </summary>
     /// <param name="bytes">The received bytes.</param>
-    protected virtual void OnDataReceived(
-        byte[] bytes) { }
+    protected virtual void OnDataReceived(byte[] bytes) { }
 
     /// <inheritdoc />
     public void Dispose()
@@ -371,8 +369,7 @@ public partial class TcpClient : ITcpClient
     /// Dispose.
     /// </summary>
     /// <param name="disposing">Indicates if we are disposing or not.</param>
-    protected virtual void Dispose(
-        bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!disposing)
         {
@@ -419,8 +416,7 @@ public partial class TcpClient : ITcpClient
         OnNoDataReceived();
     }
 
-    private void InvokeDataReceived(
-        byte[] data)
+    private void InvokeDataReceived(byte[] data)
     {
         DataReceived?.Invoke(data);
         OnDataReceived(data);
@@ -631,8 +627,7 @@ public partial class TcpClient : ITcpClient
         }
     }
 
-    private async Task DataReceiver(
-        CancellationToken cancellationToken)
+    private async Task DataReceiver(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -647,8 +642,7 @@ public partial class TcpClient : ITcpClient
         }
     }
 
-    private async Task HandleReadDataTaskResponse(
-        Task<byte[]> readDataTask)
+    private async Task HandleReadDataTaskResponse(Task<byte[]> readDataTask)
     {
         if (readDataTask.IsCanceled)
         {
@@ -711,8 +705,7 @@ public partial class TcpClient : ITcpClient
         }
     }
 
-    private async Task<byte[]> ReadData(
-        CancellationToken cancellationToken)
+    private async Task<byte[]> ReadData(CancellationToken cancellationToken)
     {
         if (networkStream is null ||
             !networkStream.CanRead)

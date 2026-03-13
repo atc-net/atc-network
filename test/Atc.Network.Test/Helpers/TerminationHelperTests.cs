@@ -9,7 +9,10 @@ public class TerminationHelperTests
     [InlineData(7, "Hallo", TerminationType.CarriageReturnLineFeed)]
     [InlineData(6, "Hallo", TerminationType.EndOfText)]
     [InlineData(6, "Hallo", TerminationType.EndOfTransmission)]
-    public void AppendTerminationBytesIfNeeded(int expectedLength, string value, TerminationType terminationType)
+    public void AppendTerminationBytesIfNeeded(
+        int expectedLength,
+        string value,
+        TerminationType terminationType)
     {
         // Arrange
         var bytes = Encoding.ASCII.GetBytes(value);

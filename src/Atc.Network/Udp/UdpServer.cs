@@ -104,8 +104,7 @@ public partial class UdpServer : IUdpServer
     /// Triggered when the application host is ready to start the service.
     /// </summary>
     /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-    public Task StartAsync(
-        CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         IsRunning = true;
         return Task.CompletedTask;
@@ -115,8 +114,7 @@ public partial class UdpServer : IUdpServer
     /// Triggered when the application host is performing a graceful shutdown.
     /// </summary>
     /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
-    public Task StopAsync(
-        CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken)
     {
         IsRunning = false;
         return Task.CompletedTask;
@@ -223,15 +221,13 @@ public partial class UdpServer : IUdpServer
     /// Called when data received.
     /// </summary>
     /// <param name="bytes">The received bytes.</param>
-    protected virtual void OnDataReceived(
-        byte[] bytes) { }
+    protected virtual void OnDataReceived(byte[] bytes) { }
 
     /// <summary>
     /// Dispose.
     /// </summary>
     /// <param name="disposing">Indicates if we are disposing or not.</param>
-    protected virtual void Dispose(
-        bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!disposing)
         {
@@ -261,8 +257,7 @@ public partial class UdpServer : IUdpServer
         }
     }
 
-    private void InvokeDataReceived(
-        byte[] data)
+    private void InvokeDataReceived(byte[] data)
     {
         DataReceived?.Invoke(data);
         OnDataReceived(data);

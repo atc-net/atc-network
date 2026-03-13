@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+    <InternalsVisibleTo Include="Atc.Network.Test" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,6 +16,7 @@ public partial class UdpClient : IUdpClient
     private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly UdpClientConfig clientConfig;
     private readonly ArraySegment<byte> receiveBufferSegment;
+    private readonly string remoteEndPointAddressStr;
 
     private Task? receiveListenerTask;
     private CancellationTokenSource? cancellationTokenSource;
@@ -61,6 +62,8 @@ public partial class UdpClient : IUdpClient
         syncLockSendTimeoutInMs = this.clientConfig.SendTimeout <= 0
             ? UdpConstants.DefaultSendReceiveTimeout
             : this.clientConfig.SendTimeout + UdpConstants.GracePeriodTimeout;
+
+        remoteEndPointAddressStr = RemoteEndPoint.Address.ToString();
     }
 
     public UdpClient(
@@ -73,6 +76,7 @@ public partial class UdpClient : IUdpClient
         ArgumentNullException.ThrowIfNull(ipAddress);
 
         RemoteEndPoint = new IPEndPoint(ipAddress, port);
+        remoteEndPointAddressStr = RemoteEndPoint.Address.ToString();
     }
 
     [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]
@@ -114,8 +118,7 @@ public partial class UdpClient : IUdpClient
     /// Connect.
     /// </summary>
     /// <param name="cancellationToken">The cancellationToken.</param>
-    public Task<bool> Connect(
-        CancellationToken cancellationToken = default)
+    public Task<bool> Connect(CancellationToken cancellationToken = default)
         => DoConnect(raiseEventsAndLog: true, cancellationToken);
 
     /// <summary>
@@ -183,7 +186,7 @@ public partial class UdpClient : IUdpClient
 
         if (!IsConnected)
         {
-            LogClientNotConnected(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
+            LogClientNotConnected(remoteEndPointAddressStr, RemoteEndPoint.Port);
             return;
         }
 
@@ -252,8 +255,7 @@ public partial class UdpClient : IUdpClient
     /// Called when data received.
     /// </summary>
     /// <param name="bytes">The received bytes.</param>
-    protected virtual void OnDataReceived(
-        byte[] bytes) { }
+    protected virtual void OnDataReceived(byte[] bytes) { }
 
     /// <inheritdoc />
     public void Dispose()
@@ -266,8 +268,7 @@ public partial class UdpClient : IUdpClient
     /// Dispose.
     /// </summary>
     /// <param name="disposing">Indicates if we are disposing or not.</param>
-    protected virtual void Dispose(
-        bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!disposing)
         {
@@ -308,8 +309,7 @@ public partial class UdpClient : IUdpClient
         }
     }
 
-    private void InvokeDataReceived(
-        byte[] data)
+    private void InvokeDataReceived(byte[] data)
     {
         DataReceived?.Invoke(data);
         OnDataReceived(data);
@@ -326,7 +326,7 @@ public partial class UdpClient : IUdpClient
 
         if (raiseEventsAndLog)
         {
-            LogConnecting(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
+            LogConnecting(remoteEndPointAddressStr, RemoteEndPoint.Port);
             InvokeConnectionStateChanged(ConnectionState.Connecting);
         }
 
@@ -355,7 +355,7 @@ public partial class UdpClient : IUdpClient
         {
             if (raiseEventsAndLog)
             {
-                LogConnectionError(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port, ex.Message);
+                LogConnectionError(remoteEndPointAddressStr, RemoteEndPoint.Port, ex.Message);
                 InvokeConnectionStateChanged(ConnectionState.ConnectionFailed, ex.Message);
             }
 
@@ -373,21 +373,20 @@ public partial class UdpClient : IUdpClient
 
         if (raiseEventsAndLog)
         {
-            LogConnected(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
+            LogConnected(remoteEndPointAddressStr, RemoteEndPoint.Port);
             InvokeConnectionStateChanged(ConnectionState.Connected);
         }
 
         return true;
     }
 
-    private Task DoDisconnect(
-        bool raiseEventsAndLog)
+    private Task DoDisconnect(bool raiseEventsAndLog)
     {
         if (raiseEventsAndLog)
         {
             InvokeConnectionStateChanged(ConnectionState.Disconnecting);
 
-            LogDisconnecting(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
+            LogDisconnecting(remoteEndPointAddressStr, RemoteEndPoint.Port);
         }
 
         return SetDisconnected(raiseEvents: raiseEventsAndLog);
@@ -473,8 +472,7 @@ public partial class UdpClient : IUdpClient
         }
     }
 
-    private async Task DataReceiver(
-        CancellationToken cancellationToken)
+    private async Task DataReceiver(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {

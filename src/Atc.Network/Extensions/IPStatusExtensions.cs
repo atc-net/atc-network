@@ -31,8 +31,7 @@ public static class IPStatusExtensions
     /// Console.WriteLine(description); // Outputs the localized description for the IPStatus.TimedOut
     /// </code>
     /// </example>
-    public static string GetLocalizedDescription(
-        this IPStatus ipStatus)
+    public static string GetLocalizedDescription(this IPStatus ipStatus)
             => ipStatus switch
             {
                 IPStatus.Unknown => EnumResources.IPStatusUnknown,
