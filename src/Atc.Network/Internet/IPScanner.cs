@@ -18,6 +18,7 @@ public partial class IPScanner : IIPScanner, IDisposable
     private readonly SemaphoreSlim syncLock = new(1, 1);
     private readonly ConcurrentBag<IPScanResult> processedScanResults = new();
     private readonly IPScannerProgressReport progressReporting = new();
+    private readonly IMacAddressVendorLookup macAddressVendorLookup = new OnlineMacAddressVendorLookup();
     private ArpEntity[]? arpEntities;
     private int tasksToProcessCount;
     private int tasksProcessedCount;
@@ -53,6 +54,23 @@ public partial class IPScanner : IIPScanner, IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="IPScanner"/> class using a default logger instance.
     /// </summary>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IPScanner"/> class that resolves MAC address vendors with the given lookup,
+    /// for example <see cref="IeeeOuiMacAddressVendorLookup"/> to look up offline.
+    /// </summary>
+    /// <param name="logger">The logger to use for logging information and errors during scan operations.</param>
+    /// <param name="ipScannerConfig">Optional configuration settings for the scanner. If not provided, default settings are used.</param>
+    /// <param name="macAddressVendorLookup">The MAC address vendor lookup, used when <see cref="IPScannerConfig.ResolveVendorFromMacAddress"/> is on.</param>
+    public IPScanner(
+        ILogger logger,
+        IPScannerConfig? ipScannerConfig,
+        IMacAddressVendorLookup macAddressVendorLookup)
+        : this(logger, ipScannerConfig)
+    {
+        ArgumentNullException.ThrowIfNull(macAddressVendorLookup);
+        this.macAddressVendorLookup = macAddressVendorLookup;
+    }
+
     public IPScanner()
         : this(NullLogger.Instance)
     {
@@ -367,35 +385,42 @@ public partial class IPScanner : IIPScanner, IDisposable
         RaiseProgressReporting(IPScannerProgressReportingType.MacAddress, ipScanResult);
     }
 
+    /// <summary>
+    /// Returns the vendor name for a scanned address: a fixed name for the loopback and the local machine,
+    /// otherwise the name from the MAC address vendor lookup.
+    /// </summary>
+    /// <param name="ipAddress">The scanned IP address.</param>
+    /// <param name="macAddress">Its MAC address.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    /// <returns>The vendor name, or <see langword="null"/> when it is unknown.</returns>
+    internal Task<string?> ResolveMacVendor(
+        IPAddress ipAddress,
+        string macAddress,
+        CancellationToken cancellationToken)
+    {
+        if (macAddress == ArpHelper.LoopbackMacAddress)
+        {
+            return Task.FromResult<string?>("Loopback Interface");
+        }
+
+        if (ArpHelper.IsLocalMachineAddress(ipAddress))
+        {
+            return Task.FromResult<string?>("Local Machine");
+        }
+
+        return macAddressVendorLookup.LookupVendorName(macAddress, cancellationToken);
+    }
+
     private async Task HandleResolveVendorFromMacAddress(
         IPScanResult ipScanResult,
         CancellationToken cancellationToken)
     {
         if (!string.IsNullOrEmpty(ipScanResult.MacAddress))
         {
-            // Check if this is the loopback MAC address
-            if (ipScanResult.MacAddress == ArpHelper.LoopbackMacAddress)
+            var vendorName = await ResolveMacVendor(ipScanResult.IPAddress, ipScanResult.MacAddress, cancellationToken);
+            if (!string.IsNullOrEmpty(vendorName))
             {
-                // Set a specific vendor name for loopback addresses
-                ipScanResult.MacVendor = "Loopback Interface";
-            }
-
-            // Check if this is the local machine IP
-            else if (ArpHelper.IsLocalMachineAddress(ipScanResult.IPAddress))
-            {
-                // Set the vendor name to indicate it's the local machine
-                ipScanResult.MacVendor = "Local Machine";
-            }
-            else
-            {
-                var vendorName = await MacAddressVendorLookupHelper.LookupVendorNameFromMacAddress(
-                    ipScanResult.MacAddress,
-                    cancellationToken);
-
-                if (!string.IsNullOrEmpty(vendorName))
-                {
-                    ipScanResult.MacVendor = vendorName;
-                }
+                ipScanResult.MacVendor = vendorName;
             }
         }
 
