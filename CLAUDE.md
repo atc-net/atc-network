@@ -12,13 +12,13 @@ dotnet restore
 dotnet build -c Release --no-restore
 
 # Run unit tests (excludes integration tests)
-dotnet test -c Release --no-build --filter "Category!=Integration"
+dotnet test -c Release --no-build --filter-query "/[category!=integration]"
 
 # Run a single test class
-dotnet test -c Release --filter "FullyQualifiedName~Atc.Network.Test.PingHelperTests"
+dotnet test -c Release --filter-class "Atc.Network.Test.Helpers.PingHelperTests"
 
 # Run a single test method
-dotnet test -c Release --filter "FullyQualifiedName~Atc.Network.Test.PingHelperTests.Run_ShouldReturn_Succeed"
+dotnet test -c Release --filter-method "Atc.Network.Test.Helpers.PingHelperTests.GetStatus_TimeoutInMs"
 
 # Create NuGet package
 dotnet pack -c Release --no-restore -o ./packages
@@ -26,7 +26,7 @@ dotnet pack -c Release --no-restore -o ./packages
 
 ## Architecture Overview
 
-Atc.Network is a .NET 8 library for network communication and scanning. Core modules:
+Atc.Network is a .NET 10 library for network communication and scanning. Core modules:
 
 **TCP/UDP Clients & Servers** (`Tcp/`, `Udp/`):
 - Interface-based design: `ITcpClient`/`TcpClient`, `ITcpServer`/`TcpServer`, etc.
@@ -57,7 +57,7 @@ Atc.Network is a .NET 8 library for network communication and scanning. Core mod
 
 - Atc base library for common utilities
 - Microsoft.Extensions.Hosting/Logging.Abstractions for DI/logging patterns
-- Test framework: xUnit with Atc.XUnit
+- Test framework: xUnit v3 on Microsoft.Testing.Platform (see `global.json`), with Atc.Test and Atc.XUnit; shared test packages live in `test/Directory.Build.props`
 
 ## CI/CD
 
