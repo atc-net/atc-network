@@ -43,6 +43,7 @@ Which components record what:
 | `UdpServer` | – | – | – | ✅ | ✅ |
 | `VncClient` | ✅ | ✅ | ✅ | – | ✅ |
 | `WakeOnLanHelper` | – | – | – | ✅ (sent) | – |
+| `NtpHelper` | – | – | – | ✅ | – |
 
 ### 🏷️ Tags
 
@@ -50,8 +51,8 @@ Every measurement and span has these tags:
 
 | Tag | Value |
 |-----|-------|
-| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client` or `wake_on_lan` |
-| `server.address` | The server a client connects to, the address a server listens on, or where a Wake-on-LAN packet is sent |
+| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client`, `wake_on_lan` or `ntp_client` |
+| `server.address` | The server a client connects to, the address a server listens on, where a Wake-on-LAN packet is sent, or the NTP server asked |
 | `server.port` | The server's port |
 
 Client endpoints of a server are not tags, so the number of time series stays small however many clients connect.
@@ -70,5 +71,6 @@ Client endpoints of a server are not tags, so the number of time series stays sm
 | `UdpServer.Send` | Internal | Each `Send` |
 | `VncClient.Connect` | Client | `Connect`. Status `Error` when it fails |
 | `WakeOnLan.Send` | Producer | Each `SendMagicPacket`. Status `Error` when it fails |
+| `Ntp.GetTime` | Client | Each `GetTime`. Status `Error` on a timeout or a refused reply |
 
 A span is a child of the caller's current activity, for example the request that called `Send`. The receive loops run outside any span, so the logs and spans of your `DataReceived` handlers are not attached to the connect span that started the loop.

@@ -34,6 +34,9 @@ public class CodeComplianceTests
 
         // SendMagicPacket is covered by WakeOnLanHelperTests, but only from async tests, which this check does not see.
         typeof(WakeOnLanHelper),
+
+        // GetTime is covered by NtpHelperTests, but only from async tests, which this check does not see.
+        typeof(NtpHelper),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

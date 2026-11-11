@@ -3,6 +3,14 @@ namespace Atc.Network.Helpers;
 /// <summary>
 /// Provides utilities for fetching the current time from the WorldTimeAPI.
 /// </summary>
+/// <remarks>
+/// For new code, <see cref="NtpHelper.GetTime(string, TimeSpan?, CancellationToken)"/> is the better way to get the time.
+/// It asks an NTP server directly, which is the standard for time synchronization and is not tied to one web service.
+/// It works on a LAN without internet access (against a router or a domain controller), reports failures
+/// with an exception instead of <see langword="null"/>, and also returns the local clock's offset and the round-trip delay.
+/// NTP gives UTC; for the time in a time zone, use
+/// <c>TimeZoneInfo.ConvertTimeFromUtc(result.UtcTime, TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))</c>.
+/// </remarks>
 public static class InternetWorldTimeHelper
 {
     private const string WorldTimeBaseApi = "https://worldtimeapi.org/api/timezone/";
@@ -16,6 +24,9 @@ public static class InternetWorldTimeHelper
     /// <returns>
     /// A <see cref="DateTime"/> representing the current time in Europe/Berlin timezone, or null if the operation fails or is canceled.
     /// </returns>
+    /// <remarks>
+    /// For new code, <see cref="NtpHelper.GetTime(string, TimeSpan?, CancellationToken)"/> is recommended instead; see the class remarks.
+    /// </remarks>
     public static Task<DateTime?> GetTimeForEuropeBerlin(
         CancellationToken cancellationToken)
         => GetTimeForWorldTimezone("europe/Berlin", cancellationToken);
@@ -30,6 +41,10 @@ public static class InternetWorldTimeHelper
     /// </returns>
     /// <remarks>
     /// This method ensures thread safety by using a SemaphoreSlim to limit concurrent access. It checks for network connectivity before making the HTTP request. If the network is unavailable or the request fails, the method returns null.
+    /// <para>
+    /// For new code, <see cref="NtpHelper.GetTime(string, TimeSpan?, CancellationToken)"/> is recommended instead:
+    /// it uses NTP, the standard time protocol, reports why it failed, and converts to a time zone with <see cref="TimeZoneInfo"/>.
+    /// </para>
     /// </remarks>
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK.")]
     public static async Task<DateTime?> GetTimeForWorldTimezone(

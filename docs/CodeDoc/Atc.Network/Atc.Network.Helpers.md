@@ -252,6 +252,7 @@ Looks up MAC address vendors offline, from the IEEE registry CSV files. Nothing 
 
 ## InternetWorldTimeHelper
 Provides utilities for fetching the current time from the WorldTimeAPI.
+><b>Remarks:</b> For new code, `Atc.Network.Helpers.NtpHelper.GetTime(System.String,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)` is the better way to get the time. It asks an NTP server directly, which is the standard for time synchronization and is not tied to one web service. It works on a LAN without internet access (against a router or a domain controller), reports failures with an exception instead of <see langword="null" />, and also returns the local clock's offset and the round-trip delay. NTP gives UTC; for the time in a time zone, use `TimeZoneInfo.ConvertTimeFromUtc(result.UtcTime, TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))`.
 
 >```csharp
 >public static class InternetWorldTimeHelper
@@ -269,6 +270,8 @@ Provides utilities for fetching the current time from the WorldTimeAPI.
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;A token to monitor for cancellation requests.<br />
 >
 ><b>Returns:</b> A `System.DateTime` representing the current time in Europe/Berlin timezone, or null if the operation fails or is canceled.
+>
+><b>Remarks:</b> For new code, `Atc.Network.Helpers.NtpHelper.GetTime(System.String,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)` is recommended instead; see the class remarks.
 #### GetTimeForWorldTimezone
 >```csharp
 >Task<DateTime?> GetTimeForWorldTimezone(string worldTimezone, CancellationToken cancellationToken)
@@ -281,7 +284,7 @@ Provides utilities for fetching the current time from the WorldTimeAPI.
 >
 ><b>Returns:</b> A `System.DateTime` representing the current time in the specified timezone, or null if the operation fails or is canceled.
 >
-><b>Remarks:</b> This method ensures thread safety by using a SemaphoreSlim to limit concurrent access. It checks for network connectivity before making the HTTP request. If the network is unavailable or the request fails, the method returns null.
+><b>Remarks:</b> This method ensures thread safety by using a SemaphoreSlim to limit concurrent access. It checks for network connectivity before making the HTTP request. If the network is unavailable or the request fails, the method returns null. For new code, `Atc.Network.Helpers.NtpHelper.GetTime(System.String,System.Nullable{System.TimeSpan},System.Threading.CancellationToken)` is recommended instead: it uses NTP, the standard time protocol, reports why it failed, and converts to a time zone with `System.TimeZoneInfo`.
 
 <br />
 
@@ -297,6 +300,60 @@ Provides utilities for fetching the current time from the WorldTimeAPI.
 >```csharp
 >Task<string> LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
 >```
+
+<br />
+
+## NtpHelper
+Gets the time from an NTP server with SNTP (RFC 4330), and how far the local clock is from it.
+><b>Remarks:</b> One request is sent per call, as a UDP datagram to port 123. The result has the clock offset and the round-trip delay, from the four NTP timestamps. NTP servers serve UTC; convert it with `System.TimeZoneInfo.ConvertTimeFromUtc(System.DateTime,System.TimeZoneInfo)` for a time zone. Public servers limit how often a client may ask; don't call this more than about once a minute per server.
+
+>```csharp
+>public static class NtpHelper
+>```
+
+### Static Fields
+
+#### DefaultHost
+>```csharp
+>string DefaultHost
+>```
+><b>Summary:</b> The default server: the NTP Pool, which picks a nearby public server.
+#### DefaultPort
+>```csharp
+>int DefaultPort
+>```
+><b>Summary:</b> The NTP port.
+#### DefaultTimeoutInMs
+>```csharp
+>int DefaultTimeoutInMs
+>```
+><b>Summary:</b> The default time to wait for the reply, in milliseconds.
+### Static Methods
+
+#### GetTime
+>```csharp
+>Task<NtpResult> GetTime(string host = pool.ntp.org, TimeSpan? timeout = null, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Gets the time from an NTP server by host name or IP address.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`host`&nbsp;&nbsp;-&nbsp;&nbsp;The server's host name or IP address. The default is .<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`timeout`&nbsp;&nbsp;-&nbsp;&nbsp;How long to wait for the reply. The default is 5 seconds. Resolving the host name is not included.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellation token.<br />
+>
+><b>Returns:</b> The server's time and the local clock's offset from it.
+#### GetTime
+>```csharp
+>Task<NtpResult> GetTime(IPEndPoint endPoint, TimeSpan? timeout = null, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Gets the time from an NTP server by host name or IP address.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`host`&nbsp;&nbsp;-&nbsp;&nbsp;The server's host name or IP address. The default is .<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`timeout`&nbsp;&nbsp;-&nbsp;&nbsp;How long to wait for the reply. The default is 5 seconds. Resolving the host name is not included.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellation token.<br />
+>
+><b>Returns:</b> The server's time and the local clock's offset from it.
 
 <br />
 

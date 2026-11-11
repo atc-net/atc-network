@@ -156,6 +156,14 @@
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
+- [NtpHelper](Atc.Network.Helpers.md#ntphelper)
+  -  Static Fields
+     - int DefaultPort
+     - int DefaultTimeoutInMs
+     - string DefaultHost
+  -  Static Methods
+     - GetTime(IPEndPoint endPoint, TimeSpan? timeout = null, CancellationToken cancellationToken = null)
+     - GetTime(string host = pool.ntp.org, TimeSpan? timeout = null, CancellationToken cancellationToken = null)
 - [OnlineMacAddressVendorLookup](Atc.Network.Helpers.md#onlinemacaddressvendorlookup)
   -  Methods
      - LookupVendorName(string macAddress, CancellationToken cancellationToken = null)
@@ -307,6 +315,15 @@
      - PercentageCompleted
      - Start
      - TimeDiff
+  -  Methods
+     - ToString()
+- [NtpResult](Atc.Network.Models.md#ntpresult)
+  -  Properties
+     - Offset
+     - RoundTripDelay
+     - Server
+     - Stratum
+     - UtcTime
   -  Methods
      - ToString()
 - [PingStatusResult](Atc.Network.Models.md#pingstatusresult)
