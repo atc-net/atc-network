@@ -524,8 +524,8 @@ public partial class UdpClient : IUdpClient
             return;
         }
 
-        var receivedBytes = new byte[res.Value.ReceivedBytes];
-        Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.Value.ReceivedBytes);
+        // Copy only the received bytes, not the whole receive buffer.
+        var receivedBytes = receiveBufferSegment.AsSpan(0, res.Value.ReceivedBytes).ToArray();
 
         InvokeDataReceived(receivedBytes);
     }
