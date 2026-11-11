@@ -19,14 +19,14 @@ public class CodeDocumentationTests
         // Arrange
         var assemblyName = typeof(CodeDocumentationTests).Assembly.GetName().Name;
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var index = baseDirectory!.IndexOf(assemblyName!, StringComparison.Ordinal);
-        var testProjectDirectory = new DirectoryInfo(baseDirectory.Substring(0, index + assemblyName!.Length));
-        var rootDirectory = testProjectDirectory!.Parent!.Parent;
+        var index = baseDirectory.IndexOf(assemblyName, StringComparison.Ordinal);
+        var testProjectDirectory = new DirectoryInfo(baseDirectory.Substring(0, index + assemblyName.Length));
+        var rootDirectory = testProjectDirectory.Parent.Parent;
         var codeDocPath =
             Path.Combine(
                 Path.Combine(
-                    Path.Combine(rootDirectory!.FullName, "docs"), "CodeDoc"),
-                sourceAssembly.GetName().Name!);
+                    Path.Combine(rootDirectory.FullName, "docs"), "CodeDoc"),
+                sourceAssembly.GetName().Name);
         var codeDocDirectory = new DirectoryInfo(codeDocPath);
         if (!codeDocDirectory.Exists)
         {

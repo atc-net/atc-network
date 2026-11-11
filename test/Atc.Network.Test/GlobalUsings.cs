@@ -20,4 +20,3 @@ global using Atc.Network.Vnc.IO;
 global using Atc.XUnit;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
-global using Xunit.Abstractions;
