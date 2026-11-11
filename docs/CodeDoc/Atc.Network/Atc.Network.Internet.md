@@ -362,6 +362,11 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 
 ### Static Fields
 
+#### MaxConcurrentPortScansPerIPAddress
+>```csharp
+>int MaxConcurrentPortScansPerIPAddress
+>```
+><b>Summary:</b> The maximum number of ports scanned at the same time for one IP address. IP addresses are scanned in parallel too, so this keeps the total number of open sockets bounded.
 #### TimeoutHttpInMs
 >```csharp
 >int TimeoutHttpInMs
