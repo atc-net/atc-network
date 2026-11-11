@@ -1,7 +1,8 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // The servers listen on fixed ports, without the Aspire proxy: the proxy handles TCP only, not UDP,
-// and the same setup for both keeps them easy to compare. Each port is passed to its server
+// and the same setup for both keeps them easy to compare. The TCP pair uses IPv4 (127.0.0.1),
+// the UDP pair IPv6 (::1). Each port is passed to its server
 // in an environment variable, and to its client with WithReference.
 var tcpServer = builder
     .AddProject<Projects.Showcase_TcpTestServer>("tcp-test-server")

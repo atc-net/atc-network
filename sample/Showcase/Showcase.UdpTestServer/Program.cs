@@ -5,9 +5,10 @@ builder.AddServiceDefaults();
 var port = builder.Configuration.GetValue("UDP_PORT", 9101);
 
 // UdpServer binds the port when it is created, and StartAsync marks it running.
+// The UDP pair runs over IPv6 (::1); the TCP pair runs over IPv4.
 builder.Services.AddSingleton(serviceProvider => new UdpServer(
     serviceProvider.GetRequiredService<ILogger<UdpServer>>(),
-    IPAddress.Loopback,
+    IPAddress.IPv6Loopback,
     port,
     new UdpServerConfig
     {

@@ -17,8 +17,9 @@ internal sealed partial class UdpTestClientWorker(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Aspire passes the server's endpoint with WithReference; 127.0.0.1:9101 when the app runs on its own.
-        var endpoint = configuration.GetServiceEndpoint("udp-test-server", "udp", new IPEndPoint(IPAddress.Loopback, 9101));
+        // Aspire passes the server's endpoint with WithReference; [::1]:9101 when the app runs on its own.
+        // The server listens on IPv6, so "localhost" resolves to ::1.
+        var endpoint = configuration.GetServiceEndpoint("udp-test-server", "udp", new IPEndPoint(IPAddress.IPv6Loopback, 9101));
         LogUsingServer(endpoint);
 
         using var udpClient = new UdpClient(

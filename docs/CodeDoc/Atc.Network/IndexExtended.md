@@ -435,6 +435,7 @@
      - StopAsync(CancellationToken cancellationToken)
 - [TcpServerConfig](Atc.Network.Tcp.md#tcpserverconfig)
   -  Properties
+     - DualMode
      - SslOptions
 
 ## [Atc.Network.Udp](Atc.Network.Udp.md)
@@ -527,6 +528,7 @@
      - StopAsync(CancellationToken cancellationToken)
 - [UdpServerConfig](Atc.Network.Udp.md#udpserverconfig)
   -  Properties
+     - DualMode
      - EchoOnReceivedData
      - RespondToPing
   -  Methods

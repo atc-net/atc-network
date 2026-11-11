@@ -67,6 +67,8 @@ public partial class TcpServer : ITcpServer
         Port = port;
         ipAddressStr = ipAddress.ToString();
 
+        IPEndPointHelper.ThrowIfDualModeWithoutIPv6(this.serverConfig.DualMode, ipAddress, nameof(serverConfig));
+
         tcpListener = new TcpListener(IpAddress, Port)
         {
             Server =
@@ -77,6 +79,11 @@ public partial class TcpServer : ITcpServer
                 ReceiveBufferSize = this.serverConfig.ReceiveBufferSize,
             },
         };
+
+        if (this.serverConfig.DualMode)
+        {
+            tcpListener.Server.DualMode = true;
+        }
     }
 
     [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "OK.")]

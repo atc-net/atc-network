@@ -675,13 +675,14 @@ public partial class UdpClient : IUdpClient
 
     private void CreateNewSocket()
     {
+        // The socket's address family follows the server's address, so IPv6 servers work.
         socket = new Socket(
-            AddressFamily.InterNetwork,
+            RemoteEndPoint.AddressFamily,
             SocketType.Dgram,
             ProtocolType.Udp);
 
         socket.SetSocketOption(
-            SocketOptionLevel.IP,
+            RemoteEndPoint.AddressFamily == AddressFamily.InterNetworkV6 ? SocketOptionLevel.IPv6 : SocketOptionLevel.IP,
             SocketOptionName.PacketInformation,
             optionValue: true);
 
