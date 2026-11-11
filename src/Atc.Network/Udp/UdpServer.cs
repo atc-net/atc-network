@@ -259,8 +259,32 @@ public partial class UdpServer : IUdpServer
 
     private void InvokeDataReceived(byte[] data)
     {
-        DataReceived?.Invoke(data);
-        OnDataReceived(data);
+        // Call each handler on its own, so one failing handler
+        // neither skips the others nor stops the receive loop.
+        var handlers = DataReceived;
+        if (handlers is not null)
+        {
+            foreach (var handler in handlers.GetInvocationList().Cast<Action<byte[]>>())
+            {
+                InvokeDataReceivedHandler(handler, data);
+            }
+        }
+
+        InvokeDataReceivedHandler(OnDataReceived, data);
+    }
+
+    private void InvokeDataReceivedHandler(
+        Action<byte[]> handler,
+        byte[] data)
+    {
+        try
+        {
+            handler(data);
+        }
+        catch (Exception ex)
+        {
+            LogDataReceivedHandlerError(ex);
+        }
     }
 
     private static void AppendTerminationBytesIfNeeded(
@@ -295,22 +319,38 @@ public partial class UdpServer : IUdpServer
                 continue;
             }
 
-            var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, endPointFrom);
-            var receivedBytes = new byte[res.ReceivedBytes];
-            Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
-
-            LogDataReceived(receivedBytes.Length);
-            InvokeDataReceived(receivedBytes);
-
-            var receivedStr = serverConfig.DefaultEncoding.GetString(receivedBytes);
-            if (receivedStr.StartsWith("ping", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                await Send(res.RemoteEndPoint, "pong", cancellationToken);
+                await ReceiveAndHandleMessage(endPointFrom, cancellationToken);
             }
-            else if (serverConfig.EchoOnReceivedData)
+            catch (SocketException ex)
             {
-                await Send(res.RemoteEndPoint, $"echo: {receivedStr}", cancellationToken);
+                // For example ConnectionReset on Windows after a send to a closed port.
+                // The socket is still usable, so log it and keep receiving.
+                LogDataReceiveSocketError(ex.SocketErrorCode.ToString(), ex.Message);
             }
+        }
+    }
+
+    private async Task ReceiveAndHandleMessage(
+        IPEndPoint endPointFrom,
+        CancellationToken cancellationToken)
+    {
+        var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, endPointFrom);
+        var receivedBytes = new byte[res.ReceivedBytes];
+        Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
+
+        LogDataReceived(receivedBytes.Length);
+        InvokeDataReceived(receivedBytes);
+
+        var receivedStr = serverConfig.DefaultEncoding.GetString(receivedBytes);
+        if (receivedStr.StartsWith("ping", StringComparison.OrdinalIgnoreCase))
+        {
+            await Send(res.RemoteEndPoint, "pong", cancellationToken);
+        }
+        else if (serverConfig.EchoOnReceivedData)
+        {
+            await Send(res.RemoteEndPoint, $"echo: {receivedStr}", cancellationToken);
         }
     }
 }
