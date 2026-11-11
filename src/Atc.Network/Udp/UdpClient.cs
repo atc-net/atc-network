@@ -22,6 +22,8 @@ public partial class UdpClient : IUdpClient
     private CancellationTokenSource? cancellationTokenSource;
     private CancellationTokenRegistration? cancellationTokenRegistration;
     private Socket? socket;
+    private NetworkInstrumentation? instrumentation;
+    private bool isConnected;
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -112,14 +114,34 @@ public partial class UdpClient : IUdpClient
     /// <summary>
     /// Is client connected.
     /// </summary>
-    public bool IsConnected { get; private set; }
+    public bool IsConnected
+    {
+        get => isConnected;
+        private set => SetIsConnected(value);
+    }
+
+    /// <summary>
+    /// Gets the metrics and activities of this instance. Created on first use, when the address and port are known.
+    /// </summary>
+    private NetworkInstrumentation Instrumentation
+        => LazyInitializer.EnsureInitialized(ref instrumentation, () => new NetworkInstrumentation("udp_client", remoteEndPointAddressStr, RemoteEndPoint.Port));
 
     /// <summary>
     /// Connect.
     /// </summary>
     /// <param name="cancellationToken">The cancellationToken.</param>
-    public Task<bool> Connect(CancellationToken cancellationToken = default)
-        => DoConnect(raiseEventsAndLog: true, cancellationToken);
+    public async Task<bool> Connect(
+        CancellationToken cancellationToken = default)
+    {
+        using var activity = Instrumentation.StartActivity("UdpClient.Connect", ActivityKind.Client);
+        var connected = await DoConnect(raiseEventsAndLog: true, cancellationToken);
+        if (!connected && !IsConnected)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error);
+        }
+
+        return connected;
+    }
 
     /// <summary>
     /// Disconnect.
@@ -193,6 +215,7 @@ public partial class UdpClient : IUdpClient
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
 
         var buffer = new ArraySegment<byte>(data);
+        using var activity = Instrumentation.StartActivity("UdpClient.Send", ActivityKind.Client);
         var disconnectedDueToException = false;
         var lockAcquired = false;
 
@@ -206,17 +229,20 @@ public partial class UdpClient : IUdpClient
             }
 
             await socket!.SendToAsync(buffer, SocketFlags.None, RemoteEndPoint, cancellationToken);
+            Instrumentation.Sent(data.Length);
             await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
         }
         catch (SocketException ex)
         {
             LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
             disconnectedDueToException = true;
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
         }
         catch (Exception ex)
         {
             LogDataSendingError(ex.Message);
             disconnectedDueToException = true;
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
         }
         finally
         {
@@ -328,6 +354,12 @@ public partial class UdpClient : IUdpClient
         }
     }
 
+    private void SetIsConnected(bool value)
+    {
+        isConnected = value;
+        Instrumentation.SetConnected(value);
+    }
+
     private void InvokeHandler(
         string eventName,
         Action invoke)
@@ -339,6 +371,7 @@ public partial class UdpClient : IUdpClient
         catch (Exception ex)
         {
             LogEventHandlerError(remoteEndPointAddressStr, RemoteEndPoint.Port, eventName, ex);
+            Instrumentation.HandlerFailed(eventName);
         }
     }
 
@@ -369,9 +402,11 @@ public partial class UdpClient : IUdpClient
         catch (Exception ex)
         {
             LogDataReceivedHandlerError(remoteEndPointAddressStr, RemoteEndPoint.Port, ex);
+            Instrumentation.HandlerFailed(nameof(DataReceived));
         }
     }
 
+    [SuppressMessage("Design", "MA0051:Method is too long", Justification = "OK.")]
     private async Task<bool> DoConnect(
         bool raiseEventsAndLog,
         CancellationToken cancellationToken = default)
@@ -412,6 +447,7 @@ public partial class UdpClient : IUdpClient
         {
             if (raiseEventsAndLog)
             {
+                Instrumentation.ConnectionFailed();
                 LogConnectionError(remoteEndPointAddressStr, RemoteEndPoint.Port, ex.Message);
                 InvokeConnectionStateChanged(ConnectionState.ConnectionFailed, ex.Message);
             }
@@ -560,6 +596,7 @@ public partial class UdpClient : IUdpClient
         // Copy only the received bytes, not the whole receive buffer.
         var receivedBytes = receiveBufferSegment.AsSpan(0, res.Value.ReceivedBytes).ToArray();
 
+        Instrumentation.Received(receivedBytes.Length);
         InvokeDataReceived(receivedBytes);
     }
 
@@ -593,7 +630,7 @@ public partial class UdpClient : IUdpClient
             cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenRegistration = cancellationTokenSource.Token.Register(() => { });
 
-            receiveListenerTask = Task.Run(
+            receiveListenerTask = NetworkInstrumentation.RunOutsideCurrentActivity(
                 async () => await DataReceiver(cancellationTokenSource.Token),
                 cancellationTokenSource.Token);
         }

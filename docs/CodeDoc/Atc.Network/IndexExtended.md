@@ -34,6 +34,23 @@
      - GetLocalizedDescription(this IPStatus ipStatus)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
+- [NetworkTelemetry](Atc.Network.md#networktelemetry)
+  -  Static Fields
+     - string ActiveConnectionsInstrumentName
+     - string ActivitySourceName
+     - string BytesReceivedInstrumentName
+     - string BytesSentInstrumentName
+     - string ComponentTag
+     - string ConnectionFailuresInstrumentName
+     - string EventTag
+     - string HandlerErrorsInstrumentName
+     - string MessagesReceivedInstrumentName
+     - string MessagesSentInstrumentName
+     - string MeterName
+     - string OutcomeTag
+     - string ReconnectsInstrumentName
+     - string ServerAddressTag
+     - string ServerPortTag
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
   -  Static Methods

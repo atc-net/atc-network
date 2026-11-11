@@ -242,6 +242,94 @@ Enumeration: NetworkQualityCategoryType.
 
 <br />
 
+## NetworkTelemetry
+The names of the metrics and traces that Atc.Network emits, for use with OpenTelemetry, for example `AddMeter(NetworkTelemetry.MeterName)` and `AddSource(NetworkTelemetry.ActivitySourceName)`.
+><b>Remarks:</b> Every measurement and activity is tagged with `Atc.Network.NetworkTelemetry.ComponentTag` (for example "tcp_client"), `Atc.Network.NetworkTelemetry.ServerAddressTag` and `Atc.Network.NetworkTelemetry.ServerPortTag`: the server a client connects to, or the address and port a server listens on.
+
+>```csharp
+>public static class NetworkTelemetry
+>```
+
+### Static Fields
+
+#### ActiveConnectionsInstrumentName
+>```csharp
+>string ActiveConnectionsInstrumentName
+>```
+><b>Summary:</b> Connections that are open now. A server counts each connected client.
+#### ActivitySourceName
+>```csharp
+>string ActivitySourceName
+>```
+><b>Summary:</b> The name of the `System.Diagnostics.ActivitySource`.
+#### BytesReceivedInstrumentName
+>```csharp
+>string BytesReceivedInstrumentName
+>```
+><b>Summary:</b> Bytes received.
+#### BytesSentInstrumentName
+>```csharp
+>string BytesSentInstrumentName
+>```
+><b>Summary:</b> Bytes sent.
+#### ComponentTag
+>```csharp
+>string ComponentTag
+>```
+><b>Summary:</b> The tag with the component: "tcp_client", "tcp_server", "udp_client", "udp_server" or "vnc_client".
+#### ConnectionFailuresInstrumentName
+>```csharp
+>string ConnectionFailuresInstrumentName
+>```
+><b>Summary:</b> Connect attempts that failed, and server-side TLS handshakes that failed.
+#### EventTag
+>```csharp
+>string EventTag
+>```
+><b>Summary:</b> The tag with the event whose handler threw.
+#### HandlerErrorsInstrumentName
+>```csharp
+>string HandlerErrorsInstrumentName
+>```
+><b>Summary:</b> Event handlers that threw, tagged with `Atc.Network.NetworkTelemetry.EventTag`.
+#### MessagesReceivedInstrumentName
+>```csharp
+>string MessagesReceivedInstrumentName
+>```
+><b>Summary:</b> Messages received: one per DataReceived event (a TCP client read, a TCP server message or a UDP datagram).
+#### MessagesSentInstrumentName
+>```csharp
+>string MessagesSentInstrumentName
+>```
+><b>Summary:</b> Messages sent: one per send call.
+#### MeterName
+>```csharp
+>string MeterName
+>```
+><b>Summary:</b> The name of the `System.Diagnostics.Metrics.Meter`.
+#### OutcomeTag
+>```csharp
+>string OutcomeTag
+>```
+><b>Summary:</b> The tag with the outcome of a reconnect attempt: "success" or "failure".
+#### ReconnectsInstrumentName
+>```csharp
+>string ReconnectsInstrumentName
+>```
+><b>Summary:</b> Reconnect attempts, tagged with `Atc.Network.NetworkTelemetry.OutcomeTag` "success" or "failure".
+#### ServerAddressTag
+>```csharp
+>string ServerAddressTag
+>```
+><b>Summary:</b> The tag with the server address.
+#### ServerPortTag
+>```csharp
+>string ServerPortTag
+>```
+><b>Summary:</b> The tag with the server port.
+
+<br />
+
 ## ServiceProtocolType
 
 >```csharp

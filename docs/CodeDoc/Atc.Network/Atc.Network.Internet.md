@@ -388,7 +388,7 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 >```csharp
 >int TimeoutTcpInMs
 >```
-><b>Summary:</b> The connect time-out for tpc value, in milliseconds. The default is 100 (100 msec);
+><b>Summary:</b> The connect time-out for TCP value, in milliseconds. The default is 100 (100 msec);
 
 <br />
 
