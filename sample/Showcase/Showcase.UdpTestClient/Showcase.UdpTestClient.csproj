@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    A UDP client that sends "ping <n>" to Showcase.UdpTestServer every 2 seconds and logs the replies.
+    Run it with the others from Showcase.Aspire, or on its own with "dotnet run" (no dashboard export then).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA1852</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Atc.Network\Atc.Network.csproj" />
+    <ProjectReference Include="..\Showcase.ServiceDefaults\Showcase.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

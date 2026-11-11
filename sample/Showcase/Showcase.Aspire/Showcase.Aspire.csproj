@@ -1,0 +1,23 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.5">
+
+  <!--
+    The Aspire AppHost of the showcase: runs a TCP and a UDP test server, each with a test client,
+    and the Aspire dashboard with their logs, metrics and traces.
+      dotnet run (in this folder)
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA1852</NoWarn>
+    <!-- The AppHost also runs with "dotnet run", without the Aspire CLI bundle that ASPIRE010 asks for -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);ASPIRE010</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Showcase.TcpTestServer\Showcase.TcpTestServer.csproj" />
+    <ProjectReference Include="..\Showcase.TcpTestClient\Showcase.TcpTestClient.csproj" />
+    <ProjectReference Include="..\Showcase.UdpTestServer\Showcase.UdpTestServer.csproj" />
+    <ProjectReference Include="..\Showcase.UdpTestClient\Showcase.UdpTestClient.csproj" />
+  </ItemGroup>
+
+</Project>

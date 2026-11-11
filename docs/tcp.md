@@ -203,3 +203,5 @@ var tcpServer = new TcpServer(
 ## 📂 Sample
 
 A complete working sample is available at [`sample/Atc.Network.Console.Tcp/Program.cs`](../sample/Atc.Network.Console.Tcp/Program.cs).
+
+For a real-world setup, with a TCP server and client running as hosted services under Aspire and their logs in the Aspire dashboard, see the [Showcase](../sample/Showcase/README.md).
