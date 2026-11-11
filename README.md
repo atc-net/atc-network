@@ -15,6 +15,7 @@ A .NET 10 library for network communication, scanning, and remote desktop — ba
 | 🔍 **IP Scanning** | Scan ranges or CIDR blocks with ICMP ping, hostname/NetBIOS/MAC resolution, vendor lookup, and port scanning |
 | ⏰ **Wake-on-LAN** | Wake sleeping devices with a magic packet, by broadcast or to a chosen subnet |
 | 🕰️ **NTP Time** | Get the time from an NTP server, with the local clock's offset and the round-trip delay |
+| 📹 **ONVIF Cameras** | Find IP cameras, and read their model and RTSP stream URLs |
 | 📡 **Service Discovery** | Find printers, cameras, speakers, TVs and other devices with mDNS / DNS-SD, SSDP (UPnP) and ONVIF WS-Discovery |
 | 🧩 **Interface-first** | Every component has an `I*` interface — built for DI and unit testing |
 | 📝 **Structured Logging** | `[LoggerMessage]` source generators throughout — zero-allocation, high-performance logging |
@@ -85,6 +86,7 @@ var results = await scanner.ScanRange(
 | [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, traceroute, DNS, NetBIOS, ARP, MAC vendor lookup |
 | [⏰ Wake-on-LAN](docs/wake-on-lan.md) | Magic packets, subnet broadcast, SecureOn password |
 | [🕰️ NTP Time](docs/ntp.md) | Server time, clock offset, round-trip delay, time zones |
+| [📹 ONVIF Cameras](docs/onvif.md) | Find cameras, read model and stream URLs, credentials, errors |
 | [📡 Service Discovery](docs/discovery.md) | mDNS / DNS-SD, SSDP (UPnP) and ONVIF WS-Discovery, in the IP scanner too |
 | [🧵 Events, Threads & Errors](docs/events.md) | Which thread raises events, handler exceptions, log event ids |
 | [📈 Metrics & Tracing](docs/telemetry.md) | OpenTelemetry metrics and traces: instruments, tags, spans |

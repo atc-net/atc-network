@@ -118,7 +118,7 @@ Two probes are sent: one for cameras (`NetworkVideoTransmitter`) and one for eve
 |----------|---------|
 | `IPAddress` | The address the answer came from |
 | `Name`, `Hardware`, `Location` | From the device's scopes, such as `C210`, `HIKVISION DS-2CD2183G0-IU` |
-| `DeviceServiceUrl` | The ONVIF device service, such as `http://192.168.1.132:2020/onvif/device_service` |
+| `DeviceServiceUrl` | The ONVIF device service, such as `http://192.168.1.132:2020/onvif/device_service`; pass it to [`OnvifClient`](onvif.md) for the model and stream URLs |
 | `XAddrs` | Every device service URL the device listed |
 | `IsNetworkVideoTransmitter` | Whether it is a camera or video encoder (not, say, an NVR) |
 | `Types`, `Scopes` | As the device sent them (scopes percent-decoded) |

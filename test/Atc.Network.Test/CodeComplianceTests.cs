@@ -51,6 +51,9 @@ public class CodeComplianceTests
         typeof(MdnsDiscovery),
         typeof(SsdpDiscovery),
         typeof(OnvifDiscovery),
+
+        // Covered by OnvifClientTests, but only from async tests, which this check does not see.
+        typeof(OnvifClient),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)
