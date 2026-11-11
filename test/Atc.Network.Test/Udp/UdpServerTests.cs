@@ -160,6 +160,26 @@ public sealed class UdpServerTests
         await udpServer.StopAsync(CancellationToken.None);
     }
 
+    [Fact]
+    public async Task DataReceived_LongThenShortDatagram_DeliversExactlyTheReceivedBytes()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var udpServer = new UdpServer(NullLogger.Instance, IPAddress.Loopback, port);
+        var received = new ConcurrentQueue<string>();
+        udpServer.DataReceived += data => received.Enqueue(Encoding.ASCII.GetString(data));
+        await udpServer.StartAsync(CancellationToken.None);
+
+        // Act - the short datagram must not carry leftover bytes from the long one.
+        await SendDatagrams(port, "a long datagram", "ok");
+
+        // Assert
+        Assert.True(await WaitHelper.WaitUntil(() => received.Count == 2), $"Expected 2 datagrams, got {received.Count}.");
+        Assert.Equal(["a long datagram", "ok"], received.ToArray());
+
+        await udpServer.StopAsync(CancellationToken.None);
+    }
+
     private static int GetFreePort()
     {
         using var probe = new System.Net.Sockets.UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
