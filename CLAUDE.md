@@ -61,6 +61,6 @@ Atc.Network is a .NET 10 library for network communication and scanning. Core mo
 
 ## CI/CD
 
-- Pre-integration (PRs): Builds on ubuntu, macos, windows
-- Post-integration (main): Tests, SonarCloud analysis, NuGet publish
-- Uses Nerdbank.GitVersioning for versioning
+- `build.yml` (pushes and PRs to main): builds and runs unit tests with coverage on ubuntu, macos and windows
+- `release-please.yml` (pushes to main): maintains the release PR; merging it tags a release and publishes to nuget.org via NuGet Trusted Publishing (OIDC)
+- The version lives in `Directory.Build.props` between the `x-release-please` markers; release-please bumps it from Conventional Commits (`feat:` → minor, `fix:` → patch, `!`/`BREAKING CHANGE:` → major)
