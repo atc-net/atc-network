@@ -21,6 +21,7 @@ public partial class TcpClient : ITcpClient
     private readonly TcpClientKeepAliveConfig clientKeepAliveConfig;
     private readonly byte[] receiveBuffer;
     private readonly TcpMessageFramer? messageFramer;
+    private readonly ReceivedDataReaders receivedDataReaders = new();
 
     private readonly int syncLockConnectTimeoutInMs;
     private readonly int syncLockSendTimeoutInMs;
@@ -362,6 +363,22 @@ public partial class TcpClient : ITcpClient
     }
 
     /// <summary>
+    /// Reads received data as an async stream, as an alternative to <see cref="DataReceived"/>: one item per
+    /// <see cref="DataReceived"/> event, in the same order. The stream ends when the cancellationToken is cancelled
+    /// or the client is disposed; it continues across reconnects.
+    /// </summary>
+    /// <remarks>
+    /// Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items;
+    /// when it falls behind, the client waits before reading more, so a slow reader slows down the sender
+    /// instead of using more memory.
+    /// </remarks>
+    /// <param name="cancellationToken">Ends the stream.</param>
+    /// <returns>The received data.</returns>
+    public IAsyncEnumerable<ReadOnlyMemory<byte>> ReadAllAsync(
+        CancellationToken cancellationToken = default)
+        => receivedDataReaders.ReadAllAsync(cancellationToken);
+
+    /// <summary>
     /// Called when connection is established.
     /// </summary>
     protected virtual void OnConnected() { }
@@ -409,6 +426,7 @@ public partial class TcpClient : ITcpClient
             return;
         }
 
+        receivedDataReaders.CompleteAll();
         DisposeCancellationTokenAndTask();
         DisposeTcpClientAndStream();
 
@@ -777,7 +795,7 @@ public partial class TcpClient : ITcpClient
 
             try
             {
-                await HandleReadDataTaskResponse(ReadData(cancellationToken));
+                await HandleReadDataTaskResponse(ReadData(cancellationToken), cancellationToken);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -814,7 +832,9 @@ public partial class TcpClient : ITcpClient
         }
     }
 
-    private async Task HandleReadDataTaskResponse(Task<byte[]> readDataTask)
+    private async Task HandleReadDataTaskResponse(
+        Task<byte[]> readDataTask,
+        CancellationToken cancellationToken)
     {
         if (readDataTask.IsCanceled)
         {
@@ -872,7 +892,7 @@ public partial class TcpClient : ITcpClient
         }
         else
         {
-            HandleDataRead(data);
+            await HandleDataRead(data, cancellationToken);
         }
     }
 
@@ -916,23 +936,36 @@ public partial class TcpClient : ITcpClient
     /// Raises DataReceived for one read, or, with message framing, once for each message the read completes.
     /// A framing error (a message that is too long) goes to the receive loop, which reports it and disconnects.
     /// </summary>
-    private void HandleDataRead(byte[] data)
+    private async Task HandleDataRead(
+        byte[] data,
+        CancellationToken cancellationToken)
     {
         LogDataReceivedByteLength(IPAddressOrHostname, Port, data.Length);
         Instrumentation.BytesReceived(data.Length);
 
         if (messageFramer is null)
         {
-            Instrumentation.MessageReceived();
-            InvokeDataReceived(data);
+            await DeliverReceivedData(data, cancellationToken);
             return;
         }
 
         foreach (var message in messageFramer.Append(data))
         {
-            Instrumentation.MessageReceived();
-            InvokeDataReceived(message);
+            await DeliverReceivedData(message, cancellationToken);
         }
+    }
+
+    /// <summary>
+    /// Raises DataReceived, then passes the data to the ReadAllAsync readers. Waits while a reader's buffer is full,
+    /// so a slow reader stops the client from reading ahead.
+    /// </summary>
+    private Task DeliverReceivedData(
+        byte[] data,
+        CancellationToken cancellationToken)
+    {
+        Instrumentation.MessageReceived();
+        InvokeDataReceived(data);
+        return receivedDataReaders.WriteAsync(data, cancellationToken);
     }
 
     private async Task<byte[]> ReadData(CancellationToken cancellationToken)

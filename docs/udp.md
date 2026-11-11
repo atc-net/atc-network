@@ -115,6 +115,21 @@ A handler that throws is logged and does not stop the server. An `async` handler
 
 ---
 
+## 🌊 Reading as an async stream
+
+`UdpClient.ReadAllAsync` returns the received datagrams as an `IAsyncEnumerable<ReadOnlyMemory<byte>>`, as an alternative to `DataReceived`:
+
+```csharp
+await foreach (var datagram in udpClient.ReadAllAsync(cancellationToken))
+{
+    Console.WriteLine(Encoding.UTF8.GetString(datagram.Span));
+}
+```
+
+Each enumeration buffers up to 256 datagrams; when it falls behind, the client waits before receiving more. See [Reading as an async stream](tcp.md#-reading-as-an-async-stream) for the details.
+
+---
+
 ## 📂 Sample
 
 A complete working sample is available at [`sample/Atc.Network.Console.Udp/Program.cs`](../sample/Atc.Network.Console.Udp/Program.cs).
