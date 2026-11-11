@@ -110,4 +110,4 @@ public sealed class VncPixelFormat
     /// <inheritdoc />
     public override string ToString()
         => $"{nameof(BitsPerPixel)}: {BitsPerPixel}, {nameof(Depth)}: {Depth}, {nameof(BigEndian)}: {BigEndian}, {nameof(TrueColour)}: {TrueColour}";
-}
+}

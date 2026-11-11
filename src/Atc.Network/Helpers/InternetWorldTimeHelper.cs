@@ -49,7 +49,7 @@ public static class InternetWorldTimeHelper
                 return null;
             }
 
-            if (!NetworkInformationHelper.HasConnection())
+            if (!await NetworkInformationHelper.HasConnectionAsync(cancellationToken))
             {
                 return null;
             }

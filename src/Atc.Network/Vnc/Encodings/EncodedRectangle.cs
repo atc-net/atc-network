@@ -79,4 +79,4 @@ internal abstract class EncodedRectangle
             Framebuffer.PixelData[offset] = pixel;
         }
     }
-}
+}

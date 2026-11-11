@@ -493,7 +493,7 @@ public partial class TcpClient : ITcpClient
 
             if (tcpClient is not null)
             {
-                tcpClient!.Close();
+                tcpClient.Close();
                 tcpClient.Dispose();
                 tcpClient = null;
             }
@@ -522,7 +522,7 @@ public partial class TcpClient : ITcpClient
             LogDisconnecting(IPAddressOrHostname, Port);
         }
 
-        return SetDisconnected(raiseEvents: raiseEventsAndLog, dispose: dispose);
+        return SetDisconnected(raiseEvents: raiseEventsAndLog, dispose: dispose, cancellationToken: CancellationToken.None);
     }
 
     private async Task DoReconnect()
@@ -530,9 +530,9 @@ public partial class TcpClient : ITcpClient
         LogReconnecting(IPAddressOrHostname, Port);
         InvokeConnectionStateChanged(ConnectionState.Reconnecting);
 
-        await SetDisconnected(raiseEvents: false, dispose: false);
+        await SetDisconnected(raiseEvents: false, dispose: false, cancellationToken: CancellationToken.None);
 
-        await Task.Delay(clientReconnectConfig.RetryInterval);
+        await Task.Delay(clientReconnectConfig.RetryInterval, CancellationToken.None);
 
         if (await DoConnect(raiseEventsAndLog: false, CancellationToken.None))
         {
@@ -685,12 +685,12 @@ public partial class TcpClient : ITcpClient
         {
             if (clientReconnectConfig.Enable)
             {
-                await SetDisconnected(raiseEvents: true, dispose: false);
+                await SetDisconnected(raiseEvents: true, dispose: false, cancellationToken: CancellationToken.None);
                 await DoReconnect();
             }
             else
             {
-                await SetDisconnected(raiseEvents: true, dispose: true);
+                await SetDisconnected(raiseEvents: true, dispose: true, cancellationToken: CancellationToken.None);
             }
         }
         catch (Exception ex)
@@ -724,11 +724,11 @@ public partial class TcpClient : ITcpClient
 
             if (clientReconnectConfig.Enable)
             {
-                await SetDisconnected(raiseEvents: true, dispose: false);
+                await SetDisconnected(raiseEvents: true, dispose: false, cancellationToken: CancellationToken.None);
             }
             else
             {
-                await SetDisconnected(raiseEvents: true, dispose: true);
+                await SetDisconnected(raiseEvents: true, dispose: true, cancellationToken: CancellationToken.None);
             }
         }
 
@@ -751,7 +751,7 @@ public partial class TcpClient : ITcpClient
                     }
                     else
                     {
-                        await SetDisconnected(raiseEvents: true, dispose: true);
+                        await SetDisconnected(raiseEvents: true, dispose: true, cancellationToken: CancellationToken.None);
                     }
                 }
             }
@@ -874,7 +874,7 @@ public partial class TcpClient : ITcpClient
         {
             if (receiveListenerTask.Status == TaskStatus.Running)
             {
-                receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
+                receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs), CancellationToken.None);
             }
 
             receiveListenerTask = null;

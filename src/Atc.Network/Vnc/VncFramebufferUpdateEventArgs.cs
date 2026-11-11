@@ -31,4 +31,4 @@ public class VncFramebufferUpdateEventArgs : EventArgs
     /// <inheritdoc />
     public override string ToString()
         => $"{nameof(Rectangle)}: {Rectangle}";
-}
+}

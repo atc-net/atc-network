@@ -13,4 +13,4 @@ public sealed class VncDefaultInputPolicy : IVncInputPolicy
 
     /// <inheritdoc />
     public bool AllowClipboardTransfer => true;
-}
+}

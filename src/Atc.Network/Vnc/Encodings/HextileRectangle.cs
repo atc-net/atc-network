@@ -94,4 +94,4 @@ internal sealed class HextileRectangle : EncodedRectangle
             }
         }
     }
-}
+}

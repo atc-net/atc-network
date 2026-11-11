@@ -66,4 +66,4 @@ public class VncClientConfig
     /// <inheritdoc />
     public override string ToString()
         => $"{nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(SendTimeout)}: {SendTimeout}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(BitsPerPixel)}: {BitsPerPixel}, {nameof(Depth)}: {Depth}, {nameof(ViewOnly)}: {ViewOnly}, {nameof(SharedDesktop)}: {SharedDesktop}, {nameof(Port)}: {Port}";
-}
+}

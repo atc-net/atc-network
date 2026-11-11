@@ -39,4 +39,4 @@ internal sealed class CoRreRectangle : EncodedRectangle
             Framebuffer.FillRectangle(subRect, pixel);
         }
     }
-}
+}

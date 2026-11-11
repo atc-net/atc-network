@@ -148,6 +148,7 @@ public class IPPortScan : IIPPortScan, IDisposable
     /// <returns>
     /// A task that represents the asynchronous operation, resulting in a boolean indicating connection success.
     /// </returns>
+    [SuppressMessage("Security", "S5332:Use secure protocols", Justification = "OK - the scan deliberately probes plain HTTP ports.")]
     public async Task<bool> CanConnectWithHttpOrHttps(
         int portNumber = 80,
         bool useHttps = false,

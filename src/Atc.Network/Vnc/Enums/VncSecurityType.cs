@@ -15,4 +15,4 @@ public enum VncSecurityType
     /// VNC authentication using DES-encrypted challenge-response.
     /// </summary>
     VncAuthentication = 2,
-}
+}

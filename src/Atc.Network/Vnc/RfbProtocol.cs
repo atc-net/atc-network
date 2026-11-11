@@ -501,4 +501,4 @@ internal sealed class RfbProtocol : IDisposable
             throw new InvalidOperationException("RfbProtocol has not been initialized. Call Initialize first.");
         }
     }
-}
+}

@@ -4,6 +4,7 @@ namespace Atc.Network;
 /// <summary>
 /// Extension methods for <see langword="ushort" />
 /// </summary>
+[SuppressMessage("Security", "S5332:Use secure protocols", Justification = "OK - Telnet is only a port classification, no connection is made.")]
 public static class UshortExtensions
 {
     public static bool IsPortForIPService(

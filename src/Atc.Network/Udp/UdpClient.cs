@@ -385,7 +385,7 @@ public partial class UdpClient : IUdpClient
 
             if (socket is not null)
             {
-                socket!.Close();
+                socket.Close();
                 socket.Dispose();
                 socket = null;
             }
@@ -413,7 +413,7 @@ public partial class UdpClient : IUdpClient
             LogDisconnecting(remoteEndPointAddressStr, RemoteEndPoint.Port);
         }
 
-        return SetDisconnected(raiseEvents: raiseEventsAndLog);
+        return SetDisconnected(raiseEvents: raiseEventsAndLog, cancellationToken: CancellationToken.None);
     }
 
     private async Task SetConnected(
@@ -588,7 +588,7 @@ public partial class UdpClient : IUdpClient
         {
             if (receiveListenerTask.Status == TaskStatus.Running)
             {
-                receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
+                receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs), CancellationToken.None);
             }
 
             receiveListenerTask = null;

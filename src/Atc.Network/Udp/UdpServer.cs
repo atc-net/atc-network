@@ -243,7 +243,7 @@ public partial class UdpServer : IUdpServer
 
         if (receiveListenerTask?.Status == TaskStatus.Running)
         {
-            receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
+            receiveListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs), CancellationToken.None);
         }
 
         if (socket is not null)

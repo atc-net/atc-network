@@ -23,4 +23,4 @@ internal sealed class RawRectangle : EncodedRectangle
             }
         }
     }
-}
+}
