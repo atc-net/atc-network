@@ -48,6 +48,7 @@
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
 - [TerminationHelper](Atc.Network.Helpers.md#terminationhelper)
 - [TerminationTypeHelper](Atc.Network.Helpers.md#terminationtypehelper)
+- [WakeOnLanHelper](Atc.Network.Helpers.md#wakeonlanhelper)
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
 

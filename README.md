@@ -13,6 +13,7 @@ A .NET 10 library for network communication, scanning, and remote desktop — ba
 | 🔌 **TCP & UDP** | Event-driven clients and servers with auto-reconnect, keep-alive, optional TLS, and configurable timeouts |
 | 🖥️ **VNC Client** | Cross-platform RFB protocol client — Raw, CopyRect, RRE, CoRRE, Hextile, ZRLE encodings |
 | 🔍 **IP Scanning** | Scan ranges or CIDR blocks with ICMP ping, hostname/MAC resolution, vendor lookup, and port scanning |
+| ⏰ **Wake-on-LAN** | Wake sleeping devices with a magic packet, by broadcast or to a chosen subnet |
 | 🧩 **Interface-first** | Every component has an `I*` interface — built for DI and unit testing |
 | 📝 **Structured Logging** | `[LoggerMessage]` source generators throughout — zero-allocation, high-performance logging |
 | 🐧 **Cross-platform** | Windows, Linux, macOS — no `System.Drawing`, no P/Invoke, no WinForms |
@@ -80,6 +81,7 @@ var results = await scanner.ScanRange(
 | [📡 UDP Client & Server](docs/udp.md) | Datagram communication, hosted server |
 | [🖥️ VNC Client](docs/vnc.md) | Remote desktop, encodings, pixel data, input forwarding |
 | [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, ARP, MAC vendor lookup |
+| [⏰ Wake-on-LAN](docs/wake-on-lan.md) | Magic packets, subnet broadcast, SecureOn password |
 | [🧵 Events, Threads & Errors](docs/events.md) | Which thread raises events, handler exceptions, log event ids |
 | [📈 Metrics & Tracing](docs/telemetry.md) | OpenTelemetry metrics and traces: instruments, tags, spans |
 | [🧪 Showcase with Aspire](sample/Showcase/README.md) | TCP and UDP test servers and clients, with logs and metrics in the Aspire dashboard |
