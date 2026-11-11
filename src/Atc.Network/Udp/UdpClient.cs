@@ -311,8 +311,32 @@ public partial class UdpClient : IUdpClient
 
     private void InvokeDataReceived(byte[] data)
     {
-        DataReceived?.Invoke(data);
-        OnDataReceived(data);
+        // Call each handler on its own, so one failing handler
+        // neither skips the others nor stops the receive loop.
+        var handlers = DataReceived;
+        if (handlers is not null)
+        {
+            foreach (var handler in handlers.GetInvocationList().Cast<Action<byte[]>>())
+            {
+                InvokeDataReceivedHandler(handler, data);
+            }
+        }
+
+        InvokeDataReceivedHandler(OnDataReceived, data);
+    }
+
+    private void InvokeDataReceivedHandler(
+        Action<byte[]> handler,
+        byte[] data)
+    {
+        try
+        {
+            handler(data);
+        }
+        catch (Exception ex)
+        {
+            LogDataReceivedHandlerError(remoteEndPointAddressStr, RemoteEndPoint.Port, ex);
+        }
     }
 
     private async Task<bool> DoConnect(

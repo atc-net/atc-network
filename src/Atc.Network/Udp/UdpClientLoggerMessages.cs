@@ -72,4 +72,13 @@ public partial class UdpClient
         Message = "Received error when sending data: {errorMessage}.")]
     private partial void LogDataSendingError(
         string errorMessage);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpClient.DataReceivedHandlerError,
+        Level = LogLevel.Error,
+        Message = "A DataReceived handler failed for data from {ipAddressOrHostName}:{port}.")]
+    private partial void LogDataReceivedHandlerError(
+        string ipAddressOrHostName,
+        int port,
+        Exception exception);
 }
