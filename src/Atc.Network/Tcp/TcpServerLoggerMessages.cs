@@ -12,7 +12,7 @@ public partial class TcpServer
     [LoggerMessage(
         EventId = LoggingEventIdConstants.TcpServer.Starting,
         Level = LogLevel.Trace,
-        Message = "Starting tpc-listener on {ipAddress}:{port}.")]
+        Message = "Starting TCP listener on {ipAddress}:{port}.")]
     private partial void LogStarting(
         string ipAddress,
         int port);
@@ -20,7 +20,7 @@ public partial class TcpServer
     [LoggerMessage(
         EventId = LoggingEventIdConstants.TcpServer.Started,
         Level = LogLevel.Information,
-        Message = "Started tpc-listener on {ipAddress}:{port}.")]
+        Message = "Started TCP listener on {ipAddress}:{port}.")]
     private partial void LogStarted(
         string ipAddress,
         int port);
@@ -28,7 +28,7 @@ public partial class TcpServer
     [LoggerMessage(
         EventId = LoggingEventIdConstants.TcpServer.Stopping,
         Level = LogLevel.Trace,
-        Message = "Stopping tpc-listener on {ipAddress}:{port}.")]
+        Message = "Stopping TCP listener on {ipAddress}:{port}.")]
     private partial void LogStopping(
         string ipAddress,
         int port);
@@ -36,7 +36,7 @@ public partial class TcpServer
     [LoggerMessage(
         EventId = LoggingEventIdConstants.TcpServer.Stopped,
         Level = LogLevel.Information,
-        Message = "Stopped tpc-listener on {ipAddress}:{port}.")]
+        Message = "Stopped TCP listener on {ipAddress}:{port}.")]
     private partial void LogStopped(
         string ipAddress,
         int port);
