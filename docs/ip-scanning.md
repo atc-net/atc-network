@@ -39,6 +39,14 @@ var results = await scanner.ScanRange(
     CancellationToken.None);
 ```
 
+### 🌍 IPv6
+
+A single IPv6 address can be scanned like an IPv4 address: ping, host name and ports.
+
+- Ranges and CIDR ranges are IPv4 only: even the smallest usual IPv6 subnet (/64) has 2^64 addresses.
+  `ScanRange` returns an error message and `ScanCidrRange` throws for IPv6.
+- MAC address and vendor are not resolved for IPv6 addresses (ARP is IPv4 only), except `::1`, which is reported as the loopback interface.
+
 ### 🎯 Scan a Single IP
 
 ```csharp

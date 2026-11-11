@@ -171,9 +171,10 @@ public class IPPortScan : IIPPortScan, IDisposable
             }
 
             await Task.Delay(InternalDelayInMs, cancellationToken);
+            var authority = IPEndPointHelper.ToUrlAuthority(ipAddress, portNumber);
             var uri = useHttps
-                ? new Uri($"https://{ipAddress}:{portNumber}")
-                : new Uri($"http://{ipAddress}:{portNumber}");
+                ? new Uri($"https://{authority}")
+                : new Uri($"http://{authority}");
 
             // The request is cancelled when the timeout passes or the caller cancels.
             using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);

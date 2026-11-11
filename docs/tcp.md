@@ -242,6 +242,24 @@ var tcpServer = new TcpServer(
 
 ---
 
+## 🌍 IPv6 and dual mode
+
+The clients and servers work with IPv6 addresses as well as IPv4. The socket follows the address you give.
+
+To accept IPv4 and IPv6 clients on one socket, bind the server to `IPAddress.IPv6Any` with `DualMode`:
+
+```csharp
+var tcpServer = new TcpServer(
+    logger,
+    IPAddress.IPv6Any,
+    8080,
+    new TcpServerConfig { DualMode = true });
+```
+
+IPv4 peers are then reported with their IPv4 address (`127.0.0.1`), not the IPv4-mapped form (`::ffff:127.0.0.1`). `DualMode` with an IPv4 address throws an `ArgumentException`.
+
+---
+
 ## 📂 Sample
 
 A complete working sample is available at [`sample/Atc.Network.Console.Tcp/Program.cs`](../sample/Atc.Network.Console.Tcp/Program.cs).

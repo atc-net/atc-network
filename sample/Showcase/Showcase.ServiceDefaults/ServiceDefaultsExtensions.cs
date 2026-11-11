@@ -48,7 +48,8 @@ public static class ServiceDefaultsExtensions
     /// <summary>
     /// Returns the endpoint of another showcase app, as passed by Aspire with WithReference
     /// (configuration key services:{serviceName}:{endpointName}:0, for example "tcp://localhost:9100").
-    /// "localhost" is resolved to 127.0.0.1, because the servers listen on IPv4.
+    /// "localhost" is resolved to the loopback address of the fallback's address family:
+    /// 127.0.0.1 for a server that listens on IPv4, ::1 for one that listens on IPv6.
     /// </summary>
     /// <param name="configuration">The configuration.</param>
     /// <param name="serviceName">The Aspire resource name of the server.</param>
@@ -61,6 +62,8 @@ public static class ServiceDefaultsExtensions
         string endpointName,
         IPEndPoint fallback)
     {
+        ArgumentNullException.ThrowIfNull(fallback);
+
         ArgumentNullException.ThrowIfNull(configuration);
 
         var value = configuration[$"services:{serviceName}:{endpointName}:0"];
@@ -71,7 +74,7 @@ public static class ServiceDefaultsExtensions
         }
 
         var address = string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase)
-            ? IPAddress.Loopback
+            ? fallback.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6 ? IPAddress.IPv6Loopback : IPAddress.Loopback
             : IPAddress.Parse(uri.Host);
 
         return new IPEndPoint(address, uri.Port);

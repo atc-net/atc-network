@@ -16,4 +16,11 @@ public class TcpServerConfig : TcpConfigBase
     /// without raising <see cref="TcpServer.ClientConnected"/>.
     /// </remarks>
     public SslServerAuthenticationOptions? SslOptions { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the server, bound to an IPv6 address such as <see cref="IPAddress.IPv6Any"/>,
+    /// also accepts IPv4 clients on the same socket (dual mode). IPv4 senders then appear as IPv4 addresses.
+    /// The default is <see langword="false"/>. It needs an IPv6 address.
+    /// </summary>
+    public bool DualMode { get; set; }
 }

@@ -124,6 +124,11 @@ public partial class IPScanner : IIPScanner, IDisposable
     {
         ArgumentNullException.ThrowIfNull(ipAddress);
 
+        if (ipAddress.AddressFamily == AddressFamily.InterNetworkV6)
+        {
+            throw new ArgumentException("IPv6 CIDR ranges can't be scanned; scan single IPv6 addresses instead.", nameof(ipAddress));
+        }
+
         if (cidrLength > 32)
         {
             throw new ArgumentOutOfRangeException(nameof(cidrLength), "CIDR length can maximum be 32");
@@ -151,17 +156,19 @@ public partial class IPScanner : IIPScanner, IDisposable
         IPAddress endIpAddress,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(startIpAddress);
+        ArgumentNullException.ThrowIfNull(endIpAddress);
+
         var scanResults = new IPScanResults();
 
-        var validationResult = IPv4AddressHelper.ValidateAddresses(startIpAddress, endIpAddress);
-        if (!validationResult.IsValid)
+        var (ipAddresses, errorMessage) = GetAddressesToScan(startIpAddress, endIpAddress);
+        if (errorMessage is not null)
         {
-            scanResults.ErrorMessage = validationResult.ErrorMessage;
+            scanResults.ErrorMessage = errorMessage;
             scanResults.End = DateTime.Now;
-            return await Task.FromResult(scanResults);
+            return scanResults;
         }
 
-        var ipAddresses = IPv4AddressHelper.GetAddressesInRange(startIpAddress, endIpAddress);
         if (ipAddresses.Count == 0)
         {
             scanResults.ErrorMessage = "Nothing to process";
@@ -266,6 +273,28 @@ public partial class IPScanner : IIPScanner, IDisposable
         progressReporting.TasksProcessedCount = tasksProcessedCount;
         progressReporting.LatestUpdate = ipScanResult;
         ProgressReporting?.Invoke(this, progressReporting);
+    }
+
+    /// <summary>
+    /// Returns the addresses to scan. An IPv6 address can be scanned on its own, but not as a range:
+    /// even the smallest usual IPv6 subnet (/64) has 2^64 addresses.
+    /// </summary>
+    private static (IReadOnlyCollection<IPAddress> IPAddresses, string? ErrorMessage) GetAddressesToScan(
+        IPAddress startIpAddress,
+        IPAddress endIpAddress)
+    {
+        if (startIpAddress.AddressFamily == AddressFamily.InterNetworkV6 ||
+            endIpAddress.AddressFamily == AddressFamily.InterNetworkV6)
+        {
+            return startIpAddress.Equals(endIpAddress)
+                ? ([startIpAddress], null)
+                : ([], "IPv6 ranges can't be scanned; scan single IPv6 addresses instead.");
+        }
+
+        var validationResult = IPv4AddressHelper.ValidateAddresses(startIpAddress, endIpAddress);
+        return validationResult.IsValid
+            ? (IPv4AddressHelper.GetAddressesInRange(startIpAddress, endIpAddress), null)
+            : ([], validationResult.ErrorMessage);
     }
 
     private async Task DoScan(

@@ -6,7 +6,7 @@ A real-world setup of Atc.Network: a TCP server and a UDP server, each with a cl
 |-----|--------------|
 | `Showcase.TcpTestServer` | `TcpServer` as a hosted service on port 9100. Answers every line with `ack: <line>`. |
 | `Showcase.TcpTestClient` | `TcpClient` that sends `ping <n>` every 2 seconds and reconnects when the server goes away. It uses `MessageFraming` to get one message per reply line, and reads the replies with `await foreach` over `ReadAllAsync` instead of the `DataReceived` event. |
-| `Showcase.UdpTestServer` | `UdpServer` as a hosted service on port 9101. Answers every datagram with `ack: <text>`, sent back to the sender. |
+| `Showcase.UdpTestServer` | `UdpServer` as a hosted service on port 9101, over IPv6 (`::1`). Answers every datagram with `ack: <text>`, sent back to the sender. |
 | `Showcase.UdpTestClient` | `UdpClient` that sends `ping <n>` every 2 seconds. |
 | `Showcase.ServiceDefaults` | Shared OpenTelemetry setup: logs, metrics and traces, exported to the dashboard. |
 | `Showcase.Aspire` | The Aspire AppHost that runs the four apps. |
@@ -32,7 +32,7 @@ Each app also runs on its own with `dotnet run`. It then uses the default ports 
 
 ## 🔧 How it is wired
 
-- The servers listen on fixed ports (9100 and 9101) on 127.0.0.1, without the Aspire proxy, because the proxy doesn't handle UDP. The AppHost passes each port to its server in `TCP_PORT` / `UDP_PORT`, and the endpoint to its client with `WithReference`.
+- The servers listen on fixed ports without the Aspire proxy, because the proxy doesn't handle UDP: TCP on 127.0.0.1:9100 (IPv4), UDP on [::1]:9101 (IPv6). The AppHost passes each port to its server in `TCP_PORT` / `UDP_PORT`, and the endpoint to its client with `WithReference`.
 - Each server is registered as a singleton and then as a hosted service. An event-handler service is added first, so it subscribes to the server's events before the server starts.
 - The reply handlers send on another task and catch their own exceptions. See [When a handler throws](../../docs/events.md#-when-a-handler-throws).
 - The showcase has its own solution, `Showcase.slnx`, so the Aspire packages are not part of the library's build.

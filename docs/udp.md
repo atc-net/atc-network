@@ -130,6 +130,24 @@ Each enumeration buffers up to 256 datagrams; when it falls behind, the client w
 
 ---
 
+## 🌍 IPv6 and dual mode
+
+The clients and servers work with IPv6 addresses as well as IPv4. The socket follows the address you give.
+
+To accept IPv4 and IPv6 datagrams on one socket, bind the server to `IPAddress.IPv6Any` with `DualMode`:
+
+```csharp
+var udpServer = new UdpServer(
+    logger,
+    IPAddress.IPv6Any,
+    27001,
+    new UdpServerConfig { DualMode = true });
+```
+
+IPv4 peers are then reported with their IPv4 address (`127.0.0.1`), not the IPv4-mapped form (`::ffff:127.0.0.1`). `DualMode` with an IPv4 address throws an `ArgumentException`.
+
+---
+
 ## 📂 Sample
 
 A complete working sample is available at [`sample/Atc.Network.Console.Udp/Program.cs`](../sample/Atc.Network.Console.Udp/Program.cs).

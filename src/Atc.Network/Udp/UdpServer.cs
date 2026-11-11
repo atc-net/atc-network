@@ -38,20 +38,29 @@ public partial class UdpServer : IUdpServer
 
     private UdpServer(
         ILogger logger,
+        IPAddress ipAddress,
         UdpServerConfig? serverConfig)
     {
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(ipAddress);
 
         this.logger = logger;
         this.serverConfig = serverConfig ?? new UdpServerConfig();
+        IPEndPointHelper.ThrowIfDualModeWithoutIPv6(this.serverConfig.DualMode, ipAddress, nameof(serverConfig));
 
+        // The socket's address family follows the address, so IPv6 addresses work.
         socket = new Socket(
-            AddressFamily.InterNetwork,
+            ipAddress.AddressFamily,
             SocketType.Dgram,
             ProtocolType.Udp);
 
+        if (this.serverConfig.DualMode)
+        {
+            socket.DualMode = true;
+        }
+
         socket.SetSocketOption(
-            SocketOptionLevel.IP,
+            SocketOptionLevel.Socket,
             SocketOptionName.ReuseAddress,
             optionValue: true);
 
@@ -69,10 +78,8 @@ public partial class UdpServer : IUdpServer
         IPAddress ipAddress,
         int port,
         UdpServerConfig? serverConfig = default)
-        : this(logger, serverConfig)
+        : this(logger, ipAddress, serverConfig)
     {
-        ArgumentNullException.ThrowIfNull(ipAddress);
-
         var localPointFrom = new IPEndPoint(ipAddress, port);
 
         socket!.Bind(localPointFrom);
@@ -386,7 +393,9 @@ public partial class UdpServer : IUdpServer
     private async Task DataReceiver(
         CancellationToken cancellationToken = default)
     {
-        var endPointFrom = new IPEndPoint(IPAddress.Any, 0);
+        var endPointFrom = new IPEndPoint(
+            socket!.AddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any,
+            0);
         while (!cancellationToken.IsCancellationRequested)
         {
             if (!IsRunning)
@@ -420,7 +429,7 @@ public partial class UdpServer : IUdpServer
 
         LogDataReceived(receivedBytes.Length);
         Instrumentation.Received(receivedBytes.Length);
-        InvokeDataReceived(receivedBytes, (IPEndPoint)res.RemoteEndPoint);
+        InvokeDataReceived(receivedBytes, IPEndPointHelper.WithoutIPv4Mapping((IPEndPoint)res.RemoteEndPoint));
 
         if (!serverConfig.RespondToPing && !serverConfig.EchoOnReceivedData)
         {

@@ -17,7 +17,7 @@ internal sealed class TcpServerConnection : IDisposable
         ClientId = clientId;
         Client = client;
         Stream = stream;
-        RemoteEndPoint = (IPEndPoint)client.Client.RemoteEndPoint!;
+        RemoteEndPoint = IPEndPointHelper.WithoutIPv4Mapping((IPEndPoint)client.Client.RemoteEndPoint!);
         ReceiveBuffer = new byte[receiveBufferSize];
     }
 
