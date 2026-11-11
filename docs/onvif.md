@@ -92,6 +92,18 @@ The password is never logged and never part of an exception.
 
 ---
 
+## 📂 Sample
+
+[`sample/Atc.Network.Console.Scanner`](../sample/Atc.Network.Console.Scanner/Program.cs) scans a network for IP cameras with every signal Atc.Network has (ONVIF, mDNS, SSDP, NetBIOS, MAC vendors and the camera ports), shows why each device counts as a camera, and reads the ONVIF cameras' model and stream URLs:
+
+```
+dotnet run -c Release --project sample/Atc.Network.Console.Scanner [startIp] [endIp]
+```
+
+Without arguments it offers this machine's networks (default 192.168.1.1 - 192.168.1.255). It asks for the cameras' ONVIF account, or reads it from `ATC_ONVIF_USERNAME` and `ATC_ONVIF_PASSWORD`.
+
+---
+
 ## 📈 Telemetry
 
 Each request is a span named `OnvifClient.<Operation>` (for example `OnvifClient.GetProfiles`) with the component tag `onvif_client`, and is counted on the message and byte counters. See [Metrics & Tracing](telemetry.md).
