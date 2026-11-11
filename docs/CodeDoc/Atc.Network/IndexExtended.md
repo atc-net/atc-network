@@ -461,6 +461,98 @@
      - GetHashCode()
      - ToString()
 
+## [Atc.Network.Onvif](Atc.Network.Onvif.md)
+
+- [OnvifCapabilities](Atc.Network.Onvif.md#onvifcapabilities)
+  -  Properties
+     - EventsServiceUrl
+     - ImagingServiceUrl
+     - MediaServiceUrl
+     - PtzServiceUrl
+  -  Methods
+     - <Clone>$()
+     - Deconstruct(out Uri MediaServiceUrl, out Uri PtzServiceUrl, out Uri ImagingServiceUrl, out Uri EventsServiceUrl)
+     - Equals(OnvifCapabilities other)
+     - Equals(object obj)
+     - GetHashCode()
+     - ToString()
+- [OnvifClient](Atc.Network.Onvif.md#onvifclient)
+  -  Properties
+     - ClockOffset
+     - DeviceServiceUrl
+     - Timeout
+  -  Methods
+     - GetCapabilities(CancellationToken cancellationToken = null)
+     - GetDeviceInformation(CancellationToken cancellationToken = null)
+     - GetNetworkInterfaces(CancellationToken cancellationToken = null)
+     - GetProfiles(CancellationToken cancellationToken = null)
+     - GetStreamUri(string profileToken, CancellationToken cancellationToken = null)
+     - GetStreams(CancellationToken cancellationToken)
+     - GetStreams(bool replaceHostWithDeviceHost = True, CancellationToken cancellationToken = null)
+     - GetSystemDateAndTime(CancellationToken cancellationToken = null)
+- [OnvifDeviceInformation](Atc.Network.Onvif.md#onvifdeviceinformation)
+  -  Properties
+     - FirmwareVersion
+     - HardwareId
+     - Manufacturer
+     - Model
+     - SerialNumber
+  -  Methods
+     - <Clone>$()
+     - Deconstruct(out string Manufacturer, out string Model, out string FirmwareVersion, out string SerialNumber, out string HardwareId)
+     - Equals(OnvifDeviceInformation other)
+     - Equals(object obj)
+     - GetHashCode()
+     - ToString()
+- [OnvifException](Atc.Network.Onvif.md#onvifexception)
+  -  Properties
+     - Code
+     - IsNotAuthorized
+     - Reason
+     - StatusCode
+     - Subcode
+- [OnvifMediaProfile](Atc.Network.Onvif.md#onvifmediaprofile)
+  -  Properties
+     - Encoding
+     - FrameRate
+     - Height
+     - Name
+     - Token
+     - Width
+  -  Methods
+     - <Clone>$()
+     - Deconstruct(out string Token, out string Name, out string Encoding, out int Width, out int Height, out int FrameRate)
+     - Equals(OnvifMediaProfile other)
+     - Equals(object obj)
+     - GetHashCode()
+     - ToString()
+- [OnvifNetworkInterface](Atc.Network.Onvif.md#onvifnetworkinterface)
+  -  Properties
+     - Enabled
+     - IPv4Addresses
+     - IsWireless
+     - MacAddress
+     - Name
+     - Token
+  -  Methods
+     - <Clone>$()
+     - Deconstruct(out string Token, out string Name, out bool Enabled, out string MacAddress, out IReadOnlyList`1 IPv4Addresses, out bool IsWireless)
+     - Equals(OnvifNetworkInterface other)
+     - Equals(object obj)
+     - GetHashCode()
+     - ToString()
+- [OnvifStreamInfo](Atc.Network.Onvif.md#onvifstreaminfo)
+  -  Properties
+     - Profile
+     - StreamUri
+  -  Methods
+     - <Clone>$()
+     - Deconstruct(out OnvifMediaProfile Profile, out Uri StreamUri)
+     - Equals(OnvifStreamInfo other)
+     - Equals(object obj)
+     - GetHashCode()
+     - ToString()
+
 ## [Atc.Network.Tcp](Atc.Network.Tcp.md)
 
 - [ITcpClient](Atc.Network.Tcp.md#itcpclient)

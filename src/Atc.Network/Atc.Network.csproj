@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <PackageId>Atc.Network</PackageId>
-    <PackageTags>network;tcp;udp;tls;socket;client;server;reconnect;keep-alive;framing;ipv6;opentelemetry;metrics;ip-scanner;port-scanner;ping;traceroute;arp;netbios;nbtstat;mac-vendor;wake-on-lan;wol;ntp;sntp;time;mdns;dns-sd;bonjour;zeroconf;ssdp;upnp;onvif;ws-discovery;ip-camera;discovery;vnc;rfb</PackageTags>
-    <Description>TCP and UDP clients and servers for .NET with TLS, auto-reconnect, keep-alive, message framing, IPv6 and dual-mode servers, plus an IP and port scanner (ping, host name, NetBIOS, MAC vendor), traceroute, service discovery (mDNS, SSDP, ONVIF), Wake-on-LAN, an NTP time client and a VNC (RFB) client. Built for ILogger and IHostedService, with OpenTelemetry metrics and traces.</Description>
+    <PackageTags>network;tcp;udp;tls;socket;client;server;reconnect;keep-alive;framing;ipv6;opentelemetry;metrics;ip-scanner;port-scanner;ping;traceroute;arp;netbios;nbtstat;mac-vendor;wake-on-lan;wol;ntp;sntp;time;mdns;dns-sd;bonjour;zeroconf;ssdp;upnp;onvif;ws-discovery;ip-camera;rtsp;discovery;vnc;rfb</PackageTags>
+    <Description>TCP and UDP clients and servers for .NET with TLS, auto-reconnect, keep-alive, message framing, IPv6 and dual-mode servers, plus an IP and port scanner (ping, host name, NetBIOS, MAC vendor), traceroute, service discovery (mDNS, SSDP, ONVIF), an ONVIF camera client, Wake-on-LAN, an NTP time client and a VNC (RFB) client. Built for ILogger and IHostedService, with OpenTelemetry metrics and traces.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
