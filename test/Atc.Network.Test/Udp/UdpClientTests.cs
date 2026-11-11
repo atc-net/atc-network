@@ -110,6 +110,30 @@ public sealed class UdpClientTests : IDisposable
     }
 
     [Fact]
+    public async Task DataReceived_LongThenShortDatagram_DeliversExactlyTheReceivedBytes()
+    {
+        // Arrange
+        using var udpClient = new UdpClient(NullLogger.Instance, ServerEndPoint);
+        var received = new ConcurrentQueue<string>();
+        udpClient.DataReceived += data => received.Enqueue(Encoding.ASCII.GetString(data));
+        await udpClient.Connect();
+
+        await udpClient.Send("hello", CancellationToken.None);
+        var hello = await server.ReceiveAsync();
+
+        // Act - the short datagram must not carry leftover bytes from the long one.
+        await server.SendAsync(Encoding.ASCII.GetBytes("a long datagram"), hello.RemoteEndPoint);
+        Assert.True(await WaitHelper.WaitUntil(() => received.Count == 1), "The long datagram should arrive.");
+        await server.SendAsync(Encoding.ASCII.GetBytes("ok"), hello.RemoteEndPoint);
+
+        // Assert
+        Assert.True(await WaitHelper.WaitUntil(() => received.Count == 2), "The short datagram should arrive.");
+        Assert.Equal(["a long datagram", "ok"], received.ToArray());
+
+        await udpClient.Disconnect();
+    }
+
+    [Fact]
     public async Task Disconnect_ClearsIsConnectedAndRaisesDisconnected()
     {
         // Arrange

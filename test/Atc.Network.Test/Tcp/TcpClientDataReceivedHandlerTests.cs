@@ -130,6 +130,26 @@ public sealed class TcpClientDataReceivedHandlerTests : IDisposable
         Assert.True(await WaitHelper.WaitUntil(() => disconnectedRaised), "Disconnected should be raised.");
     }
 
+    [Fact]
+    public async Task TcpClient_DataReceived_DeliversExactlyTheBytesRead()
+    {
+        // Arrange
+        var received = new ConcurrentQueue<string>();
+        var serverTask = SendMessagesToFirstClient(["a long message", "ok"], () => !received.IsEmpty);
+        using var tcpClient = new TcpClient(NullLogger.Instance, IPAddress.Loopback, ListenerPort);
+        tcpClient.DataReceived += data => received.Enqueue(Encoding.ASCII.GetString(data));
+
+        // Act
+        await tcpClient.Connect();
+        await serverTask;
+
+        // Assert - the short read must not carry leftover bytes from the long one.
+        Assert.True(await WaitHelper.WaitUntil(() => received.Count == 2), $"Expected 2 reads, got {received.Count}.");
+        Assert.Equal(["a long message", "ok"], received.ToArray());
+
+        await tcpClient.Disconnect();
+    }
+
     public void Dispose()
     {
         foreach (var serverSide in serverSides)
@@ -155,6 +175,22 @@ public sealed class TcpClientDataReceivedHandlerTests : IDisposable
         await stream.WriteAsync(Encoding.ASCII.GetBytes("A"));
         await WaitHelper.WaitUntil(firstMessageReceived);
         await stream.WriteAsync(Encoding.ASCII.GetBytes("B"));
+    }
+
+    /// <summary>
+    /// Sends the first message, waits until the client has received it, then sends the second.
+    /// </summary>
+    private async Task SendMessagesToFirstClient(
+        string[] messages,
+        Func<bool> firstMessageReceived)
+    {
+        var serverSide = await listener.AcceptTcpClientAsync();
+        serverSides.Add(serverSide);
+        var stream = serverSide.GetStream();
+
+        await stream.WriteAsync(Encoding.ASCII.GetBytes(messages[0]));
+        await WaitHelper.WaitUntil(firstMessageReceived);
+        await stream.WriteAsync(Encoding.ASCII.GetBytes(messages[1]));
     }
 
     private async Task AcceptAndCloseFirstClient()
