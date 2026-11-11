@@ -17,6 +17,7 @@ public partial class UdpClient : IUdpClient
     private readonly UdpClientConfig clientConfig;
     private readonly ArraySegment<byte> receiveBufferSegment;
     private readonly string remoteEndPointAddressStr;
+    private readonly ReceivedDataReaders receivedDataReaders = new();
 
     private Task? receiveListenerTask;
     private CancellationTokenSource? cancellationTokenSource;
@@ -265,6 +266,22 @@ public partial class UdpClient : IUdpClient
     }
 
     /// <summary>
+    /// Reads received data as an async stream, as an alternative to <see cref="DataReceived"/>: one item per
+    /// <see cref="DataReceived"/> event, in the same order. The stream ends when the cancellationToken is cancelled
+    /// or the client is disposed; it continues across reconnects.
+    /// </summary>
+    /// <remarks>
+    /// Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items;
+    /// when it falls behind, the client waits before reading more, so a slow reader slows down the sender
+    /// instead of using more memory.
+    /// </remarks>
+    /// <param name="cancellationToken">Ends the stream.</param>
+    /// <returns>The received data.</returns>
+    public IAsyncEnumerable<ReadOnlyMemory<byte>> ReadAllAsync(
+        CancellationToken cancellationToken = default)
+        => receivedDataReaders.ReadAllAsync(cancellationToken);
+
+    /// <summary>
     /// Called when connection is established.
     /// </summary>
     protected virtual void OnConnected() { }
@@ -307,6 +324,7 @@ public partial class UdpClient : IUdpClient
             return;
         }
 
+        receivedDataReaders.CompleteAll();
         DisposeCancellationTokenAndTask();
         DisposeSocket();
 
@@ -614,11 +632,11 @@ public partial class UdpClient : IUdpClient
                 continue;
             }
 
-            await HandleReceiveMessage();
+            await HandleReceiveMessage(cancellationToken);
         }
     }
 
-    private async Task HandleReceiveMessage()
+    private async Task HandleReceiveMessage(CancellationToken cancellationToken)
     {
         SocketReceiveMessageFromResult? res;
 
@@ -643,6 +661,16 @@ public partial class UdpClient : IUdpClient
 
         Instrumentation.Received(receivedBytes.Length);
         InvokeDataReceived(receivedBytes);
+
+        try
+        {
+            // Waits while a ReadAllAsync reader's buffer is full.
+            await receivedDataReaders.WriteAsync(receivedBytes, cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // The client is disconnecting.
+        }
     }
 
     private void CreateNewSocket()

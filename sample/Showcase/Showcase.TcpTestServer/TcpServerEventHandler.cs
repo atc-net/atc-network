@@ -41,7 +41,7 @@ internal sealed partial class TcpServerEventHandler(
     private void OnErrorOccurred(
         object? sender,
         NetworkErrorEventArgs e)
-        => LogNetworkError(e.Kind, e.EventName, e.Exception);
+        => LogNetworkError(e.Kind, e.EventName ?? "none", e.Exception);
 
     private void OnClientDataReceived(
         object? sender,
@@ -88,5 +88,5 @@ internal sealed partial class TcpServerEventHandler(
     private partial void LogReplyFailed(Guid clientId, Exception exception);
 
     [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "TCP server reported a {kind} error (event: {eventName})")]
-    private partial void LogNetworkError(NetworkErrorKind kind, string? eventName, Exception exception);
+    private partial void LogNetworkError(NetworkErrorKind kind, string eventName, Exception exception);
 }

@@ -27,7 +27,7 @@ internal sealed partial class UdpServerEventHandler(
     private void OnErrorOccurred(
         object? sender,
         NetworkErrorEventArgs e)
-        => LogNetworkError(e.Kind, e.EventName, e.Exception);
+        => LogNetworkError(e.Kind, e.EventName ?? "none", e.Exception);
 
     private void OnDatagramReceived(
         object? sender,
@@ -62,5 +62,5 @@ internal sealed partial class UdpServerEventHandler(
     private partial void LogReplyFailed(IPEndPoint sender, Exception exception);
 
     [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "UDP server reported a {kind} error (event: {eventName})")]
-    private partial void LogNetworkError(NetworkErrorKind kind, string? eventName, Exception exception);
+    private partial void LogNetworkError(NetworkErrorKind kind, string eventName, Exception exception);
 }

@@ -20,6 +20,8 @@ Connection events (`Connected`, `Disconnected`, `ConnectionStateChanged`) are al
 
 ### ⏱️ Keep handlers fast
 
+For received data you can also skip events: `TcpClient.ReadAllAsync` and `UdpClient.ReadAllAsync` return it as an async stream, with back-pressure (see [Reading as an async stream](tcp.md#-reading-as-an-async-stream)).
+
 The receive loop waits for your handler before it reads the next message. A slow handler delays everything after it, and for TCP the unread data builds up in the socket buffers. Do slow work elsewhere, for example by writing the data to a `Channel<T>` and processing it on another task.
 
 ---

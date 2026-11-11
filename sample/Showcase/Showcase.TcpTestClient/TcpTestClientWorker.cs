@@ -15,6 +15,7 @@ internal sealed partial class TcpTestClientWorker(
 {
     private static readonly TimeSpan SendInterval = TimeSpan.FromSeconds(2);
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2025:Ensure tasks using IDisposable instances complete before the instances are disposed", Justification = "readReplies is awaited in the finally block, before tcpClient is disposed.")]
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // Aspire passes the server's endpoint with WithReference; 127.0.0.1:9100 when the app runs on its own.
@@ -30,7 +31,7 @@ internal sealed partial class TcpTestClientWorker(
                 DefaultEncoding = Encoding.UTF8,
                 TerminationType = TerminationType.LineFeed,
 
-                // One DataReceived per reply line, however the replies are split across reads.
+                // One message per reply line, however the replies are split across reads.
                 MessageFraming = TcpMessageFraming.TerminationType,
             },
             new TcpClientReconnectConfig
@@ -39,17 +40,33 @@ internal sealed partial class TcpTestClientWorker(
                 RetryInterval = 2_000,
             });
 
-        tcpClient.DataReceived += data =>
-        {
-            var reply = Encoding.UTF8.GetString(data).TrimEnd('\n');
-            LogReplyReceived(reply);
-        };
-
         // Errors the client handled and logged itself, such as a failing handler or a failed read.
-        tcpClient.ErrorOccurred += (_, e) => LogNetworkError(e.Kind, e.EventName, e.Exception);
+        tcpClient.ErrorOccurred += (_, e) => LogNetworkError(e.Kind, e.EventName ?? "none", e.Exception);
 
-        await ConnectUntilConnected(tcpClient, stoppingToken);
+        // Read the replies as an async stream instead of through the DataReceived event.
+        // The stream ends when the app stops.
+        var readReplies = ReadReplies(tcpClient, stoppingToken);
 
+        try
+        {
+            await ConnectUntilConnected(tcpClient, stoppingToken);
+            await SendPingsUntilStopped(tcpClient, stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // The app is stopping.
+        }
+        finally
+        {
+            await tcpClient.Disconnect();
+            await readReplies;
+        }
+    }
+
+    private async Task SendPingsUntilStopped(
+        TcpClient tcpClient,
+        CancellationToken stoppingToken)
+    {
         var counter = 0;
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -61,8 +78,6 @@ internal sealed partial class TcpTestClientWorker(
 
             await Task.Delay(SendInterval, stoppingToken);
         }
-
-        await tcpClient.Disconnect();
     }
 
     /// <summary>
@@ -77,6 +92,24 @@ internal sealed partial class TcpTestClientWorker(
                !await tcpClient.Connect(stoppingToken))
         {
             await Task.Delay(SendInterval, stoppingToken);
+        }
+    }
+
+    private async Task ReadReplies(
+        TcpClient tcpClient,
+        CancellationToken stoppingToken)
+    {
+        try
+        {
+            await foreach (var reply in tcpClient.ReadAllAsync(stoppingToken))
+            {
+                var text = Encoding.UTF8.GetString(reply.Span).TrimEnd('\n');
+                LogReplyReceived(text);
+            }
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // The app is stopping.
         }
     }
 
@@ -111,5 +144,5 @@ internal sealed partial class TcpTestClientWorker(
     private partial void LogPingFailed(string message, string reason);
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "TCP client reported a {kind} error (event: {eventName})")]
-    private partial void LogNetworkError(NetworkErrorKind kind, string? eventName, Exception exception);
+    private partial void LogNetworkError(NetworkErrorKind kind, string eventName, Exception exception);
 }

@@ -76,6 +76,18 @@ This is a interface for `Atc.Network.Tcp.TcpClient`.
 >```csharp
 >Task Disconnect()
 >```
+#### ReadAllAsync
+>```csharp
+>IAsyncEnumerable<ReadOnlyMemory<byte>> ReadAllAsync(CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Reads received data as an async stream, as an alternative to `Atc.Network.Tcp.ITcpClient.DataReceived`: one item per `Atc.Network.Tcp.ITcpClient.DataReceived` event, in the same order. The stream ends when the cancellationToken is cancelled or the client is disposed; it continues across reconnects.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;Ends the stream.<br />
+>
+><b>Returns:</b> The received data.
+>
+><b>Remarks:</b> Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items; when it falls behind, the client waits before reading more, so a slow reader slows down the sender instead of using more memory.
 #### Send
 >```csharp
 >Task Send(string data, CancellationToken cancellationToken = null)
@@ -275,6 +287,18 @@ The main TcpClient - Handles call execution.
 >```csharp
 >void Dispose()
 >```
+#### ReadAllAsync
+>```csharp
+>IAsyncEnumerable<ReadOnlyMemory<byte>> ReadAllAsync(CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Reads received data as an async stream, as an alternative to `Atc.Network.Tcp.TcpClient.DataReceived`: one item per `Atc.Network.Tcp.TcpClient.DataReceived` event, in the same order. The stream ends when the cancellationToken is cancelled or the client is disposed; it continues across reconnects.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;Ends the stream.<br />
+>
+><b>Returns:</b> The received data.
+>
+><b>Remarks:</b> Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items; when it falls behind, the client waits before reading more, so a slow reader slows down the sender instead of using more memory.
 #### Send
 >```csharp
 >Task Send(string data, CancellationToken cancellationToken = null)

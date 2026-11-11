@@ -64,6 +64,21 @@ public interface ITcpClient : IDisposable
     Task Disconnect();
 
     /// <summary>
+    /// Reads received data as an async stream, as an alternative to <see cref="DataReceived"/>: one item per
+    /// <see cref="DataReceived"/> event, in the same order. The stream ends when the cancellationToken is cancelled
+    /// or the client is disposed; it continues across reconnects.
+    /// </summary>
+    /// <remarks>
+    /// Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items;
+    /// when it falls behind, the client waits before reading more, so a slow reader slows down the sender
+    /// instead of using more memory.
+    /// </remarks>
+    /// <param name="cancellationToken">Ends the stream.</param>
+    /// <returns>The received data.</returns>
+    IAsyncEnumerable<ReadOnlyMemory<byte>> ReadAllAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Send data.
     /// </summary>
     /// <param name="data">The data to send.</param>

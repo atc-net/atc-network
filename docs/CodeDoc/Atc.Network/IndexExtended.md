@@ -328,6 +328,7 @@
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
+     - ReadAllAsync(CancellationToken cancellationToken = null)
      - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
      - Send(byte[] data, CancellationToken cancellationToken = null)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
@@ -362,6 +363,7 @@
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
      - Dispose()
+     - ReadAllAsync(CancellationToken cancellationToken = null)
      - Send(Encoding encoding, string data, CancellationToken cancellationToken = null)
      - Send(byte[] data, CancellationToken cancellationToken = null)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken = null)
@@ -450,6 +452,7 @@
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
+     - ReadAllAsync(CancellationToken cancellationToken = null)
      - Send(Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(byte[] data, CancellationToken cancellationToken)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken)
@@ -480,6 +483,7 @@
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
      - Dispose()
+     - ReadAllAsync(CancellationToken cancellationToken = null)
      - Send(Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(byte[] data, CancellationToken cancellationToken)
      - Send(byte[] data, TerminationType terminationType, CancellationToken cancellationToken)

@@ -90,6 +90,24 @@ var tcpClient = new TcpClient(
     });
 ```
 
+### 🌊 Reading as an async stream
+
+`ReadAllAsync` returns the same data as `DataReceived` (one item per event, after framing) as an `IAsyncEnumerable<ReadOnlyMemory<byte>>`:
+
+```csharp
+await foreach (var message in tcpClient.ReadAllAsync(cancellationToken))
+{
+    Console.WriteLine(Encoding.UTF8.GetString(message.Span));
+}
+```
+
+- Exceptions in your loop stay in your code; there is no event handler that can throw into the client.
+- **Back-pressure:** each enumeration buffers up to 256 items. When it falls behind, the client stops reading from the socket until there is room, so TCP flow control slows down the sender instead of the client using more memory. `DataReceived` handlers are then called later, too.
+- The stream continues across reconnects and ends when the `cancellationToken` is cancelled (with an `OperationCanceledException`) or the client is disposed.
+- Data received before the enumeration starts is not included. Several enumerations at the same time each get every item.
+
+`UdpClient.ReadAllAsync` works the same way, with one item per datagram.
+
 A message longer than `MaxMessageSize` (16 MB by default) is reported through `ErrorOccurred` as a `Receive` error with an `InvalidDataException`, and the connection is closed (and reconnected, if reconnect is on). Bytes of a message that was cut off by a dropped connection are discarded on reconnect.
 
 `TcpServer` is different: it collects reads until the data contains its `TerminationType`, then raises `DataReceived` once for the whole message.
