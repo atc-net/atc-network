@@ -89,20 +89,6 @@ public sealed class IPPortScanHttpTests : IDisposable
         listener.Dispose();
     }
 
-    private static X509Certificate2 CreateSelfSignedCertificate()
-    {
-        using var rsa = RSA.Create(2048);
-        var request = new CertificateRequest("CN=localhost", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-        var sanBuilder = new SubjectAlternativeNameBuilder();
-        sanBuilder.AddIpAddress(IPAddress.Loopback);
-        request.CertificateExtensions.Add(sanBuilder.Build());
-
-        using var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-5), DateTimeOffset.UtcNow.AddHours(1));
-
-        // Round-trip through PFX so the private key is usable by the platform TLS stack.
-        return X509CertificateLoader.LoadPkcs12(certificate.Export(X509ContentType.Pfx), password: null);
-    }
-
     /// <summary>
     /// Accepts one connection, reads the request headers and answers with 401.
     /// A client that rejects the connection (for example the TLS certificate) is not an error here;
@@ -125,7 +111,7 @@ public sealed class IPPortScanHttpTests : IDisposable
         using var serverSide = await listener.AcceptTcpClientAsync();
         Stream stream = serverSide.GetStream();
 
-        using var certificate = useTls ? CreateSelfSignedCertificate() : null;
+        using var certificate = useTls ? CertificateHelper.CreateSelfSignedCertificate() : null;
         if (certificate is not null)
         {
             var sslStream = new SslStream(stream, leaveInnerStreamOpen: false);
