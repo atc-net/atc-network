@@ -110,8 +110,10 @@ public partial class TcpServer : ITcpServer
         }
 
         LogStopping(ipAddressStr, Port);
-        tcpListener?.Stop();
+
+        // Clear IsRunning first, so the accept loop treats the stop as expected.
         IsRunning = false;
+        tcpListener?.Stop();
         LogStopped(ipAddressStr, Port);
 
         return Task.CompletedTask;
@@ -170,16 +172,45 @@ public partial class TcpServer : ITcpServer
             while (IsRunning)
             {
                 var serverClient = await tcpListener.AcceptTcpClientAsync(cancellationToken);
-
-                while (IsRunning && serverClient.Connected)
-                {
-                    await HandleServerClientIncomingStream(serverClient, cancellationToken);
-                }
+                await HandleServerClient(serverClient, cancellationToken);
             }
         }
-        catch (SocketException)
+        catch (Exception ex) when ((ex is SocketException or ObjectDisposedException) && !IsRunning)
+        {
+            // StopAsync stopped the listener.
+        }
+        catch (Exception ex)
+        {
+            LogListenerError(ipAddressStr, Port, ex);
+        }
+        finally
         {
             IsRunning = false;
+        }
+    }
+
+    /// <summary>
+    /// Reads from one client until it disconnects. A failing client connection
+    /// is logged and closed, so the server goes on accepting the next client.
+    /// </summary>
+    private async Task HandleServerClient(
+        System.Net.Sockets.TcpClient serverClient,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (IsRunning && serverClient.Connected)
+            {
+                await HandleServerClientIncomingStream(serverClient, cancellationToken);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or SocketException or ObjectDisposedException)
+        {
+            LogClientConnectionError(ipAddressStr, Port, ex.Message);
+        }
+        finally
+        {
+            serverClient.Dispose();
         }
     }
 
@@ -226,7 +257,31 @@ public partial class TcpServer : ITcpServer
 
     private void InvokeDataReceived(byte[] data)
     {
-        DataReceived?.Invoke(data);
-        OnDataReceived(data);
+        // Call each handler on its own, so one failing handler
+        // neither skips the others nor stops the server.
+        var handlers = DataReceived;
+        if (handlers is not null)
+        {
+            foreach (var handler in handlers.GetInvocationList().Cast<Action<byte[]>>())
+            {
+                InvokeDataReceivedHandler(handler, data);
+            }
+        }
+
+        InvokeDataReceivedHandler(OnDataReceived, data);
+    }
+
+    private void InvokeDataReceivedHandler(
+        Action<byte[]> handler,
+        byte[] data)
+    {
+        try
+        {
+            handler(data);
+        }
+        catch (Exception ex)
+        {
+            LogDataReceivedHandlerError(ipAddressStr, Port, ex);
+        }
     }
 }

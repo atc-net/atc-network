@@ -33,6 +33,9 @@ public static class LoggingEventIdConstants
         public const int Started = 10122;
         public const int Stopping = 10123;
         public const int Stopped = 10124;
+        public const int DataReceivedHandlerError = 10125;
+        public const int ClientConnectionError = 10126;
+        public const int ListenerError = 10127;
         public const int DataReceivedByteLength = 10111;
         public const int DataReceivedChunkByteLength = 10112;
     }
