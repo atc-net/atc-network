@@ -140,6 +140,7 @@ tcpServer.ClientDataReceived += async (_, e) =>
 - `Send` returns `false` if the client is no longer connected.
 - `StopAsync` stops accepting clients and closes the connected ones.
 - A handler that throws is logged and does not stop the server.
+- An `async` handler runs as `async void`: an exception after its first `await` is not caught by the server and can end the process. Catch exceptions inside `async` handlers yourself.
 
 ---
 

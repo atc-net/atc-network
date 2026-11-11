@@ -31,6 +31,7 @@ var udpServer = new UdpServer(
     new UdpServerConfig
     {
         EchoOnReceivedData = true,
+        RespondToPing = true,
     });
 
 udpServer.DataReceived += OnServerDataReceived;
