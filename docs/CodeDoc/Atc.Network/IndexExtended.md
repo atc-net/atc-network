@@ -42,6 +42,12 @@
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
 - [TerminationType](Atc.Network.md#terminationtype)
 - [TransportProtocolType](Atc.Network.md#transportprotocoltype)
+- [UdpDatagramReceivedEventArgs](Atc.Network.md#udpdatagramreceivedeventargs)
+  -  Properties
+     - Data
+     - RemoteEndPoint
+  -  Methods
+     - ToString()
 - [UshortExtensions](Atc.Network.md#ushortextensions)
   -  Static Methods
      - IsPortForIPService(this ushort portNumber, ServiceProtocolType serviceProtocolType, IPServicePortExaminationLevel matchLevel)
@@ -379,6 +385,7 @@
      - IsRunning
   -  Events
      - DataReceived
+     - DatagramReceived
   -  Methods
      - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, byte[] data, CancellationToken cancellationToken)
@@ -428,6 +435,7 @@
      - IsRunning
   -  Events
      - DataReceived
+     - DatagramReceived
   -  Methods
      - Dispose()
      - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)

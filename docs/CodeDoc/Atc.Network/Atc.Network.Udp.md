@@ -121,6 +121,11 @@ This is a interface for `Atc.Network.Udp.UdpServer`.
 >DataReceived
 >```
 ><b>Summary:</b> Event to raise when data has become available from the server.
+#### DatagramReceived
+>```csharp
+>DatagramReceived
+>```
+><b>Summary:</b> Event to raise when a datagram is received, with the endpoint that sent it.
 ### Methods
 
 #### Send
@@ -404,6 +409,11 @@ The main UdpServer - Handles call execution.
 >DataReceived
 >```
 ><b>Summary:</b> Event to raise when data has become available from the server.
+#### DatagramReceived
+>```csharp
+>DatagramReceived
+>```
+><b>Summary:</b> Event to raise when a datagram is received, with the endpoint that sent it.
 ### Methods
 
 #### Dispose
