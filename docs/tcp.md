@@ -60,7 +60,15 @@ tcpClient.Dispose();
 | `SendBufferSize` | 8,192 bytes | Send buffer size |
 | `ReceiveBufferSize` | 8,192 bytes | Receive buffer size |
 | `DefaultEncoding` | ASCII | Default text encoding |
-| `TerminationType` | None | Line termination style |
+| `TerminationType` | None | Appended to data you send, if it is not already there |
+
+### 📥 What `DataReceived` delivers
+
+`TcpClient.DataReceived` is raised once per read from the socket, with the bytes of that read. TCP is a stream, so one read can hold part of a message, a whole message or several messages. `TerminationType` is not used to split received data on the client. If your protocol has message boundaries, collect the bytes and split them yourself.
+
+`TcpServer` is different: it collects reads until the data contains its `TerminationType`, then raises `DataReceived` once for the whole message.
+
+See [Events, Threads & Errors](events.md) for which thread raises the events and what happens when a handler throws.
 
 ### 🔄 Reconnection
 
