@@ -171,4 +171,14 @@ public partial class TcpClient
         string ipAddressOrHostName,
         int port,
         Exception exception);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpClient.EventHandlerError,
+        Level = LogLevel.Error,
+        Message = "A {eventName} handler failed for {ipAddressOrHostName}:{port}.")]
+    private partial void LogEventHandlerError(
+        string ipAddressOrHostName,
+        int port,
+        string eventName,
+        Exception exception);
 }

@@ -107,9 +107,10 @@ public sealed class TcpClientDataReceivedHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task TcpClient_DataReceiver_UnexpectedException_SetsDisconnected()
+    public async Task TcpClient_ServerClosesAndNoDataReceivedHandlerThrows_SetsDisconnected()
     {
         // Arrange - the server closes the connection, and a NoDataReceived handler throws.
+        // The handler is isolated, so the client still goes through its normal disconnect.
         var serverTask = AcceptAndCloseFirstClient();
         using var tcpClient = new TcpClient(
             NullLogger.Instance,

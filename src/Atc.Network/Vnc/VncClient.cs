@@ -890,14 +890,7 @@ public partial class VncClient : IVncClient
 
         foreach (var handler in handlers.GetInvocationList())
         {
-            try
-            {
-                invoke(handler);
-            }
-            catch (Exception ex)
-            {
-                LogEventHandlerError(IPAddressOrHostname, Port, eventName, ex);
-            }
+            InvokeHandler(eventName, () => invoke(handler));
         }
     }
 
@@ -920,14 +913,14 @@ public partial class VncClient : IVncClient
             {
                 InvokeConnectionStateChanged(ConnectionState.Disconnected);
                 InvokeDisconnected();
-                ConnectionLost?.Invoke();
+                InvokeConnectionLost();
             }
         }
         else
         {
             InvokeConnectionStateChanged(ConnectionState.Disconnected);
             InvokeDisconnected();
-            ConnectionLost?.Invoke();
+            InvokeConnectionLost();
         }
     }
 
@@ -965,7 +958,7 @@ public partial class VncClient : IVncClient
         LogReconnectionMaxRetryExceededError(IPAddressOrHostname, Port);
         InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
         InvokeDisconnected();
-        ConnectionLost?.Invoke();
+        InvokeConnectionLost();
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK - reconnect must not throw.")]
@@ -1043,29 +1036,45 @@ public partial class VncClient : IVncClient
 
     private void InvokeConnected()
     {
-        Connected?.Invoke();
-        OnConnected();
+        InvokeHandlers(Connected, nameof(Connected), handler => ((Action)handler)());
+        InvokeHandler(nameof(OnConnected), OnConnected);
     }
 
     private void InvokeDisconnected()
     {
-        Disconnected?.Invoke();
-        OnDisconnected();
+        InvokeHandlers(Disconnected, nameof(Disconnected), handler => ((Action)handler)());
+        InvokeHandler(nameof(OnDisconnected), OnDisconnected);
     }
+
+    private void InvokeConnectionLost()
+        => InvokeHandlers(ConnectionLost, nameof(ConnectionLost), handler => ((Action)handler)());
 
     private void InvokeConnectionStateChanged(
         ConnectionState connectionState,
         string? errorMessage = null)
     {
-        if (errorMessage is null)
+        var eventArgs = errorMessage is null
+            ? new ConnectionStateEventArgs(connectionState)
+            : new ConnectionStateEventArgs(connectionState, errorMessage);
+
+        InvokeHandlers(
+            ConnectionStateChanged,
+            nameof(ConnectionStateChanged),
+            handler => ((EventHandler<ConnectionStateEventArgs>)handler)(this, eventArgs));
+        InvokeHandler(nameof(OnConnectionStateChanged), () => OnConnectionStateChanged(connectionState, errorMessage));
+    }
+
+    private void InvokeHandler(
+        string eventName,
+        Action invoke)
+    {
+        try
         {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState));
-            OnConnectionStateChanged(connectionState);
+            invoke();
         }
-        else
+        catch (Exception ex)
         {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState, errorMessage));
-            OnConnectionStateChanged(connectionState, errorMessage);
+            LogEventHandlerError(IPAddressOrHostname, Port, eventName, ex);
         }
     }
 

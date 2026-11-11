@@ -140,6 +140,35 @@ public sealed class VncClientEndToEndTests
     }
 
     [Fact]
+    public async Task ConnectionEventHandlersThatThrow_DoNotBreakTheClient()
+    {
+        // Arrange
+        using var server = new FakeVncServer();
+        var logger = new CapturingLogger();
+        using var vncClient = new VncClient(
+            logger,
+            IPAddress.Loopback,
+            server.Port,
+            new VncClientConfig { ReceiveTimeout = 10_000, ConnectTimeout = 500 },
+            new VncClientReconnectConfig { Enable = false });
+
+        vncClient.ConnectionStateChanged += (_, _) => throw new InvalidOperationException("handler bug");
+        vncClient.Connected += () => throw new InvalidOperationException("handler bug");
+        vncClient.Disconnected += () => throw new InvalidOperationException("handler bug");
+        vncClient.ConnectionLost += () => throw new InvalidOperationException("handler bug");
+
+        // Act
+        using var session = await ConnectAndStartUpdates(vncClient, server, password: string.Empty);
+        var isConnectedAfterConnect = vncClient.IsConnected;
+        await vncClient.Disconnect();
+
+        // Assert
+        Assert.True(isConnectedAfterConnect);
+        Assert.False(vncClient.IsConnected);
+        Assert.Contains(logger.Entries, x => x.EventId.Id == LoggingEventIdConstants.VncClient.EventHandlerError);
+    }
+
+    [Fact]
     public async Task ConnectionDropped_WithReconnect_ReconnectsAndResumesUpdates()
     {
         // Arrange

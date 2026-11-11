@@ -383,36 +383,69 @@ public partial class TcpClient : ITcpClient
 
     private void InvokeConnected()
     {
-        Connected?.Invoke();
-        OnConnected();
+        InvokeHandlers(Connected, nameof(Connected), handler => ((Action)handler)());
+        InvokeHandler(nameof(OnConnected), OnConnected);
     }
 
     private void InvokeDisconnected()
     {
-        Disconnected?.Invoke();
-        OnDisconnected();
+        InvokeHandlers(Disconnected, nameof(Disconnected), handler => ((Action)handler)());
+        InvokeHandler(nameof(OnDisconnected), OnDisconnected);
     }
 
     private void InvokeConnectionStateChanged(
         ConnectionState connectionState,
         string? errorMessage = null)
     {
-        if (errorMessage is null)
-        {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState));
-            OnConnectionStateChanged(connectionState);
-        }
-        else
-        {
-            ConnectionStateChanged?.Invoke(this, new ConnectionStateEventArgs(connectionState, errorMessage));
-            OnConnectionStateChanged(connectionState, errorMessage);
-        }
+        var eventArgs = errorMessage is null
+            ? new ConnectionStateEventArgs(connectionState)
+            : new ConnectionStateEventArgs(connectionState, errorMessage);
+
+        InvokeHandlers(
+            ConnectionStateChanged,
+            nameof(ConnectionStateChanged),
+            handler => ((EventHandler<ConnectionStateEventArgs>)handler)(this, eventArgs));
+        InvokeHandler(nameof(OnConnectionStateChanged), () => OnConnectionStateChanged(connectionState, errorMessage));
     }
 
     private void InvokeNoDataReceived()
     {
-        NoDataReceived?.Invoke();
-        OnNoDataReceived();
+        InvokeHandlers(NoDataReceived, nameof(NoDataReceived), handler => ((Action)handler)());
+        InvokeHandler(nameof(OnNoDataReceived), OnNoDataReceived);
+    }
+
+    /// <summary>
+    /// Calls each subscriber on its own, so a failing handler is logged
+    /// and neither skips the others nor breaks the client.
+    /// </summary>
+    private void InvokeHandlers(
+        Delegate? handlers,
+        string eventName,
+        Action<Delegate> invoke)
+    {
+        if (handlers is null)
+        {
+            return;
+        }
+
+        foreach (var handler in handlers.GetInvocationList())
+        {
+            InvokeHandler(eventName, () => invoke(handler));
+        }
+    }
+
+    private void InvokeHandler(
+        string eventName,
+        Action invoke)
+    {
+        try
+        {
+            invoke();
+        }
+        catch (Exception ex)
+        {
+            LogEventHandlerError(IPAddressOrHostname, Port, eventName, ex);
+        }
     }
 
     private void InvokeDataReceived(byte[] data)

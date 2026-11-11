@@ -24,6 +24,7 @@ public static class LoggingEventIdConstants
         public const int DataReceiveError = 10016;
         public const int DataReceivedHandlerError = 10017;
         public const int DataReceiverUnexpectedError = 10018;
+        public const int EventHandlerError = 10019;
     }
 
     internal static class TcpServer
@@ -52,6 +53,7 @@ public static class LoggingEventIdConstants
         public const int DataSendingSocketError = 10210;
         public const int DataSendingError = 10211;
         public const int DataReceivedHandlerError = 10212;
+        public const int EventHandlerError = 10213;
     }
 
     internal static class UdpServer
