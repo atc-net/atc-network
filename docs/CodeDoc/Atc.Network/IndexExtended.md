@@ -236,6 +236,12 @@
      - ConvertToBytes(TerminationType terminationType)
      - ConvertToString(TerminationType terminationType)
      - HasTerminationType(TerminationType terminationType, byte[] data)
+- [TracerouteHelper](Atc.Network.Helpers.md#traceroutehelper)
+  -  Static Fields
+     - int DefaultMaxHops
+     - int DefaultTimeoutPerHopInMs
+  -  Static Methods
+     - Trace(IPAddress target, int maxHops = 30, TimeSpan? timeoutPerHop = null, CancellationToken cancellationToken = null)
 - [WakeOnLanHelper](Atc.Network.Helpers.md#wakeonlanhelper)
   -  Static Fields
      - int DefaultPort
@@ -414,6 +420,20 @@
      - QualityCategoryDescriptionAndTime
      - Status
   -  Methods
+     - ToString()
+- [TracerouteHop](Atc.Network.Models.md#traceroutehop)
+  -  Properties
+     - HopNumber
+     - IPAddress
+     - IsDestination
+     - RoundtripTime
+     - Status
+  -  Methods
+     - <Clone>$()
+     - Deconstruct(out int HopNumber, out IPAddress IPAddress, out TimeSpan? RoundtripTime, out IPStatus Status, out bool IsDestination)
+     - Equals(TracerouteHop other)
+     - Equals(object obj)
+     - GetHashCode()
      - ToString()
 
 ## [Atc.Network.Tcp](Atc.Network.Tcp.md)

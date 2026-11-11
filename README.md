@@ -82,7 +82,7 @@ var results = await scanner.ScanRange(
 | [🔌 TCP Client & Server](docs/tcp.md) | Connections, TLS, reconnection, keep-alive, events |
 | [📡 UDP Client & Server](docs/udp.md) | Datagram communication, hosted server |
 | [🖥️ VNC Client](docs/vnc.md) | Remote desktop, encodings, pixel data, input forwarding |
-| [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, NetBIOS, ARP, MAC vendor lookup |
+| [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, traceroute, DNS, NetBIOS, ARP, MAC vendor lookup |
 | [⏰ Wake-on-LAN](docs/wake-on-lan.md) | Magic packets, subnet broadcast, SecureOn password |
 | [🕰️ NTP Time](docs/ntp.md) | Server time, clock offset, round-trip delay, time zones |
 | [📡 Service Discovery](docs/discovery.md) | mDNS / DNS-SD and SSDP (UPnP), in the IP scanner too |

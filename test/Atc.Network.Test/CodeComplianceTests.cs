@@ -42,6 +42,10 @@ public class CodeComplianceTests
         // which this check does not see.
         typeof(NetBiosHelper),
 
+        // The public Trace sends real pings; the unit tests use the internal overload with a fake probe sender,
+        // and the public one is covered by integration tests.
+        typeof(TracerouteHelper),
+
         // The public methods send to the real multicast addresses. The unit tests use the internal overloads
         // that take the target endpoint (a fake responder); the public ones are covered by integration tests.
         typeof(MdnsDiscovery),
