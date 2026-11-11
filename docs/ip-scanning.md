@@ -13,8 +13,8 @@ Scan single IPs or entire ranges with configurable discovery options.
 - 🏓 ICMP ping with network quality metrics
 - 🏷️ Hostname resolution
 - 📡 MAC address discovery (via ARP)
-- 🏭 Vendor identification from MAC address
-- 🔌 Port scanning (None, WellKnown, WellKnownAndCommon, All)
+- 🏭 Vendor identification from MAC address (online lookup, see [MacAddressVendorLookupHelper](#-macaddressvendorlookuphelper))
+- 🔌 Port scanning (None, WellKnown, WellKnownAndCommon, All), up to 16 ports per IP address at a time
 - 📊 Progress reporting via events
 
 ### 🚀 Scan a Range
@@ -99,7 +99,7 @@ var result = await PingHelper.GetStatus(
     IPAddress.Parse("8.8.8.8"),
     timeoutInMs: 2000);
 
-// result.Status, result.RoundtripTime, etc.
+// result.Status, result.PingInMs, result.QualityCategory
 ```
 
 ### 🏷️ DnsLookupHelper
@@ -124,10 +124,17 @@ bool isLocal = ArpHelper.IsLocalMachineAddress(
 
 ### 🏭 MacAddressVendorLookupHelper
 
-Resolve MAC addresses to vendor names using a built-in database:
+Resolve a MAC address to the manufacturer's name:
 
 ```csharp
-var helper = new MacAddressVendorLookupHelper();
-string? vendor = helper.LookupVendorName("AA:BB:CC:DD:EE:FF");
-// → "Manufacturer Name"
+string? vendor = await MacAddressVendorLookupHelper.LookupVendorNameFromMacAddress(
+    "AA:BB:CC:DD:EE:FF",
+    CancellationToken.None);
+// → "Manufacturer Name", or null when the vendor is unknown or the lookup failed
 ```
+
+> 🔒 **Privacy:** there is no built-in database. Each MAC address that is not cached yet is sent over HTTPS to the
+> third-party service [macvendors.com](https://macvendors.com). Answers, including "not found", are cached in
+> `%TEMP%/AtcCache/macvendors.txt` (the system temp folder), and the service is called at most once every 1.2 seconds.
+> `IPScanner` uses this helper when `ResolveVendorFromMacAddress` is `true` (the default); set it to `false` to keep
+> MAC addresses on your network.

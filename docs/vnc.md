@@ -161,6 +161,8 @@ var vncClient = new VncClient(
 
 > 💡 **`FramebufferUpdated` fires once per updated rectangle**, not once per frame. A single server update can contain multiple rectangles. For rendering, update each region as it arrives and let your UI framework coalesce the visual updates.
 
+> 🧵 Events are raised on a background thread, so dispatch to your UI thread before touching UI elements. A handler that throws is logged and does not end the session. See [Events, Threads & Errors](events.md).
+
 ---
 
 ## ⌨️ Input Forwarding

@@ -2,7 +2,7 @@
 
 # 🌐 Atc.Network
 
-A .NET 10 library for network communication, scanning, and remote desktop — batteries included, zero external dependencies.
+A .NET 10 library for network communication, scanning, and remote desktop — batteries included.
 
 ---
 
@@ -80,13 +80,17 @@ var results = await scanner.ScanRange(
 | [📡 UDP Client & Server](docs/udp.md) | Datagram communication, hosted server |
 | [🖥️ VNC Client](docs/vnc.md) | Remote desktop, encodings, pixel data, input forwarding |
 | [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, ARP, MAC vendor lookup |
+| [🧵 Events, Threads & Errors](docs/events.md) | Which thread raises events, handler exceptions, log event ids |
 
 ---
 
 ## 🔧 Requirements
 
 - .NET 10.0+
-- No additional NuGet dependencies beyond the .NET SDK
+- NuGet dependencies, pulled in automatically:
+  - [Atc](https://www.nuget.org/packages/Atc): ATC base library
+  - [Microsoft.Extensions.Hosting](https://www.nuget.org/packages/Microsoft.Extensions.Hosting): `IHostedService` for `TcpServer` and `UdpServer`
+  - [Microsoft.Extensions.Logging.Abstractions](https://www.nuget.org/packages/Microsoft.Extensions.Logging.Abstractions): `ILogger`
 
 ---
 

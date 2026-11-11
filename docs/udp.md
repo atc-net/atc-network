@@ -55,7 +55,7 @@ udpClient.Dispose();
 | `SendBufferSize` | 8,192 bytes | Send buffer size |
 | `ReceiveBufferSize` | 8,192 bytes | Receive buffer size |
 | `DefaultEncoding` | ASCII | Default text encoding |
-| `TerminationType` | None | Line termination style |
+| `TerminationType` | None | Appended to data you send, if it is not already there |
 
 ### 📡 Events
 
@@ -64,7 +64,9 @@ udpClient.Dispose();
 | `Connected` | `Action` | Fired when connection is established |
 | `Disconnected` | `Action` | Fired when connection is destroyed |
 | `ConnectionStateChanged` | `EventHandler<ConnectionStateEventArgs>` | Fired on any state transition |
-| `DataReceived` | `Action<byte[]>` | Fired when data arrives |
+| `DataReceived` | `Action<byte[]>` | Fired once per received datagram, with its bytes |
+
+See [Events, Threads & Errors](events.md) for which thread raises the events and what happens when a handler throws.
 
 ---
 
