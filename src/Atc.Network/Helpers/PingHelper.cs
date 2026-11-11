@@ -49,11 +49,31 @@ public static class PingHelper
             var pingReply = await ping.SendPingAsync(ipAddress, timeoutInMs);
             sw.Stop();
 
-            return new PingStatusResult(ipAddress, pingReply.Status, sw.ElapsedMilliseconds);
+            return CreateResult(ipAddress, pingReply.Status, pingReply.RoundtripTime, sw.ElapsedMilliseconds);
         }
         catch (Exception ex)
         {
             return new PingStatusResult(ipAddress, ex);
         }
     }
+
+    /// <summary>
+    /// A reply's round-trip time is the network time. The elapsed time of the call also includes setting up
+    /// the ping, which can take tens of milliseconds for the first ping in a process. Without a reply the
+    /// round-trip time is 0, so the elapsed time is used.
+    /// </summary>
+    /// <param name="ipAddress">The pinged IP address.</param>
+    /// <param name="status">The status of the reply.</param>
+    /// <param name="roundtripTimeInMs">The round-trip time of the reply.</param>
+    /// <param name="elapsedInMs">The elapsed time of the whole call.</param>
+    /// <returns>The ping status result.</returns>
+    internal static PingStatusResult CreateResult(
+        IPAddress ipAddress,
+        IPStatus status,
+        long roundtripTimeInMs,
+        long elapsedInMs)
+        => new(
+            ipAddress,
+            status,
+            status == IPStatus.Success ? roundtripTimeInMs : elapsedInMs);
 }
