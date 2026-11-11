@@ -55,6 +55,17 @@ public class TcpClientConfig
     /// </summary>
     public TerminationType TerminationType { get; set; } = TerminationType.None;
 
+    /// <summary>
+    /// Gets or sets the TLS options. When set, the connection is encrypted with TLS
+    /// and the server is authenticated before the client counts as connected.
+    /// When <see langword="null"/> (the default), plain TCP is used.
+    /// </summary>
+    /// <remarks>
+    /// When <see cref="SslClientAuthenticationOptions.TargetHost"/> is empty, the hostname or IP address
+    /// the client connects to is used. The TLS handshake must finish within <see cref="ConnectTimeout"/>.
+    /// </remarks>
+    public SslClientAuthenticationOptions? SslOptions { get; set; }
+
     /// <inheritdoc />
     public override string ToString()
         => $"{nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(SendTimeout)}: {SendTimeout}, {nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}";

@@ -69,6 +69,7 @@ Use these ids to find handler failures and receive errors in your logs.
 | `TcpServer` | 10126 | A client connection fails (the client is closed; the server keeps running) |
 | `TcpServer` | 10127 | The listener stops unexpectedly (`IsRunning` becomes `false`) |
 | `TcpServer` | 10128 | A `ClientConnected` or `ClientDisconnected` handler throws |
+| `TcpServer` | 10129 | A client's TLS handshake fails or times out (the client is closed) |
 | `UdpServer` | 10323 | A `DataReceived` or `DatagramReceived` handler throws |
 | `UdpServer` | 10324 | A receive fails with a socket error (the server keeps receiving) |
 | `VncClient` | 10421 | Any `VncClient` event handler throws |

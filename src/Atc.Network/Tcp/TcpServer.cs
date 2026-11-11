@@ -7,6 +7,8 @@ namespace Atc.Network.Tcp;
 [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1502:Element should not be on a single line", Justification = "OK.")]
 public partial class TcpServer : ITcpServer
 {
+    private const int TlsHandshakeTimeoutInMs = 10_000;
+
     private readonly TcpServerConfig serverConfig;
     private readonly TcpListener? tcpListener;
     private readonly string ipAddressStr;
@@ -204,7 +206,7 @@ public partial class TcpServer : ITcpServer
             await connection.SendLock.WaitAsync(cancellationToken);
             lockAcquired = true;
 
-            await connection.Client.GetStream().WriteAsync(data, cancellationToken);
+            await connection.Stream.WriteAsync(data, cancellationToken);
             return true;
         }
         catch (Exception ex) when (ex is IOException or SocketException or ObjectDisposedException or InvalidOperationException)
@@ -273,17 +275,10 @@ public partial class TcpServer : ITcpServer
             while (IsRunning)
             {
                 var serverClient = await tcpListener!.AcceptTcpClientAsync(cancellationToken);
-                var connection = new TcpServerConnection(Guid.NewGuid(), serverClient, serverConfig.ReceiveBufferSize);
-                clients[connection.ClientId] = connection;
 
-                var eventArgs = new TcpServerClientEventArgs(connection.ClientId, connection.RemoteEndPoint);
-                InvokeHandlers(
-                    ClientConnected,
-                    nameof(ClientConnected),
-                    handler => ((EventHandler<TcpServerClientEventArgs>)handler)(this, eventArgs));
-
-                // Each client is read in its own task, so the next client is accepted right away.
-                _ = Task.Run(() => HandleServerClient(connection, cancellationToken), CancellationToken.None);
+                // Each client is set up (including any TLS handshake) and read in its own task,
+                // so the next client is accepted right away.
+                _ = Task.Run(() => HandleServerClient(serverClient, cancellationToken), CancellationToken.None);
             }
         }
         catch (Exception ex) when ((ex is SocketException or ObjectDisposedException) && !IsRunning)
@@ -305,9 +300,23 @@ public partial class TcpServer : ITcpServer
     /// is logged and closed, so the server goes on serving the other clients.
     /// </summary>
     private async Task HandleServerClient(
-        TcpServerConnection connection,
+        System.Net.Sockets.TcpClient serverClient,
         CancellationToken cancellationToken)
     {
+        var connection = await CreateConnection(serverClient);
+        if (connection is null)
+        {
+            return;
+        }
+
+        clients[connection.ClientId] = connection;
+
+        var connectedEventArgs = new TcpServerClientEventArgs(connection.ClientId, connection.RemoteEndPoint);
+        InvokeHandlers(
+            ClientConnected,
+            nameof(ClientConnected),
+            handler => ((EventHandler<TcpServerClientEventArgs>)handler)(this, connectedEventArgs));
+
         try
         {
             while (IsRunning && connection.Client.Connected)
@@ -334,6 +343,57 @@ public partial class TcpServer : ITcpServer
     }
 
     /// <summary>
+    /// Sets up a newly accepted client and, when <see cref="TcpServerConfig.SslOptions"/> is set,
+    /// runs the TLS handshake. Returns <see langword="null"/> after logging and closing the client
+    /// when it can't be served, for example because the handshake failed or timed out.
+    /// </summary>
+    [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The stream is owned by the returned connection, or disposed below on failure.")]
+    private async Task<TcpServerConnection?> CreateConnection(
+        System.Net.Sockets.TcpClient serverClient)
+    {
+        Stream? stream = null;
+        try
+        {
+            stream = serverClient.GetStream();
+
+            var sslOptions = serverConfig.SslOptions;
+            if (sslOptions is not null)
+            {
+                var sslStream = new SslStream(stream, leaveInnerStreamOpen: false);
+                stream = sslStream;
+
+                using var timeoutCts = new CancellationTokenSource(TlsHandshakeTimeoutInMs);
+                await sslStream.AuthenticateAsServerAsync(sslOptions, timeoutCts.Token);
+            }
+
+            if (IsRunning)
+            {
+                return new TcpServerConnection(Guid.NewGuid(), serverClient, stream, serverConfig.ReceiveBufferSize);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (serverConfig.SslOptions is null)
+            {
+                LogClientConnectionError(ipAddressStr, Port, ex.Message);
+            }
+            else
+            {
+                LogClientTlsHandshakeError(ipAddressStr, Port, ex.Message);
+            }
+        }
+
+        // The client failed, or the server stopped while the client was being set up.
+        if (stream is not null)
+        {
+            await stream.DisposeAsync();
+        }
+
+        serverClient.Dispose();
+        return null;
+    }
+
+    /// <summary>
     /// Closes every connected client. Each client's own task then ends and raises <see cref="ClientDisconnected"/>.
     /// </summary>
     private void CloseClients()
@@ -354,8 +414,7 @@ public partial class TcpServer : ITcpServer
 
         do
         {
-            var readCount = await connection.Client
-                .GetStream()
+            var readCount = await connection.Stream
                 .ReadAsync(
                     buffer.AsMemory(0, buffer.Length),
                     cancellationToken);
