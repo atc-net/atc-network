@@ -7,8 +7,6 @@ namespace Atc.Network.Tcp;
 [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1502:Element should not be on a single line", Justification = "OK.")]
 public partial class TcpServer : ITcpServer
 {
-    private const int TimeToWaitForStartTcpListenerInMs = 500;
-
     private readonly TcpServerConfig serverConfig;
     private readonly TcpListener? tcpListener;
     private readonly string ipAddressStr;
@@ -91,10 +89,32 @@ public partial class TcpServer : ITcpServer
     /// Triggered when the application host is ready to start the service.
     /// </summary>
     /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+    /// <exception cref="SocketException">The listener could not be started, for example because the port is in use.</exception>
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _ = Task.Run(StartTcpListener, cancellationToken);
-        return Task.Delay(TimeToWaitForStartTcpListenerInMs, cancellationToken);
+        if (IsRunning || tcpListener is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        LogStarting(ipAddressStr, Port);
+
+        try
+        {
+            // Start (bind) here, so a port that is in use fails StartAsync instead of a background task.
+            tcpListener.Start();
+        }
+        catch (SocketException ex)
+        {
+            LogListenerError(ipAddressStr, Port, ex);
+            throw;
+        }
+
+        IsRunning = true;
+        LogStarted(ipAddressStr, Port);
+
+        _ = Task.Run(AcceptClients, CancellationToken.None);
+        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -148,30 +168,15 @@ public partial class TcpServer : ITcpServer
         GC.SuppressFinalize(this);
     }
 
-    private async Task StartTcpListener()
+    private async Task AcceptClients()
     {
-        if (IsRunning)
-        {
-            return;
-        }
-
-        LogStarting(ipAddressStr, Port);
-        if (tcpListener is null)
-        {
-            return;
-        }
-
         var cancellationToken = CancellationToken.None;
 
         try
         {
-            tcpListener.Start();
-            IsRunning = true;
-            LogStarted(ipAddressStr, Port);
-
             while (IsRunning)
             {
-                var serverClient = await tcpListener.AcceptTcpClientAsync(cancellationToken);
+                var serverClient = await tcpListener!.AcceptTcpClientAsync(cancellationToken);
                 await HandleServerClient(serverClient, cancellationToken);
             }
         }
