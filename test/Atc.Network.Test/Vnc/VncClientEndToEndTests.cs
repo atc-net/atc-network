@@ -118,6 +118,28 @@ public sealed class VncClientEndToEndTests
     }
 
     [Fact]
+    public async Task FramebufferUpdatedHandlerThrows_KeepsTheSession()
+    {
+        // Arrange - reconnect is off, so a dropped session would stay dropped.
+        using var server = new FakeVncServer();
+        using var vncClient = CreateClient(server, reconnect: false);
+        var bellReceived = false;
+        vncClient.FramebufferUpdated += (_, _) => throw new InvalidOperationException("handler bug");
+        vncClient.BellReceived += () => bellReceived = true;
+        using var session = await ConnectAndStartUpdates(vncClient, server, password: string.Empty);
+
+        // Act
+        await session.SendRawRectangle(0, 0, 1, 1, red: 0, green: 255, blue: 0);
+        await session.SendBell();
+
+        // Assert
+        Assert.True(await WaitHelper.WaitUntil(() => bellReceived), "The session should survive a throwing handler.");
+        Assert.True(vncClient.IsConnected);
+
+        await vncClient.Disconnect();
+    }
+
+    [Fact]
     public async Task ConnectionDropped_WithReconnect_ReconnectsAndResumesUpdates()
     {
         // Arrange

@@ -776,13 +776,13 @@ public partial class VncClient : IVncClient
 
                     case Enums.VncServerMessageType.Bell:
                         LogBellReceived(IPAddressOrHostname, Port);
-                        BellReceived?.Invoke();
+                        InvokeHandlers(BellReceived, nameof(BellReceived), handler => ((Action)handler)());
                         break;
 
                     case Enums.VncServerMessageType.ServerCutText:
                         var text = rfb.ReadServerCutText();
                         LogServerCutTextReceived(IPAddressOrHostname, Port);
-                        ServerCutText?.Invoke(text);
+                        InvokeHandlers(ServerCutText, nameof(ServerCutText), handler => ((Action<string>)handler)(text));
                         break;
 
                     default:
@@ -864,13 +864,41 @@ public partial class VncClient : IVncClient
 
                 encodedRect.Decode();
 
-                FramebufferUpdated?.Invoke(this, new VncFramebufferUpdateEventArgs(rectangle, Framebuffer));
+                var eventArgs = new VncFramebufferUpdateEventArgs(rectangle, Framebuffer);
+                InvokeHandlers(FramebufferUpdated, nameof(FramebufferUpdated), handler => ((EventHandler<VncFramebufferUpdateEventArgs>)handler)(this, eventArgs));
             }
         }
         catch (Exception ex)
         {
             LogFramebufferUpdateError(IPAddressOrHostname, Port, ex.Message);
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Calls each subscriber on its own, so a failing handler is logged
+    /// and neither skips the others nor ends the session.
+    /// </summary>
+    private void InvokeHandlers(
+        Delegate? handlers,
+        string eventName,
+        Action<Delegate> invoke)
+    {
+        if (handlers is null)
+        {
+            return;
+        }
+
+        foreach (var handler in handlers.GetInvocationList())
+        {
+            try
+            {
+                invoke(handler);
+            }
+            catch (Exception ex)
+            {
+                LogEventHandlerError(IPAddressOrHostname, Port, eventName, ex);
+            }
         }
     }
 
