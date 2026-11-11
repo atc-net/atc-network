@@ -198,6 +198,12 @@
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
+- [NetBiosHelper](Atc.Network.Helpers.md#netbioshelper)
+  -  Static Fields
+     - int DefaultPort
+     - int DefaultTimeoutInMs
+  -  Static Methods
+     - GetNodeStatus(IPAddress ipAddress, TimeSpan? timeout = null, CancellationToken cancellationToken = null)
 - [NtpHelper](Atc.Network.Helpers.md#ntphelper)
   -  Static Fields
      - int DefaultPort
@@ -285,10 +291,12 @@
      - PortNumbers
      - ResolveHostName
      - ResolveMacAddress
+     - ResolveNetBiosName
      - ResolveVendorFromMacAddress
      - Timeout
      - TimeoutDiscovery
      - TimeoutHttp
+     - TimeoutNetBios
      - TimeoutPing
      - TimeoutTcp
      - TreatOpenPortsAsWebServices
@@ -303,6 +311,7 @@
      - int TimeoutDiscoveryInMs
      - int TimeoutHttpInMs
      - int TimeoutInMs
+     - int TimeoutNetBiosInMs
      - int TimeoutPingInMs
      - int TimeoutTcpInMs
 - [IPScannerProgressReport](Atc.Network.Internet.md#ipscannerprogressreport)
@@ -345,6 +354,7 @@
      - MacVendor
      - MdnsHostName
      - MdnsServices
+     - NetBiosStatus
      - OpenPortNumbers
      - PingStatus
      - Ports
@@ -363,6 +373,27 @@
      - PercentageCompleted
      - Start
      - TimeDiff
+  -  Methods
+     - ToString()
+- [NetBiosName](Atc.Network.Models.md#netbiosname)
+  -  Properties
+     - IsGroup
+     - Name
+     - Suffix
+  -  Methods
+     - <Clone>$()
+     - Deconstruct(out string Name, out byte Suffix, out bool IsGroup)
+     - Equals(NetBiosName other)
+     - Equals(object obj)
+     - GetHashCode()
+     - ToString()
+- [NetBiosNodeStatus](Atc.Network.Models.md#netbiosnodestatus)
+  -  Properties
+     - ComputerName
+     - IPAddress
+     - MacAddress
+     - Names
+     - Workgroup
   -  Methods
      - ToString()
 - [NtpResult](Atc.Network.Models.md#ntpresult)

@@ -45,6 +45,7 @@ Which components record what:
 | `WakeOnLanHelper` | – | – | – | ✅ (sent) | – |
 | `NtpHelper` | – | – | – | ✅ | – |
 | `MdnsDiscovery`, `SsdpDiscovery` | – | – | – | ✅ | – |
+| `NetBiosHelper` | – | – | – | ✅ | – |
 
 ### 🏷️ Tags
 
@@ -52,8 +53,8 @@ Every measurement and span has these tags:
 
 | Tag | Value |
 |-----|-------|
-| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client`, `wake_on_lan`, `ntp_client`, `mdns_discovery` or `ssdp_discovery` |
-| `server.address` | The server a client connects to, the address a server listens on, where a Wake-on-LAN packet is sent, the NTP server asked, or the multicast address a discovery queries |
+| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client`, `wake_on_lan`, `ntp_client`, `mdns_discovery`, `ssdp_discovery` or `netbios_client` |
+| `server.address` | The server a client connects to, the address a server listens on, where a Wake-on-LAN packet is sent, the NTP or NetBIOS host asked, or the multicast address a discovery queries |
 | `server.port` | The server's port |
 
 Client endpoints of a server are not tags, so the number of time series stays small however many clients connect.
@@ -75,5 +76,6 @@ Client endpoints of a server are not tags, so the number of time series stays sm
 | `Ntp.GetTime` | Client | Each `GetTime`. Status `Error` on a timeout or a refused reply |
 | `MdnsDiscovery.Browse`, `MdnsDiscovery.BrowseAll`, `MdnsDiscovery.GetServiceTypes` | Client | Each discovery, for its whole duration |
 | `SsdpDiscovery.Search` | Client | Each search, for its whole duration |
+| `NetBios.GetNodeStatus` | Client | Each `GetNodeStatus` |
 
 A span is a child of the caller's current activity, for example the request that called `Send`. The receive loops run outside any span, so the logs and spans of your `DataReceived` handlers are not attached to the connect span that started the loop.

@@ -50,6 +50,7 @@
 - [IeeeOuiMacAddressVendorLookup](Atc.Network.Helpers.md#ieeeouimacaddressvendorlookup)
 - [InternetWorldTimeHelper](Atc.Network.Helpers.md#internetworldtimehelper)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
+- [NetBiosHelper](Atc.Network.Helpers.md#netbioshelper)
 - [NtpHelper](Atc.Network.Helpers.md#ntphelper)
 - [OnlineMacAddressVendorLookup](Atc.Network.Helpers.md#onlinemacaddressvendorlookup)
 - [OpcUaAddressHelper](Atc.Network.Helpers.md#opcuaaddresshelper)
@@ -74,6 +75,8 @@
 - [IPScanPortResult](Atc.Network.Models.md#ipscanportresult)
 - [IPScanResult](Atc.Network.Models.md#ipscanresult)
 - [IPScanResults](Atc.Network.Models.md#ipscanresults)
+- [NetBiosName](Atc.Network.Models.md#netbiosname)
+- [NetBiosNodeStatus](Atc.Network.Models.md#netbiosnodestatus)
 - [NtpResult](Atc.Network.Models.md#ntpresult)
 - [PingStatusResult](Atc.Network.Models.md#pingstatusresult)
 

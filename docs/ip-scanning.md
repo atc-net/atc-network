@@ -12,6 +12,7 @@ Scan single IPs or entire ranges with configurable discovery options.
 
 - 🏓 ICMP ping with network quality metrics
 - 🏷️ Hostname resolution
+- 🪟 NetBIOS computer name and workgroup (`ResolveNetBiosName`), for Windows computers and Samba servers that DNS doesn't know
 - 📡 MAC address discovery (via ARP)
 - 🏭 Vendor identification from MAC address, online or [offline](#-offline-vendor-lookup)
 - 🔌 Port scanning (None, WellKnown, WellKnownAndCommon, All), up to 16 ports per IP address at a time
@@ -119,6 +120,22 @@ string? hostname = await DnsLookupHelper.GetHostname(
     CancellationToken.None);
 // → "dns.google"
 ```
+
+### 🪟 NetBiosHelper
+
+Asks a host for its NetBIOS names and MAC address, as `nbtstat -A` does. Windows computers (with NetBIOS over TCP/IP) and Samba servers, such as NAS boxes, answer on UDP port 137, often when DNS knows nothing about them.
+
+```csharp
+NetBiosNodeStatus? status = await NetBiosHelper.GetNodeStatus(IPAddress.Parse("192.168.1.212"));
+// status.ComputerName → "NETDISK1512"
+// status.Workgroup    → "WORKGROUP"
+// status.MacAddress   → null: Samba reports none; Windows reports its MAC, such as "3C-97-0E-D6-3C-CB"
+// status.Names        → NETDISK1512<00>, NETDISK1512<20>, WORKGROUP<00>, ...
+```
+
+It returns `null` when the host doesn't answer within the timeout (1 second by default), which is normal for devices without NetBIOS. It's IPv4 only.
+
+In the IP scanner, turn on `ResolveNetBiosName` to fill `IPScanResult.NetBiosStatus` for each address; `IPScanResult.ToString()` shows the computer name when DNS found none. Addresses that don't answer wait up to `TimeoutNetBios`, so a scan of 254 addresses takes a few seconds longer.
 
 ### 📡 ArpHelper
 

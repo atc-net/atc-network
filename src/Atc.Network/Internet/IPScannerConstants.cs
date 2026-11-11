@@ -33,6 +33,11 @@ public static class IPScannerConstants
     public const int TimeoutDiscoveryInMs = 3000;
 
     /// <summary>
+    /// How long to wait for a NetBIOS answer, in milliseconds. The default is 1000 (1 sec).
+    /// </summary>
+    public const int TimeoutNetBiosInMs = 1000;
+
+    /// <summary>
     /// The maximum number of ports scanned at the same time for one IP address.
     /// IP addresses are scanned in parallel too, so this keeps the total number of open sockets bounded.
     /// </summary>

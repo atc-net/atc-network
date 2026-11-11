@@ -303,6 +303,43 @@ Provides utilities for fetching the current time from the WorldTimeAPI.
 
 <br />
 
+## NetBiosHelper
+Asks a host for its NetBIOS names and MAC address with a node status query (RFC 1002, as `nbtstat -A` does).
+><b>Remarks:</b> Windows computers with NetBIOS over TCP/IP, and Samba servers (NAS boxes, Linux file servers), answer on UDP port 137 with their computer name and workgroup, even when DNS knows nothing about them. Most other devices don't answer.
+
+>```csharp
+>public static class NetBiosHelper
+>```
+
+### Static Fields
+
+#### DefaultPort
+>```csharp
+>int DefaultPort
+>```
+><b>Summary:</b> The NetBIOS name service port.
+#### DefaultTimeoutInMs
+>```csharp
+>int DefaultTimeoutInMs
+>```
+><b>Summary:</b> The default time to wait for the answer, in milliseconds.
+### Static Methods
+
+#### GetNodeStatus
+>```csharp
+>Task<NetBiosNodeStatus> GetNodeStatus(IPAddress ipAddress, TimeSpan? timeout = null, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Asks a host for its NetBIOS names and MAC address.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`ipAddress`&nbsp;&nbsp;-&nbsp;&nbsp;The host's IPv4 address.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`timeout`&nbsp;&nbsp;-&nbsp;&nbsp;How long to wait for the answer. The default is 1 second.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellation token.<br />
+>
+><b>Returns:</b> The host's names and MAC address, or <see langword="null" /> when it does not answer in time, which is normal for hosts without NetBIOS.
+
+<br />
+
 ## NtpHelper
 Gets the time from an NTP server with SNTP (RFC 4330), and how far the local clock is from it.
 ><b>Remarks:</b> One request is sent per call, as a UDP datagram to port 123. The result has the clock offset and the round-trip delay, from the four NTP timestamps. NTP servers serve UTC; convert it with `System.TimeZoneInfo.ConvertTimeFromUtc(System.DateTime,System.TimeZoneInfo)` for a time zone. Public servers limit how often a client may ask; don't call this more than about once a minute per server.

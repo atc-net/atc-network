@@ -316,6 +316,13 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 >```csharp
 >ResolveMacAddress
 >```
+#### ResolveNetBiosName
+>```csharp
+>ResolveNetBiosName
+>```
+><b>Summary:</b> Gets or sets a value indicating whether each address is asked for its NetBIOS names and MAC address (`Atc.Network.Models.IPScanResult.NetBiosStatus`). Windows computers and Samba servers (NAS boxes) answer with their computer name and workgroup, even when DNS knows nothing about them. The default is <see langword="false" />.
+>
+><b>Remarks:</b> Addresses that don't answer wait up to `Atc.Network.Internet.IPScannerConfig.TimeoutNetBios`.
 #### ResolveVendorFromMacAddress
 >```csharp
 >ResolveVendorFromMacAddress
@@ -333,6 +340,11 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 >```csharp
 >TimeoutHttp
 >```
+#### TimeoutNetBios
+>```csharp
+>TimeoutNetBios
+>```
+><b>Summary:</b> Gets or sets how long to wait for a NetBIOS answer. The default is 1 second.
 #### TimeoutPing
 >```csharp
 >TimeoutPing
@@ -394,6 +406,11 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 >int TimeoutInMs
 >```
 ><b>Summary:</b> The connect time-out value, in milliseconds. The default is 180000 (3 min);
+#### TimeoutNetBiosInMs
+>```csharp
+>int TimeoutNetBiosInMs
+>```
+><b>Summary:</b> How long to wait for a NetBIOS answer, in milliseconds. The default is 1000 (1 sec).
 #### TimeoutPingInMs
 >```csharp
 >int TimeoutPingInMs

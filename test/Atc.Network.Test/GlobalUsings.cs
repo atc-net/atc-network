@@ -17,6 +17,7 @@ global using Atc.Network.Data;
 global using Atc.Network.Discovery;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
+global using Atc.Network.Models;
 global using Atc.Network.Tcp;
 global using Atc.Network.Test.TestHelpers;
 global using Atc.Network.Udp;

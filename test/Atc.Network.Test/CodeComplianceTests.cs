@@ -38,6 +38,10 @@ public class CodeComplianceTests
         // GetTime is covered by NtpHelperTests, but only from async tests, which this check does not see.
         typeof(NtpHelper),
 
+        // GetNodeStatus is covered by NetBiosHelperTests (port 137 only in an integration test), but only from async tests,
+        // which this check does not see.
+        typeof(NetBiosHelper),
+
         // The public methods send to the real multicast addresses. The unit tests use the internal overloads
         // that take the target endpoint (a fake responder); the public ones are covered by integration tests.
         typeof(MdnsDiscovery),

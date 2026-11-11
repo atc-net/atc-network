@@ -106,6 +106,11 @@ public partial class IPScanner : IIPScanner, IDisposable
     internal IPEndPoint SsdpQueryEndPoint { get; set; } = SsdpDiscovery.MulticastEndPoint;
 
     /// <summary>
+    /// Gets or sets the port NetBIOS queries are sent to. Tests point it at a fake responder.
+    /// </summary>
+    internal int NetBiosPort { get; set; } = NetBiosHelper.DefaultPort;
+
+    /// <summary>
     /// Initiates an asynchronous scan for the specified IP address.
     /// </summary>
     /// <param name="ipAddress">The IP address to scan.</param>
@@ -407,6 +412,11 @@ public partial class IPScanner : IIPScanner, IDisposable
             await HandleResolveHostName(ipScanResult, ipAddress, cancellationToken);
         }
 
+        if (Configuration.ResolveNetBiosName)
+        {
+            await HandleResolveNetBiosName(ipScanResult, ipAddress, cancellationToken);
+        }
+
         if (Configuration.ResolveMacAddress)
         {
             HandleResolveMacAddress(ipScanResult, ipAddress);
@@ -449,6 +459,34 @@ public partial class IPScanner : IIPScanner, IDisposable
         ipScanResult.PingStatus = await PingHelper.GetStatus(ipAddress, Configuration.TimeoutPing);
         Interlocked.Increment(ref tasksProcessedCount);
         RaiseProgressReporting(IPScannerProgressReportingType.Ping, ipScanResult);
+    }
+
+    /// <summary>
+    /// Asks the address for its NetBIOS names. NetBIOS is IPv4 only; a host that does not answer, or a send
+    /// that fails, leaves <see cref="IPScanResult.NetBiosStatus"/> empty.
+    /// </summary>
+    private async Task HandleResolveNetBiosName(
+        IPScanResult ipScanResult,
+        IPAddress ipAddress,
+        CancellationToken cancellationToken)
+    {
+        if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+        {
+            try
+            {
+                ipScanResult.NetBiosStatus = await NetBiosHelper.GetNodeStatus(
+                    new IPEndPoint(ipAddress, NetBiosPort),
+                    Configuration.TimeoutNetBios,
+                    cancellationToken);
+            }
+            catch (SocketException)
+            {
+                // Such as "network unreachable": the address has no NetBIOS answer.
+            }
+        }
+
+        Interlocked.Increment(ref tasksProcessedCount);
+        RaiseProgressReporting(IPScannerProgressReportingType.NetBiosName, ipScanResult);
     }
 
     private async Task HandleResolveHostName(
