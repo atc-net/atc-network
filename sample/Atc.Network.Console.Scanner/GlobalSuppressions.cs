@@ -1,0 +1,2 @@
+[assembly: SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "OK.")]
+[assembly: SuppressMessage("Security", "S1313:Do not hardcode IP address", Justification = "OK - the sample scans the 192.168.1.x network by default.")]
