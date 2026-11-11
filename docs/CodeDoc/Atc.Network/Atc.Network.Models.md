@@ -191,6 +191,49 @@
 
 <br />
 
+## NtpResult
+The time from an NTP server, and how far the local clock is from it.
+
+>```csharp
+>public class NtpResult
+>```
+
+### Properties
+
+#### Offset
+>```csharp
+>Offset
+>```
+><b>Summary:</b> Gets how far the server's clock is ahead of the local clock. A negative value means the local clock is ahead. Add it to `System.DateTime.UtcNow` to get the server's time.
+#### RoundTripDelay
+>```csharp
+>RoundTripDelay
+>```
+><b>Summary:</b> Gets the time the request and the reply spent on the network, without the time the server needed to answer.
+#### Server
+>```csharp
+>Server
+>```
+><b>Summary:</b> Gets the server that answered.
+#### Stratum
+>```csharp
+>Stratum
+>```
+><b>Summary:</b> Gets the server's distance from a reference clock: 1 for a server with its own clock (GPS, atomic), 2 for a server that synchronizes with a stratum 1 server, and so on.
+#### UtcTime
+>```csharp
+>UtcTime
+>```
+><b>Summary:</b> Gets the server's time (UTC) at the moment the reply arrived: the local time then, plus `Atc.Network.Models.NtpResult.Offset`.
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
+
+<br />
+
 ## PingStatusResult
 
 >```csharp
