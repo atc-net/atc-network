@@ -249,6 +249,68 @@ public sealed class TcpServerTests
         Assert.True(await IsClosedByServer(client), "StopAsync should close connected clients.");
     }
 
+    [Fact]
+    public async Task LargeTerminatedMessage_InManyReads_IsDeliveredOnceAndWhole()
+    {
+        // Arrange - the message is much larger than the receive buffer, so it arrives in many reads.
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(
+            NullLogger.Instance,
+            IPAddress.Loopback,
+            port,
+            new TcpServerConfig { TerminationType = TerminationType.LineFeed, ReceiveBufferSize = 1024 });
+
+        var received = new ConcurrentQueue<byte[]>();
+        tcpServer.DataReceived += data => received.Enqueue(data);
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        var payload = Encoding.ASCII.GetBytes(new string('x', 200_000) + "\n");
+
+        // Act
+        using var client = new System.Net.Sockets.TcpClient();
+        await client.ConnectAsync(IPAddress.Loopback, port);
+        await client.GetStream().WriteAsync(payload);
+
+        // Assert
+        Assert.True(await WaitHelper.WaitUntil(() => !received.IsEmpty), "The message should be delivered.");
+        await Task.Delay(200);
+        Assert.Single(received);
+        Assert.Equal(payload, received.Single());
+
+        await tcpServer.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task CarriageReturnLineFeed_SplitAcrossReads_EndsTheMessage()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(
+            NullLogger.Instance,
+            IPAddress.Loopback,
+            port,
+            new TcpServerConfig { TerminationType = TerminationType.CarriageReturnLineFeed });
+
+        var received = new ConcurrentQueue<string>();
+        tcpServer.DataReceived += data => received.Enqueue(Encoding.ASCII.GetString(data));
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        using var client = new System.Net.Sockets.TcpClient();
+        await client.ConnectAsync(IPAddress.Loopback, port);
+        var stream = client.GetStream();
+
+        // Act - "\r" ends the first read and "\n" starts the second.
+        await stream.WriteAsync(Encoding.ASCII.GetBytes("abc\r"));
+        await Task.Delay(200);
+        await stream.WriteAsync(Encoding.ASCII.GetBytes("\n"));
+
+        // Assert
+        Assert.True(await WaitHelper.WaitUntil(() => !received.IsEmpty), "The message should be delivered.");
+        Assert.Equal("abc\r\n", received.Single());
+
+        await tcpServer.StopAsync(CancellationToken.None);
+    }
+
     private static int GetFreePort()
     {
         using var listener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
