@@ -14,7 +14,7 @@ public static class TerminationTypeHelper
 
     private static readonly byte[] LineFeedAsBytes = { LineFeed };
     private static readonly byte[] CarriageReturnAsBytes = { CarriageReturn };
-    private static readonly byte[] CarriageReturnLineFeedAsBytes = { LineFeed, CarriageReturn };
+    private static readonly byte[] CarriageReturnLineFeedAsBytes = { CarriageReturn, LineFeed };
     private static readonly byte[] EndOfTextAsBytes = { EndOfText };
     private static readonly byte[] EndOfTransmissionAsBytes = { EndOfTransmission };
 

@@ -23,4 +23,30 @@ public class TerminationHelperTests
         // Assert
         Assert.Equal(expectedLength, bytes.Length);
     }
+
+    [Fact]
+    public void AppendTerminationBytesIfNeeded_CarriageReturnLineFeed_AppendsCarriageReturnThenLineFeed()
+    {
+        // Arrange
+        var bytes = Encoding.ASCII.GetBytes("Hallo");
+
+        // Act
+        TerminationHelper.AppendTerminationBytesIfNeeded(ref bytes, TerminationType.CarriageReturnLineFeed);
+
+        // Assert
+        Assert.Equal("Hallo\r\n", Encoding.ASCII.GetString(bytes));
+    }
+
+    [Fact]
+    public void AppendTerminationBytesIfNeeded_AlreadyEndsWithCarriageReturnLineFeed_AppendsNothing()
+    {
+        // Arrange
+        var bytes = Encoding.ASCII.GetBytes("Hallo\r\n");
+
+        // Act
+        TerminationHelper.AppendTerminationBytesIfNeeded(ref bytes, TerminationType.CarriageReturnLineFeed);
+
+        // Assert
+        Assert.Equal("Hallo\r\n", Encoding.ASCII.GetString(bytes));
+    }
 }
