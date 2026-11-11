@@ -151,6 +151,28 @@ public sealed class UdpClientTests : IDisposable
     }
 
     [Fact]
+    public async Task ConnectionEventHandlersThatThrow_DoNotBreakConnectOrDisconnect()
+    {
+        // Arrange
+        var logger = new CapturingLogger();
+        using var udpClient = new UdpClient(logger, ServerEndPoint);
+        udpClient.ConnectionStateChanged += (_, _) => throw new InvalidOperationException("handler bug");
+        udpClient.Connected += () => throw new InvalidOperationException("handler bug");
+        udpClient.Disconnected += () => throw new InvalidOperationException("handler bug");
+
+        // Act
+        var connected = await udpClient.Connect();
+        var isConnectedAfterConnect = udpClient.IsConnected;
+        await udpClient.Disconnect();
+
+        // Assert
+        Assert.True(connected);
+        Assert.True(isConnectedAfterConnect);
+        Assert.False(udpClient.IsConnected);
+        Assert.Contains(logger.Entries, x => x.EventId.Id == LoggingEventIdConstants.UdpClient.EventHandlerError);
+    }
+
+    [Fact]
     public async Task Send_WhenNotConnected_SendsNothing()
     {
         // Arrange
