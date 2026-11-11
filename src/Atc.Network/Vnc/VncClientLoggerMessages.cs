@@ -187,4 +187,14 @@ public partial class VncClient
     private partial void LogReconnectionMaxRetryExceededError(
         string ipAddressOrHostName,
         int port);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.VncClient.EventHandlerError,
+        Level = LogLevel.Error,
+        Message = "A {eventName} handler failed for {ipAddressOrHostName}:{port}.")]
+    private partial void LogEventHandlerError(
+        string ipAddressOrHostName,
+        int port,
+        string eventName,
+        Exception exception);
 }

@@ -86,5 +86,6 @@ public static class LoggingEventIdConstants
         public const int Reconnected = 10418;
         public const int ReconnectionWarning = 10419;
         public const int ReconnectionMaxRetryExceededError = 10420;
+        public const int EventHandlerError = 10421;
     }
 }
