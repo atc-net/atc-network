@@ -31,6 +31,7 @@ public static class ArpHelper
     /// Otherwise, it performs a new ARP lookup using the system's 'arp' command. The results are parsed, cached, and then returned.
     /// If there's no network connection, an empty array is returned.
     /// </remarks>
+    [SuppressMessage("Security", "S4036:Use an absolute path for this command", Justification = "OK - the location of 'arp' differs per OS, so it is resolved from PATH.")]
     public static ArpEntity[] GetArpResult()
     {
         var timeSpan = DateTimeOffset.Now - lastLookup;

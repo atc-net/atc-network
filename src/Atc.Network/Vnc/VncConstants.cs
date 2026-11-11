@@ -121,4 +121,4 @@ public static class VncConstants
     /// Default reconnect retry max attempts (1800 × 2s = 1 hour).
     /// </summary>
     public const int DefaultReconnectRetryMaxAttempts = 1800;
-}
+}

@@ -217,4 +217,4 @@ internal sealed class ZrleRectangle : EncodedRectangle
             }
         }
     }
-}
+}

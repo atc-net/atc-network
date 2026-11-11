@@ -1,8 +1,8 @@
 namespace Atc.Network.Vnc;
 
-/// <summary>
+/// <content>
 /// VncClient LoggerMessages.
-/// </summary>
+/// </content>
 [SuppressMessage("Design", "MA0048:File name must match type name", Justification = "OK - By Design")]
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OK")]
 public partial class VncClient
@@ -187,4 +187,4 @@ public partial class VncClient
     private partial void LogReconnectionMaxRetryExceededError(
         string ipAddressOrHostName,
         int port);
-}
+}

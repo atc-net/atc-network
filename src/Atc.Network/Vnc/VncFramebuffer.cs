@@ -93,4 +93,4 @@ public sealed class VncFramebuffer
     /// <inheritdoc />
     public override string ToString()
         => $"{nameof(Width)}: {Width}, {nameof(Height)}: {Height}, {nameof(DesktopName)}: {DesktopName}, {nameof(PixelFormat)}: {PixelFormat}";
-}
+}

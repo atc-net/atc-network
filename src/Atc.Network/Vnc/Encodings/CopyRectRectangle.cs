@@ -44,4 +44,4 @@ internal sealed class CopyRectRectangle : EncodedRectangle
             }
         }
     }
-}
+}

@@ -2,6 +2,7 @@
 // ReSharper disable LocalizableElement
 namespace Atc.Network;
 
+[SuppressMessage("Major Code Smell", "S1313:Do not hardcode IP addresses", Justification = "OK - IANA reserved/private address ranges.")]
 public static class IPAddressExtensions
 {
     public static bool IsPublic(this IPAddress ipAddress)

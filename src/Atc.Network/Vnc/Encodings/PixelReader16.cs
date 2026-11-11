@@ -28,4 +28,4 @@ internal sealed class PixelReader16 : PixelReader
 
         return unchecked((int)0xFF000000) | (red << 16) | (green << 8) | blue;
     }
-}
+}

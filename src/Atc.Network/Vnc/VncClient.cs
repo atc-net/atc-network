@@ -268,9 +268,9 @@ public partial class VncClient : IVncClient
             {
                 await tcpClient.ConnectAsync(IPAddressOrHostname, Port, linkedCts.Token);
             }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
             {
-                throw new InvalidOperationException("Connection timed out");
+                throw new InvalidOperationException("Connection timed out", ex);
             }
 
             if (clientKeepAliveConfig.Enable)
@@ -618,7 +618,7 @@ public partial class VncClient : IVncClient
         LogDisconnecting(IPAddressOrHostname, Port);
         InvokeConnectionStateChanged(ConnectionState.Disconnecting);
 
-        await Task.Delay(TimeToWaitForDisconnectionInMs);
+        await Task.Delay(TimeToWaitForDisconnectionInMs, CancellationToken.None);
 
         DisposeCancellationTokenAndTask();
         CleanupTcpClient();
@@ -913,7 +913,7 @@ public partial class VncClient : IVncClient
         CleanupTcpClient();
         IsConnected = false;
 
-        await Task.Delay(clientReconnectConfig.RetryInterval);
+        await Task.Delay(clientReconnectConfig.RetryInterval, CancellationToken.None);
 
         if (await DoConnectAuthenticateAndInitialize())
         {
@@ -951,7 +951,7 @@ public partial class VncClient : IVncClient
         {
             tcpClient = new System.Net.Sockets.TcpClient();
 
-            var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout);
+            var connectTimeoutTask = Task.Delay(clientConfig.ConnectTimeout, CancellationToken.None);
             var connectTask = tcpClient.ConnectAsync(IPAddressOrHostname, Port);
 
             await await Task.WhenAny(connectTask, connectTimeoutTask);
@@ -991,7 +991,7 @@ public partial class VncClient : IVncClient
             // Re-authenticate
             if (storedPassword is not null)
             {
-                var authResult = await Authenticate(storedPassword);
+                var authResult = await Authenticate(storedPassword, CancellationToken.None);
                 if (!authResult)
                 {
                     CleanupTcpClient();
@@ -1001,10 +1001,10 @@ public partial class VncClient : IVncClient
             }
 
             // Re-initialize
-            await Initialize();
+            await Initialize(CancellationToken.None);
 
             // Restart updates
-            await StartUpdates();
+            await StartUpdates(CancellationToken.None);
 
             return true;
         }
@@ -1061,7 +1061,7 @@ public partial class VncClient : IVncClient
         {
             if (updateListenerTask.Status == TaskStatus.Running)
             {
-                updateListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs));
+                updateListenerTask.Wait(TimeSpan.FromMilliseconds(TimeToWaitForDisposeDisconnectionInMs), CancellationToken.None);
             }
 
             updateListenerTask = null;
@@ -1077,4 +1077,4 @@ public partial class VncClient : IVncClient
             tcpClient = null;
         }
     }
-}
+}

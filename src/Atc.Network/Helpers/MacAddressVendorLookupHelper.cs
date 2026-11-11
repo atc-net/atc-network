@@ -12,7 +12,7 @@ public static class MacAddressVendorLookupHelper
     private const int SyncLockTimeoutInMs = 30_000;
 
     private static readonly SemaphoreSlim SyncLock = new(1, 1);
-    private static readonly Uri MacVendorsApiUrl = new("http://api.macvendors.com/");
+    private static readonly Uri MacVendorsApiUrl = new("https://api.macvendors.com/");
     private static DateTimeOffset lastLookup = DateTimeOffset.MinValue;
     private static List<string> cacheFileLines = new();
 
@@ -51,7 +51,8 @@ public static class MacAddressVendorLookupHelper
             var cacheFile = Path.Combine(tempPath, AtcCacheFile);
             if (File.Exists(cacheFile))
             {
-                cacheFileLines = (await File.ReadAllLinesAsync(cacheFile, cancellationToken)).ToList();
+                var cacheFileContent = await File.ReadAllLinesAsync(cacheFile, cancellationToken);
+                cacheFileLines = [.. cacheFileContent];
                 cacheVendorName = GetVendorFromCacheFileLines(macAddress);
                 if (!string.IsNullOrEmpty(cacheVendorName))
                 {

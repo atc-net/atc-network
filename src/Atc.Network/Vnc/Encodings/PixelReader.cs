@@ -22,4 +22,4 @@ internal abstract class PixelReader
     /// </summary>
     /// <returns>A 32-bit ARGB pixel value.</returns>
     public abstract int ReadPixel();
-}
+}

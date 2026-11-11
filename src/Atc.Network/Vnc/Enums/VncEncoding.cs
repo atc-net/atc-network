@@ -37,4 +37,4 @@ public enum VncEncoding
     /// Zlib Run-Length Encoding.
     /// </summary>
     Zrle = 16,
-}
+}

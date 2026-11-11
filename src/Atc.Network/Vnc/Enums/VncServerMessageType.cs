@@ -24,4 +24,4 @@ public enum VncServerMessageType
     /// Server cut text (clipboard) message.
     /// </summary>
     ServerCutText = 3,
-}
+}
