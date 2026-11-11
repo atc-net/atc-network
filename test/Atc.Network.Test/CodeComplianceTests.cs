@@ -25,6 +25,12 @@ public class CodeComplianceTests
         typeof(UdpClient),
         typeof(UdpServer),
         typeof(VncClient),
+
+        // Calls the macvendors.com web service.
+        typeof(OnlineMacAddressVendorLookup),
+
+        // Covered by IeeeOuiMacAddressVendorLookupTests, but only from async tests, which this check does not see.
+        typeof(IeeeOuiMacAddressVendorLookup),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

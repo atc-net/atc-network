@@ -38,9 +38,12 @@
 
 - [ArpHelper](Atc.Network.Helpers.md#arphelper)
 - [DnsLookupHelper](Atc.Network.Helpers.md#dnslookuphelper)
+- [IMacAddressVendorLookup](Atc.Network.Helpers.md#imacaddressvendorlookup)
 - [IPv4AddressHelper](Atc.Network.Helpers.md#ipv4addresshelper)
+- [IeeeOuiMacAddressVendorLookup](Atc.Network.Helpers.md#ieeeouimacaddressvendorlookup)
 - [InternetWorldTimeHelper](Atc.Network.Helpers.md#internetworldtimehelper)
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
+- [OnlineMacAddressVendorLookup](Atc.Network.Helpers.md#onlinemacaddressvendorlookup)
 - [OpcUaAddressHelper](Atc.Network.Helpers.md#opcuaaddresshelper)
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
 - [TerminationHelper](Atc.Network.Helpers.md#terminationhelper)

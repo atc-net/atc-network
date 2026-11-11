@@ -105,6 +105,30 @@ Provides utilities for performing DNS lookups.
 
 <br />
 
+## IMacAddressVendorLookup
+Finds the manufacturer (vendor) of a network interface from its MAC address.
+><b>Remarks:</b> Use `Atc.Network.Helpers.IeeeOuiMacAddressVendorLookup` to look up offline from the IEEE registry files, or `Atc.Network.Helpers.OnlineMacAddressVendorLookup` to ask the macvendors.com web service.
+
+>```csharp
+>public interface IMacAddressVendorLookup
+>```
+
+### Methods
+
+#### LookupVendorName
+>```csharp
+>Task<string> LookupVendorName(string macAddress, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Returns the vendor name for the MAC address.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`macAddress`&nbsp;&nbsp;-&nbsp;&nbsp;The MAC address, for example "00:1B:C5:00:90:01", "00-1B-C5-00-90-01" or "001BC5009001".<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Returns:</b> The vendor name, or <see langword="null" /> when the vendor is unknown.
+
+<br />
+
 ## IPv4AddressHelper
 Provides utilities for validating and working with IPv4 addresses.
 
@@ -180,6 +204,52 @@ Provides utilities for validating and working with IPv4 addresses.
 
 <br />
 
+## IeeeOuiMacAddressVendorLookup
+Looks up MAC address vendors offline, from the IEEE registry CSV files. Nothing is sent over the network.
+><b>Remarks:</b> Download the files from the IEEE Registration Authority (https://regauth.standards.ieee.org/standards-ra-web/pub/view.html): `oui.csv` (MA-L, 24-bit prefixes), `mam.csv` (MA-M, 28-bit) and `oui36.csv` (MA-S, 36-bit). `oui.csv` alone covers most devices.<br>When several files are loaded, the longest matching prefix wins, so a small block inside a larger one returns the small block's owner.
+
+>```csharp
+>public class IeeeOuiMacAddressVendorLookup : IMacAddressVendorLookup
+>```
+
+### Static Methods
+
+#### FromCsv
+>```csharp
+>IeeeOuiMacAddressVendorLookup FromCsv(TextReader[] csvReaders)
+>```
+><b>Summary:</b> Loads IEEE registry CSV content, with the columns Registry, Assignment, Organization Name and Organization Address.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`csvReaders`&nbsp;&nbsp;-&nbsp;&nbsp;The CSV content. The readers are read to the end but not disposed.<br />
+>
+><b>Returns:</b> The lookup.
+#### FromFiles
+>```csharp
+>IeeeOuiMacAddressVendorLookup FromFiles(string[] csvFilePaths)
+>```
+><b>Summary:</b> Loads IEEE registry CSV files, such as `oui.csv`, `mam.csv` and `oui36.csv`.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`csvFilePaths`&nbsp;&nbsp;-&nbsp;&nbsp;The files.<br />
+>
+><b>Returns:</b> The lookup.
+### Properties
+
+#### Count
+>```csharp
+>Count
+>```
+><b>Summary:</b> Gets the number of assignments loaded.
+### Methods
+
+#### LookupVendorName
+>```csharp
+>Task<string> LookupVendorName(string macAddress, CancellationToken cancellationToken = null)
+>```
+
+<br />
+
 ## InternetWorldTimeHelper
 Provides utilities for fetching the current time from the WorldTimeAPI.
 
@@ -226,6 +296,23 @@ Provides utilities for fetching the current time from the WorldTimeAPI.
 #### LookupVendorNameFromMacAddress
 >```csharp
 >Task<string> LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
+>```
+
+<br />
+
+## OnlineMacAddressVendorLookup
+Looks up MAC address vendors with the macvendors.com web service, through `Atc.Network.Helpers.MacAddressVendorLookupHelper`.
+><b>Remarks:</b> Each MAC address that is not cached yet is sent to macvendors.com, at most once every 1.2 seconds. Use `Atc.Network.Helpers.IeeeOuiMacAddressVendorLookup` to look up offline instead.
+
+>```csharp
+>public class OnlineMacAddressVendorLookup : IMacAddressVendorLookup
+>```
+
+### Methods
+
+#### LookupVendorName
+>```csharp
+>Task<string> LookupVendorName(string macAddress, CancellationToken cancellationToken = null)
 >```
 
 <br />

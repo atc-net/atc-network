@@ -130,6 +130,9 @@
 - [DnsLookupHelper](Atc.Network.Helpers.md#dnslookuphelper)
   -  Static Methods
      - GetHostname(IPAddress ipAddress, CancellationToken cancellationToken)
+- [IMacAddressVendorLookup](Atc.Network.Helpers.md#imacaddressvendorlookup)
+  -  Methods
+     - LookupVendorName(string macAddress, CancellationToken cancellationToken = null)
 - [IPv4AddressHelper](Atc.Network.Helpers.md#ipv4addresshelper)
   -  Static Methods
      - GetAddressesInRange(IPAddress ipAddress, int cidrLength)
@@ -138,6 +141,14 @@
      - GetLocalAddress()
      - IsValid(string ipAddress)
      - ValidateAddresses(IPAddress startIpAddress, IPAddress endIpAddress)
+- [IeeeOuiMacAddressVendorLookup](Atc.Network.Helpers.md#ieeeouimacaddressvendorlookup)
+  -  Static Methods
+     - FromCsv(TextReader[] csvReaders)
+     - FromFiles(string[] csvFilePaths)
+  -  Properties
+     - Count
+  -  Methods
+     - LookupVendorName(string macAddress, CancellationToken cancellationToken = null)
 - [InternetWorldTimeHelper](Atc.Network.Helpers.md#internetworldtimehelper)
   -  Static Methods
      - GetTimeForEuropeBerlin(CancellationToken cancellationToken)
@@ -145,6 +156,9 @@
 - [MacAddressVendorLookupHelper](Atc.Network.Helpers.md#macaddressvendorlookuphelper)
   -  Static Methods
      - LookupVendorNameFromMacAddress(string macAddress, CancellationToken cancellationToken = null)
+- [OnlineMacAddressVendorLookup](Atc.Network.Helpers.md#onlinemacaddressvendorlookup)
+  -  Methods
+     - LookupVendorName(string macAddress, CancellationToken cancellationToken = null)
 - [OpcUaAddressHelper](Atc.Network.Helpers.md#opcuaaddresshelper)
   -  Static Methods
      - IsValid(Uri uri, bool restrictToIp4Address = False)
