@@ -5,7 +5,7 @@ A real-world setup of Atc.Network: a TCP server and a UDP server, each with a cl
 | App | What it does |
 |-----|--------------|
 | `Showcase.TcpTestServer` | `TcpServer` as a hosted service on port 9100. Answers every line with `ack: <line>`. |
-| `Showcase.TcpTestClient` | `TcpClient` that sends `ping <n>` every 2 seconds and reconnects when the server goes away. |
+| `Showcase.TcpTestClient` | `TcpClient` that sends `ping <n>` every 2 seconds and reconnects when the server goes away. It uses `MessageFraming` to get one `DataReceived` per reply line. |
 | `Showcase.UdpTestServer` | `UdpServer` as a hosted service on port 9101. Answers every datagram with `ack: <text>`, sent back to the sender. |
 | `Showcase.UdpTestClient` | `UdpClient` that sends `ping <n>` every 2 seconds. |
 | `Showcase.ServiceDefaults` | Shared OpenTelemetry setup: logs, metrics and traces, exported to the dashboard. |

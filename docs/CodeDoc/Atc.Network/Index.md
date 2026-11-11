@@ -22,6 +22,7 @@
 - [NetworkTelemetry](Atc.Network.md#networktelemetry)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
+- [TcpMessageFraming](Atc.Network.md#tcpmessageframing)
 - [TcpServerClientEventArgs](Atc.Network.md#tcpserverclienteventargs)
 - [TcpServerDataReceivedEventArgs](Atc.Network.md#tcpserverdatareceivedeventargs)
 - [TerminationType](Atc.Network.md#terminationtype)

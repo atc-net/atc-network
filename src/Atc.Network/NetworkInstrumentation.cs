@@ -62,9 +62,15 @@ internal sealed class NetworkInstrumentation
 
     public void Received(int byteCount)
     {
-        NetworkTelemetry.BytesReceived.Add(byteCount, tags);
-        NetworkTelemetry.MessagesReceived.Add(1, tags);
+        BytesReceived(byteCount);
+        MessageReceived();
     }
+
+    public void BytesReceived(int byteCount)
+        => NetworkTelemetry.BytesReceived.Add(byteCount, tags);
+
+    public void MessageReceived()
+        => NetworkTelemetry.MessagesReceived.Add(1, tags);
 
     public void HandlerFailed(string eventName)
         => NetworkTelemetry.HandlerErrors.Add(1, WithTag(NetworkTelemetry.EventTag, eventName));

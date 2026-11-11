@@ -1,3 +1,4 @@
+global using System.Buffers.Binary;
 global using System.Collections.Concurrent;
 global using System.ComponentModel.DataAnnotations;
 global using System.Diagnostics;

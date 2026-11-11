@@ -343,6 +343,16 @@ Base configurations for `Atc.Network.Tcp.TcpClient`.
 >DefaultEncoding
 >```
 ><b>Summary:</b> Gets or sets the default encoding.
+#### MaxMessageSize
+>```csharp
+>MaxMessageSize
+>```
+><b>Summary:</b> Gets or sets the largest message, in bytes, that `Atc.Network.Tcp.TcpClientConfig.MessageFraming` accepts. A longer message is reported as a receive error and the connection is closed. The default is 16 MB.
+#### MessageFraming
+>```csharp
+>MessageFraming
+>```
+><b>Summary:</b> Gets or sets how the received byte stream is split into messages. The default, `Atc.Network.TcpMessageFraming.None`, raises `DataReceived` once per read.
 #### ReceiveBufferSize
 >```csharp
 >ReceiveBufferSize
@@ -548,6 +558,11 @@ This class contains default constant for `Atc.Network.Tcp.TcpClient` and `Atc.Ne
 >int DefaultConnectTimeout
 >```
 ><b>Summary:</b> The connect time-out value, in milliseconds (10 sec).
+#### DefaultMaxMessageSize
+>```csharp
+>int DefaultMaxMessageSize
+>```
+><b>Summary:</b> The largest message, in bytes, that message framing accepts (16 MB).
 #### DefaultReconnectRetryInterval
 >```csharp
 >int DefaultReconnectRetryInterval

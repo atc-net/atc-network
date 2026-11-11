@@ -66,7 +66,20 @@ public class TcpClientConfig
     /// </remarks>
     public SslClientAuthenticationOptions? SslOptions { get; set; }
 
+    /// <summary>
+    /// Gets or sets how the received byte stream is split into messages.
+    /// The default, <see cref="TcpMessageFraming.None"/>, raises <c>DataReceived</c> once per read.
+    /// </summary>
+    public TcpMessageFraming MessageFraming { get; set; } = TcpMessageFraming.None;
+
+    /// <summary>
+    /// Gets or sets the largest message, in bytes, that <see cref="MessageFraming"/> accepts.
+    /// A longer message is reported as a receive error and the connection is closed.
+    /// The default is 16 MB.
+    /// </summary>
+    public int MaxMessageSize { get; set; } = TcpConstants.DefaultMaxMessageSize;
+
     /// <inheritdoc />
     public override string ToString()
-        => $"{nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(SendTimeout)}: {SendTimeout}, {nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}";
+        => $"{nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(SendTimeout)}: {SendTimeout}, {nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}, {nameof(MessageFraming)}: {MessageFraming}, {nameof(MaxMessageSize)}: {MaxMessageSize}";
 }

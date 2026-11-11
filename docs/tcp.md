@@ -63,10 +63,34 @@ tcpClient.Dispose();
 | `DefaultEncoding` | ASCII | Default text encoding |
 | `TerminationType` | None | Appended to data you send, if it is not already there |
 | `SslOptions` | `null` | TLS options; `null` means plain TCP (see [TLS](#-tls)) |
+| `MessageFraming` | None | How received data is split into messages (see [What `DataReceived` delivers](#-what-datareceived-delivers)) |
+| `MaxMessageSize` | 16 MB | The largest message that `MessageFraming` accepts |
 
 ### 📥 What `DataReceived` delivers
 
-`TcpClient.DataReceived` is raised once per read from the socket, with the bytes of that read. TCP is a stream, so one read can hold part of a message, a whole message or several messages. `TerminationType` is not used to split received data on the client. If your protocol has message boundaries, collect the bytes and split them yourself.
+By default, `TcpClient.DataReceived` is raised once per read from the socket, with the bytes of that read. TCP is a stream, so one read can hold part of a message, a whole message or several messages.
+
+Set `MessageFraming` to get one `DataReceived` per message instead:
+
+| `MessageFraming` | Receiving | Sending |
+|------------------|-----------|---------|
+| `None` (default) | One event per read | Appends `TerminationType` |
+| `TerminationType` | Collects reads until `TerminationType`, then one event per message, including the terminator. Several messages in one read give several events | Appends `TerminationType` |
+| `LengthPrefix` | Each message starts with its length as a 4-byte big-endian integer. One event per message, without the length | Adds the length. `TerminationType` is not used |
+
+```csharp
+var tcpClient = new TcpClient(
+    logger,
+    "device.example.com",
+    4000,
+    new TcpClientConfig
+    {
+        TerminationType = TerminationType.LineFeed,
+        MessageFraming = TcpMessageFraming.TerminationType,
+    });
+```
+
+A message longer than `MaxMessageSize` (16 MB by default) is reported through `ErrorOccurred` as a `Receive` error with an `InvalidDataException`, and the connection is closed (and reconnected, if reconnect is on). Bytes of a message that was cut off by a dropped connection are discarded on reconnect.
 
 `TcpServer` is different: it collects reads until the data contains its `TerminationType`, then raises `DataReceived` once for the whole message.
 
