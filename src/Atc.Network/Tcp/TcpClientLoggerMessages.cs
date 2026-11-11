@@ -153,4 +153,22 @@ public partial class TcpClient
         string ipAddressOrHostName,
         int port,
         string errorMessage);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpClient.DataReceivedHandlerError,
+        Level = LogLevel.Error,
+        Message = "A DataReceived handler failed for data from {ipAddressOrHostName}:{port}.")]
+    private partial void LogDataReceivedHandlerError(
+        string ipAddressOrHostName,
+        int port,
+        Exception exception);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpClient.DataReceiverUnexpectedError,
+        Level = LogLevel.Error,
+        Message = "Unexpected error in the data receiver for {ipAddressOrHostName}:{port}.")]
+    private partial void LogDataReceiverUnexpectedError(
+        string ipAddressOrHostName,
+        int port,
+        Exception exception);
 }

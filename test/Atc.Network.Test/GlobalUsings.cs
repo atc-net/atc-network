@@ -1,3 +1,4 @@
+global using System.Collections.Concurrent;
 global using System.Diagnostics;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Globalization;
@@ -10,11 +11,13 @@ global using Atc.Network.Data;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
 global using Atc.Network.Tcp;
+global using Atc.Network.Test.TestHelpers;
 global using Atc.Network.Udp;
 global using Atc.Network.Vnc;
 global using Atc.Network.Vnc.Encodings;
 global using Atc.Network.Vnc.Enums;
 global using Atc.Network.Vnc.IO;
 global using Atc.XUnit;
+global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
 global using Xunit.Abstractions;

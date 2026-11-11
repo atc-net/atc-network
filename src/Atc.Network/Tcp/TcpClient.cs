@@ -418,8 +418,32 @@ public partial class TcpClient : ITcpClient
 
     private void InvokeDataReceived(byte[] data)
     {
-        DataReceived?.Invoke(data);
-        OnDataReceived(data);
+        // Call each handler on its own, so one failing handler
+        // neither skips the others nor stops the receive loop.
+        var handlers = DataReceived;
+        if (handlers is not null)
+        {
+            foreach (var handler in handlers.GetInvocationList().Cast<Action<byte[]>>())
+            {
+                InvokeDataReceivedHandler(handler, data);
+            }
+        }
+
+        InvokeDataReceivedHandler(OnDataReceived, data);
+    }
+
+    private void InvokeDataReceivedHandler(
+        Action<byte[]> handler,
+        byte[] data)
+    {
+        try
+        {
+            handler(data);
+        }
+        catch (Exception ex)
+        {
+            LogDataReceivedHandlerError(IPAddressOrHostname, Port, ex);
+        }
     }
 
     [SuppressMessage("Design", "MA0051:Method is too long", Justification = "OK.")]
@@ -638,7 +662,41 @@ public partial class TcpClient : ITcpClient
                 continue;
             }
 
-            await HandleReadDataTaskResponse(ReadData(cancellationToken));
+            try
+            {
+                await HandleReadDataTaskResponse(ReadData(cancellationToken));
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                await HandleDataReceiverUnexpectedError(ex);
+            }
+        }
+    }
+
+    private async Task HandleDataReceiverUnexpectedError(Exception exception)
+    {
+        LogDataReceiverUnexpectedError(IPAddressOrHostname, Port, exception);
+
+        try
+        {
+            if (clientReconnectConfig.Enable)
+            {
+                await SetDisconnected(raiseEvents: true, dispose: false);
+                await DoReconnect();
+            }
+            else
+            {
+                await SetDisconnected(raiseEvents: true, dispose: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            // An event handler may throw while we recover; log it so the loop keeps running.
+            LogDataReceiverUnexpectedError(IPAddressOrHostname, Port, ex);
         }
     }
 
