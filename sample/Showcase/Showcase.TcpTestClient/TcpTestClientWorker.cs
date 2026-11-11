@@ -42,6 +42,9 @@ internal sealed partial class TcpTestClientWorker(
             LogReplyReceived(reply);
         };
 
+        // Errors the client handled and logged itself, such as a failing handler or a failed read.
+        tcpClient.ErrorOccurred += (_, e) => LogNetworkError(e.Kind, e.EventName, e.Exception);
+
         await ConnectUntilConnected(tcpClient, stoppingToken);
 
         var counter = 0;
@@ -103,4 +106,7 @@ internal sealed partial class TcpTestClientWorker(
 
     [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "Could not send \"{message}\": {reason}")]
     private partial void LogPingFailed(string message, string reason);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "TCP client reported a {kind} error (event: {eventName})")]
+    private partial void LogNetworkError(NetworkErrorKind kind, string? eventName, Exception exception);
 }

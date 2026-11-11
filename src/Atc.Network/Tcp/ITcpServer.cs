@@ -23,6 +23,12 @@ public interface ITcpServer : IHostedService, IDisposable
     event EventHandler<TcpServerClientEventArgs>? ClientDisconnected;
 
     /// <summary>
+    /// Event to raise when an error was handled and logged, so the server keeps running:
+    /// an event handler that threw, a client connection that failed, or the listener stopping. A handler of this event that throws is only logged.
+    /// </summary>
+    event EventHandler<NetworkErrorEventArgs>? ErrorOccurred;
+
+    /// <summary>
     /// IPAddress for server connection.
     /// </summary>
     IPAddress IpAddress { get; }

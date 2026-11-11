@@ -34,6 +34,29 @@ Each subscriber is called on its own. If one throws:
 
 The same applies to the `On…` methods you can override in a subclass.
 
+### 🚨 Reacting to errors in code
+
+A log line is not something your code can react to. `TcpClient`, `UdpClient`, `TcpServer` and `UdpServer` therefore also raise `ErrorOccurred` for every error they handle and keep running after:
+
+```csharp
+tcpClient.ErrorOccurred += (_, e) =>
+{
+    // e.Kind: EventHandler, Receive, ClientConnection or Listener
+    // e.EventName: the event whose handler threw, for EventHandler
+    // e.Exception: what went wrong
+    errorCounter.Increment(e.Kind);
+};
+```
+
+| Kind | Raised when | Raised by |
+|------|-------------|-----------|
+| `EventHandler` | An event handler or `On…` override threw | All four |
+| `Receive` | A read failed, for example a reset connection, or a UDP "port unreachable" | `TcpClient`, `UdpClient`, `UdpServer` |
+| `ClientConnection` | The server could not serve one client, for example a failed TLS handshake | `TcpServer` |
+| `Listener` | The listener stopped unexpectedly and no more clients are accepted | `TcpServer` |
+
+A handler of `ErrorOccurred` that throws is only logged, so it can't cause another `ErrorOccurred`.
+
 ### ⚠️ `async` handlers
 
 An `async` lambda used as an event handler runs as `async void`. Only the code before its first `await` runs inside the library's `try/catch`. An exception after the first `await` is not caught by the library and can end the process. Catch exceptions inside `async` handlers yourself:

@@ -35,6 +35,9 @@ internal sealed partial class UdpTestClientWorker(
             LogReplyReceived(reply);
         };
 
+        // For example a receive error while the server is down: the datagram is answered with "port unreachable".
+        udpClient.ErrorOccurred += (_, e) => LogNetworkError(e.Kind, e.EventName, e.Exception);
+
         while (!stoppingToken.IsCancellationRequested &&
                !await udpClient.Connect(stoppingToken))
         {
@@ -63,4 +66,7 @@ internal sealed partial class UdpTestClientWorker(
 
     [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "Received \"{message}\"")]
     private partial void LogReplyReceived(string message);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "UDP client reported a {kind} error (event: {eventName})")]
+    private partial void LogNetworkError(NetworkErrorKind kind, string? eventName, Exception exception);
 }

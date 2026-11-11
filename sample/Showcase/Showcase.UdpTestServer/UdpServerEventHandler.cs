@@ -13,14 +13,21 @@ internal sealed partial class UdpServerEventHandler(
     public Task StartAsync(CancellationToken cancellationToken)
     {
         udpServer.DatagramReceived += OnDatagramReceived;
+        udpServer.ErrorOccurred += OnErrorOccurred;
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
         udpServer.DatagramReceived -= OnDatagramReceived;
+        udpServer.ErrorOccurred -= OnErrorOccurred;
         return Task.CompletedTask;
     }
+
+    private void OnErrorOccurred(
+        object? sender,
+        NetworkErrorEventArgs e)
+        => LogNetworkError(e.Kind, e.EventName, e.Exception);
 
     private void OnDatagramReceived(
         object? sender,
@@ -53,4 +60,7 @@ internal sealed partial class UdpServerEventHandler(
 
     [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "Reply to {sender} failed")]
     private partial void LogReplyFailed(IPEndPoint sender, Exception exception);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "UDP server reported a {kind} error (event: {eventName})")]
+    private partial void LogNetworkError(NetworkErrorKind kind, string? eventName, Exception exception);
 }

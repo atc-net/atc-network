@@ -16,6 +16,12 @@ public interface IUdpServer : IHostedService, IDisposable
     event EventHandler<UdpDatagramReceivedEventArgs>? DatagramReceived;
 
     /// <summary>
+    /// Event to raise when an error was handled and logged, so the server keeps running:
+    /// an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
+    /// </summary>
+    event EventHandler<NetworkErrorEventArgs>? ErrorOccurred;
+
+    /// <summary>
     /// Is running.
     /// </summary>
     bool IsRunning { get; }

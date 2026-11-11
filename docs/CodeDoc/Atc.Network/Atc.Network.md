@@ -219,6 +219,58 @@ Provides extension methods for the `System.Net.NetworkInformation.IPStatus` enum
 
 <br />
 
+## NetworkErrorEventArgs
+Event data for an error that a client or server handled and logged, so it did not stop.
+
+>```csharp
+>public class NetworkErrorEventArgs : EventArgs
+>```
+
+### Properties
+
+#### EventName
+>```csharp
+>EventName
+>```
+><b>Summary:</b> Gets the event whose handler threw, such as "DataReceived", for `Atc.Network.NetworkErrorKind.EventHandler`; otherwise <see langword="null" />.
+#### Exception
+>```csharp
+>Exception
+>```
+><b>Summary:</b> Gets the exception.
+#### Kind
+>```csharp
+>Kind
+>```
+><b>Summary:</b> Gets where the error came from.
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
+
+<br />
+
+## NetworkErrorKind
+Where an error reported by an `ErrorOccurred` event came from.
+
+>```csharp
+>public enum NetworkErrorKind
+>```
+
+
+| Value | Name | Description | Summary | 
+| --- | --- | --- | --- | 
+| 0 | EventHandler | Event Handler | An event handler, or an `On…` override, threw. `Atc.Network.NetworkErrorEventArgs.EventName` names the event. The client or server keeps running. | 
+| 1 | Receive | Receive | Receiving failed, for example because the connection was reset. | 
+| 2 | ClientConnection | Client Connection | A server could not serve one client, for example because its TLS handshake failed. The server keeps serving the other clients. | 
+| 3 | Listener | Listener | A server's listener stopped unexpectedly. The server no longer accepts clients. | 
+
+
+
+<br />
+
 ## NetworkQualityCategoryType
 Enumeration: NetworkQualityCategoryType.
 

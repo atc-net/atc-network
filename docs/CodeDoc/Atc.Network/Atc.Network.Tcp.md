@@ -53,6 +53,11 @@ This is a interface for `Atc.Network.Tcp.TcpClient`.
 >Disconnected
 >```
 ><b>Summary:</b> Event to raise when connection is destroyed.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the client keeps running: an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
 #### NoDataReceived
 >```csharp
 >NoDataReceived
@@ -163,6 +168,11 @@ This is a interface for `Atc.Network.Tcp.TcpClient`.
 >DataReceived
 >```
 ><b>Summary:</b> Event to raise when data has become available from the server.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the server keeps running: an event handler that threw, a client connection that failed, or the listener stopping. A handler of this event that throws is only logged.
 ### Methods
 
 #### Send
@@ -238,6 +248,11 @@ The main TcpClient - Handles call execution.
 >Disconnected
 >```
 ><b>Summary:</b> Event to raise when connection is destroyed.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the client keeps running: an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
 #### NoDataReceived
 >```csharp
 >NoDataReceived
@@ -600,6 +615,11 @@ The main TcpServer - Handles call execution.
 >DataReceived
 >```
 ><b>Summary:</b> Event to raise when a message is received from any client.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the server keeps running: an event handler that threw, a client connection that failed, or the listener stopping. A handler of this event that throws is only logged.
 ### Methods
 
 #### Dispose

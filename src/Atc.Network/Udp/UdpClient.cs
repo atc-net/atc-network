@@ -45,6 +45,12 @@ public partial class UdpClient : IUdpClient
     /// </summary>
     public event Action<byte[]>? DataReceived;
 
+    /// <summary>
+    /// Event to raise when an error was handled and logged, so the client keeps running:
+    /// an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
+    /// </summary>
+    public event EventHandler<NetworkErrorEventArgs>? ErrorOccurred;
+
     private UdpClient(
         ILogger logger,
         UdpClientConfig? clientConfig)
@@ -360,6 +366,36 @@ public partial class UdpClient : IUdpClient
         Instrumentation.SetConnected(value);
     }
 
+    /// <summary>
+    /// Raises <see cref="ErrorOccurred"/>. Each subscriber is called on its own; one that throws is only logged,
+    /// so an error handler can't cause another error.
+    /// </summary>
+    private void InvokeError(
+        NetworkErrorKind kind,
+        Exception exception,
+        string? eventName = null)
+    {
+        var handlers = ErrorOccurred;
+        if (handlers is null)
+        {
+            return;
+        }
+
+        var eventArgs = new NetworkErrorEventArgs(kind, exception, eventName);
+        foreach (var handler in handlers.GetInvocationList().Cast<EventHandler<NetworkErrorEventArgs>>())
+        {
+            try
+            {
+                handler(this, eventArgs);
+            }
+            catch (Exception ex)
+            {
+                LogEventHandlerError(remoteEndPointAddressStr, RemoteEndPoint.Port, nameof(ErrorOccurred), ex);
+                Instrumentation.HandlerFailed(nameof(ErrorOccurred));
+            }
+        }
+    }
+
     private void InvokeHandler(
         string eventName,
         Action invoke)
@@ -372,6 +408,7 @@ public partial class UdpClient : IUdpClient
         {
             LogEventHandlerError(remoteEndPointAddressStr, RemoteEndPoint.Port, eventName, ex);
             Instrumentation.HandlerFailed(eventName);
+            InvokeError(NetworkErrorKind.EventHandler, ex, eventName);
         }
     }
 
@@ -403,6 +440,7 @@ public partial class UdpClient : IUdpClient
         {
             LogDataReceivedHandlerError(remoteEndPointAddressStr, RemoteEndPoint.Port, ex);
             Instrumentation.HandlerFailed(nameof(DataReceived));
+            InvokeError(NetworkErrorKind.EventHandler, ex, nameof(DataReceived));
         }
     }
 
@@ -588,8 +626,15 @@ public partial class UdpClient : IUdpClient
         {
             res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, RemoteEndPoint);
         }
-        catch
+        catch (Exception ex)
         {
+            // Errors caused by disconnecting or disposing the client are expected; report the others.
+            if (ex is not (OperationCanceledException or ObjectDisposedException) &&
+                !ex.IsKnownExceptionForConsumerDisposed().IsKnownSocketException)
+            {
+                InvokeError(NetworkErrorKind.Receive, ex);
+            }
+
             return;
         }
 

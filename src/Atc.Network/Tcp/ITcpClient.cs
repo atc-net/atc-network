@@ -32,6 +32,12 @@ public interface ITcpClient : IDisposable
     event Action<byte[]>? DataReceived;
 
     /// <summary>
+    /// Event to raise when an error was handled and logged, so the client keeps running:
+    /// an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
+    /// </summary>
+    event EventHandler<NetworkErrorEventArgs>? ErrorOccurred;
+
+    /// <summary>
     /// IPAddress or hostname for server connection.
     /// </summary>
     string IPAddressOrHostname { get; }
