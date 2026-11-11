@@ -180,6 +180,15 @@
      - ConvertToBytes(TerminationType terminationType)
      - ConvertToString(TerminationType terminationType)
      - HasTerminationType(TerminationType terminationType, byte[] data)
+- [WakeOnLanHelper](Atc.Network.Helpers.md#wakeonlanhelper)
+  -  Static Fields
+     - int DefaultPort
+  -  Static Properties
+     - DefaultEndPoint
+  -  Static Methods
+     - CreateMagicPacket(PhysicalAddress macAddress, byte[] secureOnPassword = null)
+     - CreateMagicPacket(string macAddress, byte[] secureOnPassword = null)
+     - SendMagicPacket(string macAddress, IPEndPoint endPoint = null, byte[] secureOnPassword = null, CancellationToken cancellationToken = null)
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
 

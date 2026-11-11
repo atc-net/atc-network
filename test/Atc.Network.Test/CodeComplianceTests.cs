@@ -31,6 +31,9 @@ public class CodeComplianceTests
 
         // Covered by IeeeOuiMacAddressVendorLookupTests, but only from async tests, which this check does not see.
         typeof(IeeeOuiMacAddressVendorLookup),
+
+        // SendMagicPacket is covered by WakeOnLanHelperTests, but only from async tests, which this check does not see.
+        typeof(WakeOnLanHelper),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)
