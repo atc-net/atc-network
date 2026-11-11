@@ -155,6 +155,7 @@ ConnectionStateEventArgs.
 | 7 | MacVendor | Mac Vendor |  | 
 | 8 | Tcp | Tcp |  | 
 | 9 | ServiceHttp | Service Http |  | 
+| 10 | NetBiosName | Net Bios Name |  | 
 
 
 

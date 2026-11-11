@@ -36,6 +36,12 @@ public class IPScanResult
     public IList<SsdpDevice> SsdpDevices { get; set; } = new List<SsdpDevice>();
 
     /// <summary>
+    /// Gets or sets the NetBIOS names and MAC address the address reported, when <see cref="IPScannerConfig.ResolveNetBiosName"/>
+    /// is on and it answered; otherwise <see langword="null"/>.
+    /// </summary>
+    public NetBiosNodeStatus? NetBiosStatus { get; set; }
+
+    /// <summary>
     /// Gets the host name the address announces with mDNS, such as "printer.local", or <see langword="null"/>.
     /// It often names devices that reverse DNS (<see cref="Hostname"/>) does not know.
     /// </summary>
@@ -64,7 +70,8 @@ public class IPScanResult
            !string.IsNullOrEmpty(MacAddress) ||
            OpenPortNumbers.Any() ||
            MdnsServices.Count > 0 ||
-           SsdpDevices.Count > 0;
+           SsdpDevices.Count > 0 ||
+           NetBiosStatus is not null;
 
     public override string ToString()
     {
@@ -75,9 +82,8 @@ public class IPScanResult
 
         if (HasConnection)
         {
-            var hostname = string.IsNullOrEmpty(Hostname)
-                ? MdnsHostName
-                : Hostname;
+            var hostname = new[] { Hostname, MdnsHostName, NetBiosStatus?.ComputerName }
+                .FirstOrDefault(x => !string.IsNullOrEmpty(x));
             if (!string.IsNullOrEmpty(hostname))
             {
                 sb.Append(hostname);

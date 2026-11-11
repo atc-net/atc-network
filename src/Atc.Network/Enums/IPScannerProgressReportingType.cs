@@ -13,4 +13,5 @@ public enum IPScannerProgressReportingType
     MacVendor,
     Tcp,
     ServiceHttp,
+    NetBiosName,
 }

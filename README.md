@@ -12,7 +12,7 @@ A .NET 10 library for network communication, scanning, and remote desktop — ba
 |---|---|
 | 🔌 **TCP & UDP** | Event-driven clients and servers with auto-reconnect, keep-alive, optional TLS, and configurable timeouts |
 | 🖥️ **VNC Client** | Cross-platform RFB protocol client — Raw, CopyRect, RRE, CoRRE, Hextile, ZRLE encodings |
-| 🔍 **IP Scanning** | Scan ranges or CIDR blocks with ICMP ping, hostname/MAC resolution, vendor lookup, and port scanning |
+| 🔍 **IP Scanning** | Scan ranges or CIDR blocks with ICMP ping, hostname/NetBIOS/MAC resolution, vendor lookup, and port scanning |
 | ⏰ **Wake-on-LAN** | Wake sleeping devices with a magic packet, by broadcast or to a chosen subnet |
 | 🕰️ **NTP Time** | Get the time from an NTP server, with the local clock's offset and the round-trip delay |
 | 📡 **Service Discovery** | Find printers, cameras, speakers, TVs and other devices with mDNS / DNS-SD and SSDP (UPnP) |
@@ -82,7 +82,7 @@ var results = await scanner.ScanRange(
 | [🔌 TCP Client & Server](docs/tcp.md) | Connections, TLS, reconnection, keep-alive, events |
 | [📡 UDP Client & Server](docs/udp.md) | Datagram communication, hosted server |
 | [🖥️ VNC Client](docs/vnc.md) | Remote desktop, encodings, pixel data, input forwarding |
-| [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, ARP, MAC vendor lookup |
+| [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, NetBIOS, ARP, MAC vendor lookup |
 | [⏰ Wake-on-LAN](docs/wake-on-lan.md) | Magic packets, subnet broadcast, SecureOn password |
 | [🕰️ NTP Time](docs/ntp.md) | Server time, clock offset, round-trip delay, time zones |
 | [📡 Service Discovery](docs/discovery.md) | mDNS / DNS-SD and SSDP (UPnP), in the IP scanner too |

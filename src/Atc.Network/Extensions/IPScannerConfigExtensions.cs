@@ -19,6 +19,11 @@ public static class IPScannerConfigExtensions
             count++;
         }
 
+        if (ipScannerConfig.ResolveNetBiosName)
+        {
+            count++;
+        }
+
         if (ipScannerConfig.ResolveMacAddress)
         {
             count++;
