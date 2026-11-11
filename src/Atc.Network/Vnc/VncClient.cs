@@ -27,7 +27,6 @@ public partial class VncClient : IVncClient
     private CancellationTokenSource? cancellationTokenSource;
     private Task? updateListenerTask;
     private string? storedPassword;
-    private int reconnectRetryCounter;
     private bool isConnected;
 
     /// <summary>
@@ -932,43 +931,41 @@ public partial class VncClient : IVncClient
         }
     }
 
+    /// <summary>
+    /// Tries to reconnect: one first attempt plus up to RetryMaxAttempts retries, RetryInterval apart.
+    /// Each reconnect cycle starts its own attempt count.
+    /// </summary>
     private async Task DoReconnect()
     {
-        LogReconnecting(IPAddressOrHostname, Port);
-        InvokeConnectionStateChanged(ConnectionState.Reconnecting);
-
-        DisposeCancellationTokenAndTask();
-        CleanupTcpClient();
-        IsConnected = false;
-
-        await Task.Delay(clientReconnectConfig.RetryInterval, CancellationToken.None);
-
-        if (await DoConnectAuthenticateAndInitialize())
+        for (var attempt = 0; attempt <= clientReconnectConfig.RetryMaxAttempts; attempt++)
         {
-            reconnectRetryCounter = 0;
-            LogReconnected(IPAddressOrHostname, Port);
-            InvokeConnectionStateChanged(ConnectionState.Reconnected);
-        }
-        else
-        {
-            if (reconnectRetryCounter < clientReconnectConfig.RetryMaxAttempts)
+            LogReconnecting(IPAddressOrHostname, Port);
+            InvokeConnectionStateChanged(ConnectionState.Reconnecting);
+
+            DisposeCancellationTokenAndTask();
+            CleanupTcpClient();
+            IsConnected = false;
+
+            await Task.Delay(clientReconnectConfig.RetryInterval, CancellationToken.None);
+
+            if (await DoConnectAuthenticateAndInitialize())
             {
-                LogReconnectionWarning(IPAddressOrHostname, Port, reconnectRetryCounter, clientReconnectConfig.RetryMaxAttempts);
-                InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
-
-                reconnectRetryCounter++;
-
-                // ReSharper disable once TailRecursiveCall
-                await DoReconnect();
+                LogReconnected(IPAddressOrHostname, Port);
+                InvokeConnectionStateChanged(ConnectionState.Reconnected);
+                return;
             }
-            else
+
+            if (attempt < clientReconnectConfig.RetryMaxAttempts)
             {
-                LogReconnectionMaxRetryExceededError(IPAddressOrHostname, Port);
+                LogReconnectionWarning(IPAddressOrHostname, Port, attempt, clientReconnectConfig.RetryMaxAttempts);
                 InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
-                InvokeDisconnected();
-                ConnectionLost?.Invoke();
             }
         }
+
+        LogReconnectionMaxRetryExceededError(IPAddressOrHostname, Port);
+        InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
+        InvokeDisconnected();
+        ConnectionLost?.Invoke();
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK - reconnect must not throw.")]
