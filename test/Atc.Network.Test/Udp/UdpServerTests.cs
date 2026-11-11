@@ -134,6 +134,32 @@ public sealed class UdpServerTests
         await udpServer.StopAsync(CancellationToken.None);
     }
 
+    [Fact]
+    public async Task DatagramReceived_CarriesSenderEndPoint_SoTheServerCanReply()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var udpServer = new UdpServer(NullLogger.Instance, IPAddress.Loopback, port);
+
+        string? receivedText = null;
+        udpServer.DatagramReceived += async (_, e) =>
+        {
+            receivedText = Encoding.ASCII.GetString(e.Data.Span);
+            await udpServer.Send(e.RemoteEndPoint, "reply", CancellationToken.None);
+        };
+
+        await udpServer.StartAsync(CancellationToken.None);
+
+        // Act
+        var reply = await SendAndReceiveReply(port, "hello");
+
+        // Assert
+        Assert.Equal("hello", receivedText);
+        Assert.Equal("reply", reply);
+
+        await udpServer.StopAsync(CancellationToken.None);
+    }
+
     private static int GetFreePort()
     {
         using var probe = new System.Net.Sockets.UdpClient(new IPEndPoint(IPAddress.Loopback, 0));

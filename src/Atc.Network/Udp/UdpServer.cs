@@ -24,6 +24,11 @@ public partial class UdpServer : IUdpServer
     /// </summary>
     public event Action<byte[]>? DataReceived;
 
+    /// <summary>
+    /// Event to raise when a datagram is received, with the endpoint that sent it.
+    /// </summary>
+    public event EventHandler<UdpDatagramReceivedEventArgs>? DatagramReceived;
+
     private UdpServer(
         ILogger logger,
         UdpServerConfig? serverConfig)
@@ -257,7 +262,9 @@ public partial class UdpServer : IUdpServer
         }
     }
 
-    private void InvokeDataReceived(byte[] data)
+    private void InvokeDataReceived(
+        byte[] data,
+        IPEndPoint remoteEndPoint)
     {
         // Call each handler on its own, so one failing handler
         // neither skips the others nor stops the receive loop.
@@ -266,20 +273,28 @@ public partial class UdpServer : IUdpServer
         {
             foreach (var handler in handlers.GetInvocationList().Cast<Action<byte[]>>())
             {
-                InvokeDataReceivedHandler(handler, data);
+                InvokeHandler(() => handler(data));
             }
         }
 
-        InvokeDataReceivedHandler(OnDataReceived, data);
+        var datagramHandlers = DatagramReceived;
+        if (datagramHandlers is not null)
+        {
+            var eventArgs = new UdpDatagramReceivedEventArgs(data, remoteEndPoint);
+            foreach (var handler in datagramHandlers.GetInvocationList().Cast<EventHandler<UdpDatagramReceivedEventArgs>>())
+            {
+                InvokeHandler(() => handler(this, eventArgs));
+            }
+        }
+
+        InvokeHandler(() => OnDataReceived(data));
     }
 
-    private void InvokeDataReceivedHandler(
-        Action<byte[]> handler,
-        byte[] data)
+    private void InvokeHandler(Action invoke)
     {
         try
         {
-            handler(data);
+            invoke();
         }
         catch (Exception ex)
         {
@@ -341,7 +356,7 @@ public partial class UdpServer : IUdpServer
         Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
 
         LogDataReceived(receivedBytes.Length);
-        InvokeDataReceived(receivedBytes);
+        InvokeDataReceived(receivedBytes, (IPEndPoint)res.RemoteEndPoint);
 
         if (!serverConfig.RespondToPing && !serverConfig.EchoOnReceivedData)
         {

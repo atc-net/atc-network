@@ -88,6 +88,18 @@ await udpServer.Send(
     CancellationToken.None);
 ```
 
+To reply to whoever sent a datagram, use `DatagramReceived`. It carries the data and the sender's endpoint:
+
+```csharp
+udpServer.DatagramReceived += async (_, e) =>
+{
+    Console.WriteLine($"📥 {e.Data.Length} bytes from {e.RemoteEndPoint}");
+    await udpServer.Send(e.RemoteEndPoint, "ack", CancellationToken.None);
+};
+```
+
+A handler that throws is logged and does not stop the server.
+
 ### ⚙️ Server Configuration
 
 `UdpServerConfig` adds two automatic replies to the settings above. Both are off by default.

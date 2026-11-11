@@ -11,6 +11,11 @@ public interface IUdpServer : IHostedService, IDisposable
     event Action<byte[]>? DataReceived;
 
     /// <summary>
+    /// Event to raise when a datagram is received, with the endpoint that sent it.
+    /// </summary>
+    event EventHandler<UdpDatagramReceivedEventArgs>? DatagramReceived;
+
+    /// <summary>
     /// Is running.
     /// </summary>
     bool IsRunning { get; }

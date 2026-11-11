@@ -344,6 +344,34 @@ Enumeration: NetworkQualityCategoryType.
 
 <br />
 
+## UdpDatagramReceivedEventArgs
+Event data for a datagram received by a UDP server, including who sent it.
+
+>```csharp
+>public class UdpDatagramReceivedEventArgs : EventArgs
+>```
+
+### Properties
+
+#### Data
+>```csharp
+>Data
+>```
+><b>Summary:</b> Gets the received data.
+#### RemoteEndPoint
+>```csharp
+>RemoteEndPoint
+>```
+><b>Summary:</b> Gets the endpoint that sent the datagram. Use it as the recipient to reply.
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
+
+<br />
+
 ## UshortExtensions
 Extension methods for <see langword="ushort" />
 
