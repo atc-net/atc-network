@@ -18,7 +18,7 @@ public class TerminationTypeHelperTests
     [InlineData(new byte[] { }, TerminationType.None)]
     [InlineData(new byte[] { 0x0A }, TerminationType.LineFeed)]
     [InlineData(new byte[] { 0x0D }, TerminationType.CarriageReturn)]
-    [InlineData(new byte[] { 0x0A, 0x0D }, TerminationType.CarriageReturnLineFeed)]
+    [InlineData(new byte[] { 0x0D, 0x0A }, TerminationType.CarriageReturnLineFeed)]
     [InlineData(new byte[] { 0x03 }, TerminationType.EndOfText)]
     [InlineData(new byte[] { 0x04 }, TerminationType.EndOfTransmission)]
     public void ConvertToBytes(
