@@ -98,7 +98,7 @@ udpServer.DatagramReceived += async (_, e) =>
 };
 ```
 
-A handler that throws is logged and does not stop the server.
+A handler that throws is logged and does not stop the server. An `async` handler runs as `async void`, so an exception after its first `await` is not caught by the server and can end the process. Catch exceptions inside `async` handlers yourself.
 
 ### ⚙️ Server Configuration
 
