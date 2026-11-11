@@ -116,5 +116,5 @@ public class IPScannerConfig
     }
 
     public override string ToString()
-        => $"{nameof(IcmpPing)}: {IcmpPing}, {nameof(ResolveHostName)}: {ResolveHostName}, {nameof(ResolveMacAddress)}: {ResolveMacAddress}, {nameof(ResolveVendorFromMacAddress)}: {ResolveVendorFromMacAddress}, {nameof(PortNumbers)}: {PortNumbers}, {nameof(TreatOpenPortsAsWebServices)}: {TreatOpenPortsAsWebServices}";
+        => $"{nameof(Timeout)}: {Timeout}, {nameof(TimeoutPing)}: {TimeoutPing}, {nameof(TimeoutTcp)}: {TimeoutTcp}, {nameof(TimeoutHttp)}: {TimeoutHttp}, {nameof(IcmpPing)}: {IcmpPing}, {nameof(ResolveHostName)}: {ResolveHostName}, {nameof(ResolveMacAddress)}: {ResolveMacAddress}, {nameof(ResolveVendorFromMacAddress)}: {ResolveVendorFromMacAddress}, {nameof(PortNumbers)}: {PortNumbers.Count} ports, {nameof(TreatOpenPortsAsWebServices)}: {TreatOpenPortsAsWebServices}";
 }

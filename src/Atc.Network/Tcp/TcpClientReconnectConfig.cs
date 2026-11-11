@@ -41,5 +41,5 @@ public class TcpClientReconnectConfig
 
     /// <inheritdoc />
     public override string ToString()
-        => $"{nameof(Enable)}: {Enable}, {nameof(RetryInterval)}: {RetryInterval}";
+        => $"{nameof(Enable)}: {Enable}, {nameof(RetryInterval)}: {RetryInterval}, {nameof(RetryMaxAttempts)}: {RetryMaxAttempts}";
 }

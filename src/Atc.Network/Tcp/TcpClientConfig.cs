@@ -81,5 +81,5 @@ public class TcpClientConfig
 
     /// <inheritdoc />
     public override string ToString()
-        => $"{nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(SendTimeout)}: {SendTimeout}, {nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}, {nameof(MessageFraming)}: {MessageFraming}, {nameof(MaxMessageSize)}: {MaxMessageSize}";
+        => $"{nameof(ConnectTimeout)}: {ConnectTimeout}, {nameof(SendTimeout)}: {SendTimeout}, {nameof(SendBufferSize)}: {SendBufferSize}, {nameof(ReceiveTimeout)}: {ReceiveTimeout}, {nameof(ReceiveBufferSize)}: {ReceiveBufferSize}, {nameof(DefaultEncoding)}: {DefaultEncoding}, {nameof(TerminationType)}: {TerminationType}, {nameof(SslOptions)}: {(SslOptions is null ? "None" : "Set")}, {nameof(MessageFraming)}: {MessageFraming}, {nameof(MaxMessageSize)}: {MaxMessageSize}";
 }
