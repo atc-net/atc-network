@@ -23,7 +23,6 @@ public partial class TcpClient : ITcpClient
 
     private readonly int syncLockConnectTimeoutInMs;
     private readonly int syncLockSendTimeoutInMs;
-    private int reconnectRetryCounter;
     private CancellationTokenSource? cancellationTokenSource;
     private CancellationTokenRegistration? cancellationTokenRegistration;
     private Task? receiveListenerTask;
@@ -525,39 +524,37 @@ public partial class TcpClient : ITcpClient
         return SetDisconnected(raiseEvents: raiseEventsAndLog, dispose: dispose, cancellationToken: CancellationToken.None);
     }
 
+    /// <summary>
+    /// Tries to reconnect: one first attempt plus up to RetryMaxAttempts retries, RetryInterval apart.
+    /// Each reconnect cycle starts its own attempt count.
+    /// </summary>
     private async Task DoReconnect()
     {
-        LogReconnecting(IPAddressOrHostname, Port);
-        InvokeConnectionStateChanged(ConnectionState.Reconnecting);
-
-        await SetDisconnected(raiseEvents: false, dispose: false, cancellationToken: CancellationToken.None);
-
-        await Task.Delay(clientReconnectConfig.RetryInterval, CancellationToken.None);
-
-        if (await DoConnect(raiseEventsAndLog: false, CancellationToken.None))
+        for (var attempt = 0; attempt <= clientReconnectConfig.RetryMaxAttempts; attempt++)
         {
-            reconnectRetryCounter = 0;
-            LogReconnected(IPAddressOrHostname, Port);
-            InvokeConnectionStateChanged(ConnectionState.Reconnected);
-        }
-        else
-        {
-            if (reconnectRetryCounter < clientReconnectConfig.RetryMaxAttempts)
+            LogReconnecting(IPAddressOrHostname, Port);
+            InvokeConnectionStateChanged(ConnectionState.Reconnecting);
+
+            await SetDisconnected(raiseEvents: false, dispose: false, cancellationToken: CancellationToken.None);
+
+            await Task.Delay(clientReconnectConfig.RetryInterval, CancellationToken.None);
+
+            if (await DoConnect(raiseEventsAndLog: false, CancellationToken.None))
             {
-                LogReconnectionWarning(IPAddressOrHostname, Port, reconnectRetryCounter, clientReconnectConfig.RetryMaxAttempts);
-                InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
-
-                reconnectRetryCounter++;
-
-                // ReSharper disable once TailRecursiveCall
-                await DoReconnect();
+                LogReconnected(IPAddressOrHostname, Port);
+                InvokeConnectionStateChanged(ConnectionState.Reconnected);
+                return;
             }
-            else
+
+            if (attempt < clientReconnectConfig.RetryMaxAttempts)
             {
-                LogReconnectionMaxRetryExceededError(IPAddressOrHostname, Port);
+                LogReconnectionWarning(IPAddressOrHostname, Port, attempt, clientReconnectConfig.RetryMaxAttempts);
                 InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
             }
         }
+
+        LogReconnectionMaxRetryExceededError(IPAddressOrHostname, Port);
+        InvokeConnectionStateChanged(ConnectionState.ReconnectionFailed);
     }
 
     private async Task SetConnected(
