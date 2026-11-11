@@ -22,10 +22,6 @@
 
   <PropertyGroup Label="Build instructions">
     <OutputType>Library</OutputType>
-    <!-- Creates a regular package and a symbols package -->
-    <IncludeSymbols>true</IncludeSymbols>
-    <!-- Creates symbol package in the new .snupkg format -->
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!--
       Instruct the build system to embed project source files that are not tracked by the source control
       or imported from a source package to the generated PDB.
@@ -54,7 +50,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="11.0.100" PrivateAssets="All" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.10.94" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
