@@ -7,13 +7,15 @@ internal sealed class TcpServerConnection : IDisposable
 {
     public TcpServerConnection(
         Guid clientId,
-        System.Net.Sockets.TcpClient client)
+        System.Net.Sockets.TcpClient client,
+        int receiveBufferSize)
     {
         ArgumentNullException.ThrowIfNull(client);
 
         ClientId = clientId;
         Client = client;
         RemoteEndPoint = (IPEndPoint)client.Client.RemoteEndPoint!;
+        ReceiveBuffer = new byte[receiveBufferSize];
     }
 
     public Guid ClientId { get; }
@@ -21,6 +23,11 @@ internal sealed class TcpServerConnection : IDisposable
     public System.Net.Sockets.TcpClient Client { get; }
 
     public IPEndPoint RemoteEndPoint { get; }
+
+    /// <summary>
+    /// Gets the read buffer, reused for every read from this client.
+    /// </summary>
+    public byte[] ReceiveBuffer { get; }
 
     /// <summary>
     /// Gets the lock that keeps sends to this client from interleaving.
