@@ -208,20 +208,14 @@ public class TcpClientTests
         tcpClient.Connected -= OnConnected;
 
         // Assert
-        var byteArrayParts = receivedData
-            .Split(TerminationTypeHelper.LineFeed)
-            .ToList();
-
-        Assert.Equal(
-            byteArrayParts.TryGetNonEnumeratedCount(out var partsCount)
-                ? partsCount
-                : byteArrayParts.Count,
-            testChars.Length);
-
-        foreach (var part in byteArrayParts)
+        var partsCount = 0;
+        foreach (var part in receivedData.Split(TerminationTypeHelper.LineFeed))
         {
+            partsCount++;
             Assert.Equal(testDataLength, part.Length);
         }
+
+        Assert.Equal(testChars.Length, partsCount);
     }
 
     [Fact]

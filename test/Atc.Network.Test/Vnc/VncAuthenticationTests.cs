@@ -15,14 +15,14 @@ public class VncAuthenticationTests
 
         Assert.NotNull(method);
 
-        var result = (byte[])method!.Invoke(null, new object[] { "password", challenge })!;
+        var result = (byte[])method.Invoke(null, new object[] { "password", challenge });
 
         // Assert - verify against known DES-ECB output with VNC bit-reversed key
         Assert.NotNull(result);
         Assert.Equal(16, result.Length);
 
         // Re-invoke to get the expected bytes deterministically, then verify stability
-        var result2 = (byte[])method!.Invoke(null, new object[] { "password", challenge })!;
+        var result2 = (byte[])method.Invoke(null, new object[] { "password", challenge });
         Assert.Equal(result, result2);
 
         // Verify encryption actually transformed the input
@@ -42,7 +42,7 @@ public class VncAuthenticationTests
 
         Assert.NotNull(method);
 
-        var result = (byte[])method!.Invoke(null, new object[] { "a", challenge })!;
+        var result = (byte[])method.Invoke(null, new object[] { "a", challenge });
 
         // Assert
         Assert.NotNull(result);
@@ -62,8 +62,8 @@ public class VncAuthenticationTests
         Assert.NotNull(method);
 
         // Act
-        var result1 = (byte[])method!.Invoke(null, new object[] { "test", challenge })!;
-        var result2 = (byte[])method!.Invoke(null, new object[] { "test", challenge })!;
+        var result1 = (byte[])method.Invoke(null, new object[] { "test", challenge });
+        var result2 = (byte[])method.Invoke(null, new object[] { "test", challenge });
 
         // Assert
         Assert.Equal(result1, result2);
@@ -83,8 +83,8 @@ public class VncAuthenticationTests
 
         // Act
         // VNC only uses first 8 chars, so use passwords that differ within 8 chars
-        var result1 = (byte[])method!.Invoke(null, new object[] { "alpha", challenge })!;
-        var result2 = (byte[])method!.Invoke(null, new object[] { "bravo", challenge })!;
+        var result1 = (byte[])method.Invoke(null, new object[] { "alpha", challenge });
+        var result2 = (byte[])method.Invoke(null, new object[] { "bravo", challenge });
 
         // Assert
         Assert.NotEqual(result1, result2);

@@ -13,7 +13,7 @@ public sealed class UdpClientDataReceivedHandlerTests : IDisposable
     }
 
     private IPEndPoint ServerEndPoint
-        => (IPEndPoint)server.Client.LocalEndPoint!;
+        => (IPEndPoint)server.Client.LocalEndPoint;
 
     [Fact]
     public async Task UdpClient_DataReceived_HandlerThrows_KeepsReceiving()
