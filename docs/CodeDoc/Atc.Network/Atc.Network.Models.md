@@ -113,6 +113,16 @@
 >```csharp
 >MacVendor
 >```
+#### MdnsHostName
+>```csharp
+>MdnsHostName
+>```
+><b>Summary:</b> Gets the host name the address announces with mDNS, such as "printer.local", or <see langword="null" />. It often names devices that reverse DNS (`Atc.Network.Models.IPScanResult.Hostname`) does not know.
+#### MdnsServices
+>```csharp
+>MdnsServices
+>```
+><b>Summary:</b> Gets or sets the mDNS / DNS-SD services found on this address, when `Atc.Network.Internet.IPScannerConfig.DiscoverServices` is on.
 #### OpenPortNumbers
 >```csharp
 >OpenPortNumbers
@@ -125,6 +135,11 @@
 >```csharp
 >Ports
 >```
+#### SsdpDevices
+>```csharp
+>SsdpDevices
+>```
+><b>Summary:</b> Gets or sets the SSDP (UPnP) devices and services found on this address, when `Atc.Network.Internet.IPScannerConfig.DiscoverServices` is on.
 #### Start
 >```csharp
 >Start

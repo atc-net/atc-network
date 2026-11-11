@@ -115,6 +115,48 @@
      - GetWellKnownOrCommon()
      - GetWellKnownOrCommon(ServiceProtocolType serviceProtocolType)
 
+## [Atc.Network.Discovery](Atc.Network.Discovery.md)
+
+- [MdnsDiscovery](Atc.Network.Discovery.md#mdnsdiscovery)
+  -  Static Fields
+     - int DefaultDurationInMs
+     - string ServiceTypesName
+  -  Static Properties
+     - MulticastEndPoint
+  -  Static Methods
+     - Browse(string serviceType, TimeSpan? duration = null, CancellationToken cancellationToken = null)
+     - BrowseAll(TimeSpan? duration = null, CancellationToken cancellationToken = null)
+     - GetServiceTypes(TimeSpan? duration = null, CancellationToken cancellationToken = null)
+- [MdnsServiceInstance](Atc.Network.Discovery.md#mdnsserviceinstance)
+  -  Properties
+     - FullName
+     - HostName
+     - IPAddresses
+     - InstanceName
+     - Port
+     - Properties
+     - ServiceType
+  -  Methods
+     - ToString()
+- [SsdpDevice](Atc.Network.Discovery.md#ssdpdevice)
+  -  Properties
+     - Headers
+     - IPAddress
+     - Location
+     - SearchTarget
+     - Server
+     - UniqueServiceName
+  -  Methods
+     - ToString()
+- [SsdpDiscovery](Atc.Network.Discovery.md#ssdpdiscovery)
+  -  Static Fields
+     - int DefaultDurationInMs
+     - string DefaultSearchTarget
+  -  Static Properties
+     - MulticastEndPoint
+  -  Static Methods
+     - Search(string searchTarget = ssdp:all, TimeSpan? duration = null, CancellationToken cancellationToken = null)
+
 ## [Atc.Network.Helpers](Atc.Network.Helpers.md)
 
 - [ArpHelper](Atc.Network.Helpers.md#arphelper)
@@ -238,12 +280,14 @@
      - ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
 - [IPScannerConfig](Atc.Network.Internet.md#ipscannerconfig)
   -  Properties
+     - DiscoverServices
      - IcmpPing
      - PortNumbers
      - ResolveHostName
      - ResolveMacAddress
      - ResolveVendorFromMacAddress
      - Timeout
+     - TimeoutDiscovery
      - TimeoutHttp
      - TimeoutPing
      - TimeoutTcp
@@ -256,6 +300,7 @@
 - [IPScannerConstants](Atc.Network.Internet.md#ipscannerconstants)
   -  Static Fields
      - int MaxConcurrentPortScansPerIPAddress
+     - int TimeoutDiscoveryInMs
      - int TimeoutHttpInMs
      - int TimeoutInMs
      - int TimeoutPingInMs
@@ -298,9 +343,12 @@
      - IsCompleted
      - MacAddress
      - MacVendor
+     - MdnsHostName
+     - MdnsServices
      - OpenPortNumbers
      - PingStatus
      - Ports
+     - SsdpDevices
      - Start
      - TimeDiff
   -  Methods

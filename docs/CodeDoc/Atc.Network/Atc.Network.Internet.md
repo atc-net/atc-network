@@ -293,6 +293,13 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 
 ### Properties
 
+#### DiscoverServices
+>```csharp
+>DiscoverServices
+>```
+><b>Summary:</b> Gets or sets a value indicating whether the scan also finds services with mDNS / DNS-SD and SSDP (UPnP), such as printers, cameras, media players and NAS boxes, and attaches them to the scanned addresses (`Atc.Network.Models.IPScanResult.MdnsServices` and `Atc.Network.Models.IPScanResult.SsdpDevices`). The default is <see langword="false" />.
+>
+><b>Remarks:</b> Discovery runs once per scan, next to the other checks, and adds up to `Atc.Network.Internet.IPScannerConfig.TimeoutDiscovery` to a short scan.
 #### IcmpPing
 >```csharp
 >IcmpPing
@@ -317,6 +324,11 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 >```csharp
 >Timeout
 >```
+#### TimeoutDiscovery
+>```csharp
+>TimeoutDiscovery
+>```
+><b>Summary:</b> Gets or sets how long service discovery collects answers. The default is 3 seconds.
 #### TimeoutHttp
 >```csharp
 >TimeoutHttp
@@ -367,6 +379,11 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 >int MaxConcurrentPortScansPerIPAddress
 >```
 ><b>Summary:</b> The maximum number of ports scanned at the same time for one IP address. IP addresses are scanned in parallel too, so this keeps the total number of open sockets bounded.
+#### TimeoutDiscoveryInMs
+>```csharp
+>int TimeoutDiscoveryInMs
+>```
+><b>Summary:</b> How long service discovery (mDNS and SSDP) collects answers, in milliseconds. The default is 3000 (3 sec).
 #### TimeoutHttpInMs
 >```csharp
 >int TimeoutHttpInMs

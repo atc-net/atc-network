@@ -25,6 +25,25 @@ public class IPScanResult
 
     public ConcurrentBag<IPScanPortResult> Ports { get; set; } = new();
 
+    /// <summary>
+    /// Gets or sets the mDNS / DNS-SD services found on this address, when <see cref="IPScannerConfig.DiscoverServices"/> is on.
+    /// </summary>
+    public IList<MdnsServiceInstance> MdnsServices { get; set; } = new List<MdnsServiceInstance>();
+
+    /// <summary>
+    /// Gets or sets the SSDP (UPnP) devices and services found on this address, when <see cref="IPScannerConfig.DiscoverServices"/> is on.
+    /// </summary>
+    public IList<SsdpDevice> SsdpDevices { get; set; } = new List<SsdpDevice>();
+
+    /// <summary>
+    /// Gets the host name the address announces with mDNS, such as "printer.local", or <see langword="null"/>.
+    /// It often names devices that reverse DNS (<see cref="Hostname"/>) does not know.
+    /// </summary>
+    public string? MdnsHostName
+        => MdnsServices
+            .Select(x => x.HostName)
+            .FirstOrDefault(x => !string.IsNullOrEmpty(x));
+
     public bool IsCompleted
         => End.HasValue;
 
@@ -43,7 +62,9 @@ public class IPScanResult
         => PingStatus?.Status == IPStatus.Success ||
            !string.IsNullOrEmpty(Hostname) ||
            !string.IsNullOrEmpty(MacAddress) ||
-           OpenPortNumbers.Any();
+           OpenPortNumbers.Any() ||
+           MdnsServices.Count > 0 ||
+           SsdpDevices.Count > 0;
 
     public override string ToString()
     {
@@ -54,9 +75,19 @@ public class IPScanResult
 
         if (HasConnection)
         {
-            if (!string.IsNullOrEmpty(Hostname))
+            var hostname = string.IsNullOrEmpty(Hostname)
+                ? MdnsHostName
+                : Hostname;
+            if (!string.IsNullOrEmpty(hostname))
             {
-                sb.Append(Hostname);
+                sb.Append(hostname);
+                sb.Append(" # ");
+            }
+
+            if (MdnsServices.Count > 0 || SsdpDevices.Count > 0)
+            {
+                sb.Append("Services ");
+                sb.Append(MdnsServices.Count + SsdpDevices.Count);
                 sb.Append(" # ");
             }
 

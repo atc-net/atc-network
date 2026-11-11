@@ -37,6 +37,11 @@ public class CodeComplianceTests
 
         // GetTime is covered by NtpHelperTests, but only from async tests, which this check does not see.
         typeof(NtpHelper),
+
+        // The public methods send to the real multicast addresses. The unit tests use the internal overloads
+        // that take the target endpoint (a fake responder); the public ones are covered by integration tests.
+        typeof(MdnsDiscovery),
+        typeof(SsdpDiscovery),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

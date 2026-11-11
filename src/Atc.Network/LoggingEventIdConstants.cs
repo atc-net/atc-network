@@ -67,6 +67,11 @@ public static class LoggingEventIdConstants
         public const int DataReceiveSocketError = 10324;
     }
 
+    internal static class IPScanner
+    {
+        public const int ServiceDiscoveryFailed = 10500;
+    }
+
     internal static class VncClient
     {
         public const int Connecting = 10400;

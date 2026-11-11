@@ -34,6 +34,13 @@
 
 - [IPServicePortLists](Atc.Network.Data.md#ipserviceportlists)
 
+## [Atc.Network.Discovery](Atc.Network.Discovery.md)
+
+- [MdnsDiscovery](Atc.Network.Discovery.md#mdnsdiscovery)
+- [MdnsServiceInstance](Atc.Network.Discovery.md#mdnsserviceinstance)
+- [SsdpDevice](Atc.Network.Discovery.md#ssdpdevice)
+- [SsdpDiscovery](Atc.Network.Discovery.md#ssdpdiscovery)
+
 ## [Atc.Network.Helpers](Atc.Network.Helpers.md)
 
 - [ArpHelper](Atc.Network.Helpers.md#arphelper)

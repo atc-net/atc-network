@@ -28,6 +28,11 @@ public static class IPScannerConstants
     public const int TimeoutHttpInMs = 500;
 
     /// <summary>
+    /// How long service discovery (mDNS and SSDP) collects answers, in milliseconds. The default is 3000 (3 sec).
+    /// </summary>
+    public const int TimeoutDiscoveryInMs = 3000;
+
+    /// <summary>
     /// The maximum number of ports scanned at the same time for one IP address.
     /// IP addresses are scanned in parallel too, so this keeps the total number of open sockets bounded.
     /// </summary>
