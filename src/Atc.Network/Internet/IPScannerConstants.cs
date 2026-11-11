@@ -18,7 +18,7 @@ public static class IPScannerConstants
     public const int TimeoutPingInMs = 4000;
 
     /// <summary>
-    /// The connect time-out for tpc value, in milliseconds. The default is 100 (100 msec);
+    /// The connect time-out for TCP value, in milliseconds. The default is 100 (100 msec);
     /// </summary>
     public const int TimeoutTcpInMs = 100;
 
