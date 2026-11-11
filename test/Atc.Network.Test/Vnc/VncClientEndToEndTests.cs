@@ -167,6 +167,32 @@ public sealed class VncClientEndToEndTests
     }
 
     [Fact]
+    public async Task ConnectionDropped_ServerNeverComesBack_StopsAfterRetryMaxAttempts()
+    {
+        // Arrange
+        var server = new FakeVncServer();
+        using var vncClient = CreateClient(server, reconnect: true, retryMaxAttempts: 2);
+        var states = new ConcurrentQueue<ConnectionState>();
+        var connectionLostCount = 0;
+        vncClient.ConnectionStateChanged += (_, e) => states.Enqueue(e.State);
+        vncClient.ConnectionLost += () => Interlocked.Increment(ref connectionLostCount);
+        var session = await ConnectAndStartUpdates(vncClient, server, password: string.Empty);
+
+        // Act - the server goes away for good.
+        server.Dispose();
+        session.Dispose();
+
+        // Assert - one first attempt plus RetryMaxAttempts retries, each reported as ReconnectionFailed.
+        Assert.True(
+            await WaitHelper.WaitUntil(() => Volatile.Read(ref connectionLostCount) == 1, timeoutInMs: 20_000),
+            "ConnectionLost should be raised once the retries are used up.");
+        await Task.Delay(500);
+        Assert.Equal(3, states.Count(x => x == ConnectionState.ReconnectionFailed));
+        Assert.Equal(1, Volatile.Read(ref connectionLostCount));
+        Assert.False(vncClient.IsConnected);
+    }
+
+    [Fact]
     public async Task ConnectionDropped_WithoutReconnect_RaisesConnectionLost()
     {
         // Arrange
@@ -186,13 +212,14 @@ public sealed class VncClientEndToEndTests
 
     private static VncClient CreateClient(
         FakeVncServer server,
-        bool reconnect = false)
+        bool reconnect = false,
+        int retryMaxAttempts = 20)
         => new(
             NullLogger.Instance,
             IPAddress.Loopback,
             server.Port,
-            new VncClientConfig { ReceiveTimeout = 10_000 },
-            new VncClientReconnectConfig { Enable = reconnect, RetryInterval = 100, RetryMaxAttempts = 20 });
+            new VncClientConfig { ReceiveTimeout = 10_000, ConnectTimeout = 500 },
+            new VncClientReconnectConfig { Enable = reconnect, RetryInterval = 100, RetryMaxAttempts = retryMaxAttempts });
 
     private static async Task<FakeVncSession> ConnectAndStartUpdates(
         VncClient vncClient,
