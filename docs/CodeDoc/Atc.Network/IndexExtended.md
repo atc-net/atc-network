@@ -437,6 +437,8 @@
   -  Properties
      - DualMode
      - SslOptions
+  -  Methods
+     - ToString()
 
 ## [Atc.Network.Udp](Atc.Network.Udp.md)
 

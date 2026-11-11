@@ -23,4 +23,8 @@ public class TcpServerConfig : TcpConfigBase
     /// The default is <see langword="false"/>. It needs an IPv6 address.
     /// </summary>
     public bool DualMode { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString()
+        => $"{base.ToString()}, {nameof(SslOptions)}: {(SslOptions is null ? "None" : "Set")}, {nameof(DualMode)}: {DualMode}";
 }
