@@ -6,6 +6,7 @@ global using System.Globalization;
 global using System.IO.Compression;
 global using System.Net;
 global using System.Net.NetworkInformation;
+global using System.Net.Security;
 global using System.Net.Sockets;
 global using System.Runtime.InteropServices;
 global using System.Text;

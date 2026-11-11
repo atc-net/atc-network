@@ -149,8 +149,6 @@ public class IPPortScan : IIPPortScan, IDisposable
     /// A task that represents the asynchronous operation, resulting in a boolean indicating connection success.
     /// </returns>
     [SuppressMessage("Security", "S5332:Use secure protocols", Justification = "OK - the scan deliberately probes plain HTTP ports.")]
-    [SuppressMessage("Security", "S4830:Server certificates should be verified during SSL/TLS connections", Justification = "OK - only reachability is checked and no data is sent.")]
-    [SuppressMessage("Security", "MA0039:Do not write your own certificate validation method", Justification = "OK - only reachability is checked and no data is sent.")]
     public async Task<bool> CanConnectWithHttpOrHttps(
         int portNumber = 80,
         bool useHttps = false,
@@ -181,19 +179,14 @@ public class IPPortScan : IIPPortScan, IDisposable
             using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeoutCts.CancelAfter(timeoutInMs);
 
-            using var handler = new HttpClientHandler
-            {
-                // Only reachability is checked and no data is sent, so devices with
-                // self-signed or otherwise untrusted certificates count as reachable.
-                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
-            };
-
-            using var client = new HttpClient(handler);
-            client.Timeout = Timeout.InfiniteTimeSpan;
+            // The shared probe client accepts self-signed or otherwise untrusted certificates,
+            // since only reachability is checked and no data is sent.
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.ConnectionClose = true;
 
             // Any HTTP response, also 401, 404 or 500, means an HTTP server answered.
-            using var httpResponseMessage = await client.GetAsync(
-                uri,
+            using var httpResponseMessage = await SharedHttpClients.Probe.SendAsync(
+                request,
                 HttpCompletionOption.ResponseHeadersRead,
                 timeoutCts.Token);
 

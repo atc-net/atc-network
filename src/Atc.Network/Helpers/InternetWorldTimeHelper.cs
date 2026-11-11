@@ -56,8 +56,7 @@ public static class InternetWorldTimeHelper
 
             var uri = new Uri(WorldTimeBaseApi + worldTimezone);
 
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetStringAsync(uri, cancellationToken);
+            var response = await SharedHttpClients.Api.GetStringAsync(uri, cancellationToken);
             var timeInfo = JsonSerializer.Deserialize<TimeResponse>(response);
 
             return timeInfo?.DateTime;

@@ -119,8 +119,7 @@ public static class MacAddressVendorLookupHelper
 
         try
         {
-            using var httpClient = new HttpClient();
-            var httpResponseMessage = await httpClient.GetAsync(uri, cancellationToken);
+            using var httpResponseMessage = await SharedHttpClients.Api.GetAsync(uri, cancellationToken);
             if (httpResponseMessage.IsSuccessStatusCode)
             {
                 return await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
