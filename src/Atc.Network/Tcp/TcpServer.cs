@@ -273,7 +273,7 @@ public partial class TcpServer : ITcpServer
             while (IsRunning)
             {
                 var serverClient = await tcpListener!.AcceptTcpClientAsync(cancellationToken);
-                var connection = new TcpServerConnection(Guid.NewGuid(), serverClient);
+                var connection = new TcpServerConnection(Guid.NewGuid(), serverClient, serverConfig.ReceiveBufferSize);
                 clients[connection.ClientId] = connection;
 
                 var eventArgs = new TcpServerClientEventArgs(connection.ClientId, connection.RemoteEndPoint);
@@ -348,9 +348,8 @@ public partial class TcpServer : ITcpServer
         TcpServerConnection connection,
         CancellationToken cancellationToken)
     {
-        var buffer = new byte[serverConfig.ReceiveBufferSize];
+        var buffer = connection.ReceiveBuffer;
         using var memoryStream = new MemoryStream();
-        byte[] receivedBuffer;
         bool messageHasEnded;
 
         do
@@ -369,20 +368,27 @@ public partial class TcpServer : ITcpServer
 
             LogDataReceivedChunk(ipAddressStr, Port, readCount);
 
+            var previousLength = (int)memoryStream.Length;
             await memoryStream.WriteAsync(
                 buffer.AsMemory(0, readCount),
                 cancellationToken);
 
-            receivedBuffer = memoryStream.ToArray();
+            // The terminator was not in the earlier reads, so only look at this read plus the
+            // byte before it (a two-byte terminator such as CR LF can be split across two reads).
+            var searchStart = System.Math.Max(0, previousLength - 1);
+            var newData = memoryStream
+                .GetBuffer()
+                .AsSpan(searchStart, (int)memoryStream.Length - searchStart)
+                .ToArray();
 
             messageHasEnded = TerminationTypeHelper.HasTerminationType(
                 serverConfig.TerminationType,
-                receivedBuffer);
+                newData);
         }
         while (!messageHasEnded);
 
         LogDataReceived(ipAddressStr, Port, (int)memoryStream.Length);
-        InvokeDataReceived(receivedBuffer, connection);
+        InvokeDataReceived(memoryStream.ToArray(), connection);
     }
 
     private void InvokeDataReceived(
