@@ -15,6 +15,7 @@ Scan single IPs or entire ranges with configurable discovery options.
 - 📡 MAC address discovery (via ARP)
 - 🏭 Vendor identification from MAC address, online or [offline](#-offline-vendor-lookup)
 - 🔌 Port scanning (None, WellKnown, WellKnownAndCommon, All), up to 16 ports per IP address at a time
+- 📡 Service discovery with mDNS and SSDP (`DiscoverServices`): printers, cameras, speakers and more, see [Service Discovery](discovery.md#-use-it-in-the-ip-scanner)
 - 📊 Progress reporting via events
 
 ### 🚀 Scan a Range

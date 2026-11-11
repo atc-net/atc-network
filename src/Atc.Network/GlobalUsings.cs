@@ -19,6 +19,7 @@ global using System.Text.RegularExpressions;
 global using System.Threading.Channels;
 global using Atc.Helpers;
 global using Atc.Network.Data;
+global using Atc.Network.Discovery;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
 global using Atc.Network.Models;

@@ -14,6 +14,7 @@ global using System.Security.Cryptography.X509Certificates;
 global using System.Text;
 global using Atc.CodeDocumentation.Markdown;
 global using Atc.Network.Data;
+global using Atc.Network.Discovery;
 global using Atc.Network.Helpers;
 global using Atc.Network.Internet;
 global using Atc.Network.Tcp;

@@ -98,3 +98,4 @@ Use these ids to find handler failures and receive errors in your logs. Handler 
 | `UdpServer` | 10323 | A `DataReceived` or `DatagramReceived` handler throws |
 | `UdpServer` | 10324 | A receive fails with a socket error (the server keeps receiving) |
 | `VncClient` | 10421 | Any `VncClient` event handler throws |
+| `IPScanner` | 10500 | Service discovery (`DiscoverServices`) fails; the scan completes without services |

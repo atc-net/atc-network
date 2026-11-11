@@ -44,6 +44,7 @@ Which components record what:
 | `VncClient` | ✅ | ✅ | ✅ | – | ✅ |
 | `WakeOnLanHelper` | – | – | – | ✅ (sent) | – |
 | `NtpHelper` | – | – | – | ✅ | – |
+| `MdnsDiscovery`, `SsdpDiscovery` | – | – | – | ✅ | – |
 
 ### 🏷️ Tags
 
@@ -51,8 +52,8 @@ Every measurement and span has these tags:
 
 | Tag | Value |
 |-----|-------|
-| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client`, `wake_on_lan` or `ntp_client` |
-| `server.address` | The server a client connects to, the address a server listens on, where a Wake-on-LAN packet is sent, or the NTP server asked |
+| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client`, `wake_on_lan`, `ntp_client`, `mdns_discovery` or `ssdp_discovery` |
+| `server.address` | The server a client connects to, the address a server listens on, where a Wake-on-LAN packet is sent, the NTP server asked, or the multicast address a discovery queries |
 | `server.port` | The server's port |
 
 Client endpoints of a server are not tags, so the number of time series stays small however many clients connect.
@@ -72,5 +73,7 @@ Client endpoints of a server are not tags, so the number of time series stays sm
 | `VncClient.Connect` | Client | `Connect`. Status `Error` when it fails |
 | `WakeOnLan.Send` | Producer | Each `SendMagicPacket`. Status `Error` when it fails |
 | `Ntp.GetTime` | Client | Each `GetTime`. Status `Error` on a timeout or a refused reply |
+| `MdnsDiscovery.Browse`, `MdnsDiscovery.BrowseAll`, `MdnsDiscovery.GetServiceTypes` | Client | Each discovery, for its whole duration |
+| `SsdpDiscovery.Search` | Client | Each search, for its whole duration |
 
 A span is a child of the caller's current activity, for example the request that called `Send`. The receive loops run outside any span, so the logs and spans of your `DataReceived` handlers are not attached to the connect span that started the loop.

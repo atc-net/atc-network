@@ -10,4 +10,12 @@ namespace Atc.Network.Internet;
 public partial class IPScanner
 {
     private readonly ILogger logger;
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.IPScanner.ServiceDiscoveryFailed,
+        Level = LogLevel.Warning,
+        Message = "Service discovery with {Protocol} failed, so the scan has no {Protocol} services: {ErrorMessage}")]
+    private partial void LogServiceDiscoveryFailed(
+        string protocol,
+        string errorMessage);
 }

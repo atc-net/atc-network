@@ -96,6 +96,16 @@ public partial class IPScanner : IIPScanner, IDisposable
     public IPScannerConfig Configuration { get; set; }
 
     /// <summary>
+    /// Gets or sets where mDNS discovery queries are sent. Tests point it at a fake responder.
+    /// </summary>
+    internal IPEndPoint MdnsQueryEndPoint { get; set; } = MdnsDiscovery.MulticastEndPoint;
+
+    /// <summary>
+    /// Gets or sets where SSDP discovery queries are sent. Tests point it at a fake responder.
+    /// </summary>
+    internal IPEndPoint SsdpQueryEndPoint { get; set; } = SsdpDiscovery.MulticastEndPoint;
+
+    /// <summary>
     /// Initiates an asynchronous scan for the specified IP address.
     /// </summary>
     /// <param name="ipAddress">The IP address to scan.</param>
@@ -198,26 +208,7 @@ public partial class IPScanner : IIPScanner, IDisposable
             tasksProcessedCount = 0;
             processedScanResults.Clear();
 
-            var parallelOptions = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
-                CancellationToken = cancellationToken,
-            };
-
-            try
-            {
-                await Parallel.ForEachAsync(
-                    ipAddresses,
-                    parallelOptions,
-                    async (ipAddress, ct) =>
-                    {
-                        await DoScan(ipAddress, ct);
-                    });
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected when cancelled
-            }
+            await ScanAddresses(ipAddresses, cancellationToken);
 
             foreach (var processedScanResult in processedScanResults)
             {
@@ -296,6 +287,107 @@ public partial class IPScanner : IIPScanner, IDisposable
             ? (IPv4AddressHelper.GetAddressesInRange(startIpAddress, endIpAddress), null)
             : ([], validationResult.ErrorMessage);
     }
+
+    /// <summary>
+    /// Scans the addresses in parallel. Service discovery, when on, runs once next to them,
+    /// and its results are attached to the addresses afterwards.
+    /// </summary>
+    private async Task ScanAddresses(
+        IReadOnlyCollection<IPAddress> ipAddresses,
+        CancellationToken cancellationToken)
+    {
+        var discoveryTask = Configuration.DiscoverServices
+            ? DiscoverServices(cancellationToken)
+            : null;
+
+        var parallelOptions = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
+            CancellationToken = cancellationToken,
+        };
+
+        try
+        {
+            await Parallel.ForEachAsync(
+                ipAddresses,
+                parallelOptions,
+                async (ipAddress, ct) =>
+                {
+                    await DoScan(ipAddress, ct);
+                });
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when cancelled
+        }
+
+        if (discoveryTask is not null)
+        {
+            var (mdnsServices, ssdpDevices) = await discoveryTask;
+            AttachDiscoveredServices(mdnsServices, ssdpDevices);
+        }
+    }
+
+    /// <summary>
+    /// Attaches the services to the scanned addresses, matched by the addresses in the mDNS records
+    /// and the address an SSDP answer came from.
+    /// </summary>
+    private void AttachDiscoveredServices(
+        IReadOnlyList<MdnsServiceInstance> mdnsServices,
+        IReadOnlyList<SsdpDevice> ssdpDevices)
+    {
+        foreach (var scanResult in processedScanResults)
+        {
+            var ipAddress = WithoutIPv4Mapping(scanResult.IPAddress);
+            scanResult.MdnsServices = mdnsServices
+                .Where(x => x.IPAddresses.Any(a => WithoutIPv4Mapping(a).Equals(ipAddress)))
+                .ToList();
+            scanResult.SsdpDevices = ssdpDevices
+                .Where(x => WithoutIPv4Mapping(x.IPAddress).Equals(ipAddress))
+                .ToList();
+        }
+    }
+
+    private async Task<(IReadOnlyList<MdnsServiceInstance> MdnsServices, IReadOnlyList<SsdpDevice> SsdpDevices)> DiscoverServices(
+        CancellationToken cancellationToken)
+    {
+        var mdnsTask = CollectDiscovered(
+            MdnsDiscovery.BrowseAll(Configuration.TimeoutDiscovery, MdnsQueryEndPoint, cancellationToken),
+            "mDNS");
+        var ssdpTask = CollectDiscovered(
+            SsdpDiscovery.Search(SsdpDiscovery.DefaultSearchTarget, Configuration.TimeoutDiscovery, SsdpQueryEndPoint, cancellationToken),
+            "SSDP");
+
+        return (await mdnsTask, await ssdpTask);
+    }
+
+    /// <summary>
+    /// Collects what a discovery finds. A discovery that fails is logged and finds nothing, so the scan still completes.
+    /// </summary>
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "OK - discovery only adds to the scan, so any failure must not fail the scan.")]
+    private async Task<IReadOnlyList<T>> CollectDiscovered<T>(
+        IAsyncEnumerable<T> discovery,
+        string protocol)
+    {
+        try
+        {
+            return await discovery.ToListAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            return [];
+        }
+        catch (Exception ex)
+        {
+            LogServiceDiscoveryFailed(protocol, ex.Message);
+            return [];
+        }
+    }
+
+    private static IPAddress WithoutIPv4Mapping(IPAddress ipAddress)
+        => ipAddress.IsIPv4MappedToIPv6
+            ? ipAddress.MapToIPv4()
+            : ipAddress;
 
     private async Task DoScan(
         IPAddress ipAddress,
