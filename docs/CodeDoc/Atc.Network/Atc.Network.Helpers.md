@@ -571,6 +571,44 @@ Provides utilities for handling different types of message termination character
 
 <br />
 
+## TracerouteHelper
+Traces the route to a host: the routers a packet passes on its way, as `tracert` and `traceroute` show them.
+><b>Remarks:</b> Pings are sent with a time to live of 1, 2, 3 and so on. Each router that drops a ping because its time to live ran out answers with "time exceeded", which names the router; the target answers the ping itself. One probe is sent per hop.
+
+>```csharp
+>public static class TracerouteHelper
+>```
+
+### Static Fields
+
+#### DefaultMaxHops
+>```csharp
+>int DefaultMaxHops
+>```
+><b>Summary:</b> The default largest number of hops.
+#### DefaultTimeoutPerHopInMs
+>```csharp
+>int DefaultTimeoutPerHopInMs
+>```
+><b>Summary:</b> The default time to wait for each hop's answer, in milliseconds.
+### Static Methods
+
+#### Trace
+>```csharp
+>IAsyncEnumerable<TracerouteHop> Trace(IPAddress target, int maxHops = 30, TimeSpan? timeoutPerHop = null, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Traces the route to a host, and returns each hop as soon as it has answered or timed out.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`target`&nbsp;&nbsp;-&nbsp;&nbsp;The host to trace the route to, IPv4 or IPv6.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`maxHops`&nbsp;&nbsp;-&nbsp;&nbsp;The largest number of hops, from 1 to 255. The default is 30.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`timeoutPerHop`&nbsp;&nbsp;-&nbsp;&nbsp;How long to wait for each hop's answer. The default is 1 second.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellation token.<br />
+>
+><b>Returns:</b> The hops, in order. The sequence ends at the target, at a hop that reports the target unreachable, or after `maxHops` hops. A hop that does not answer has no address (shown as "*").
+
+<br />
+
 ## WakeOnLanHelper
 Wakes a sleeping or powered-off device on the network by sending it a Wake-on-LAN "magic packet".
 ><b>Remarks:</b> The magic packet is 6 bytes of 0xFF followed by the device's MAC address 16 times (102 bytes), optionally followed by a 4- or 6-byte SecureOn password. It is sent as a UDP datagram, by default as a broadcast to port 9. The device must have Wake-on-LAN enabled.

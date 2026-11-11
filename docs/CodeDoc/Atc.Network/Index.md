@@ -57,6 +57,7 @@
 - [PingHelper](Atc.Network.Helpers.md#pinghelper)
 - [TerminationHelper](Atc.Network.Helpers.md#terminationhelper)
 - [TerminationTypeHelper](Atc.Network.Helpers.md#terminationtypehelper)
+- [TracerouteHelper](Atc.Network.Helpers.md#traceroutehelper)
 - [WakeOnLanHelper](Atc.Network.Helpers.md#wakeonlanhelper)
 
 ## [Atc.Network.Internet](Atc.Network.Internet.md)
@@ -79,6 +80,7 @@
 - [NetBiosNodeStatus](Atc.Network.Models.md#netbiosnodestatus)
 - [NtpResult](Atc.Network.Models.md#ntpresult)
 - [PingStatusResult](Atc.Network.Models.md#pingstatusresult)
+- [TracerouteHop](Atc.Network.Models.md#traceroutehop)
 
 ## [Atc.Network.Tcp](Atc.Network.Tcp.md)
 

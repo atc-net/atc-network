@@ -10,7 +10,7 @@ Scan single IPs or entire ranges with configurable discovery options.
 
 ### ✨ Features
 
-- 🏓 ICMP ping with network quality metrics
+- 🏓 ICMP ping with network quality metrics, and [traceroute](#-traceroutehelper)
 - 🏷️ Hostname resolution
 - 🪟 NetBIOS computer name and workgroup (`ResolveNetBiosName`), for Windows computers and Samba servers that DNS doesn't know
 - 📡 MAC address discovery (via ARP)
@@ -120,6 +120,35 @@ string? hostname = await DnsLookupHelper.GetHostname(
     CancellationToken.None);
 // → "dns.google"
 ```
+
+### 🧭 TracerouteHelper
+
+Traces the route to a host, as `tracert` and `traceroute` do: each router on the way, with its answer time.
+
+```csharp
+await foreach (var hop in TracerouteHelper.Trace(IPAddress.Parse("1.1.1.1")))
+{
+    Console.WriteLine(hop);
+}
+// 1  192.168.1.254  21 ms
+// 2  77.33.20.129  6 ms
+// ...
+// 7  *
+// 8  162.158.132.2  6 ms
+// 10  1.1.1.1  2 ms
+```
+
+| `TracerouteHop` | Meaning |
+|-----------------|---------|
+| `HopNumber` | 1, 2, 3, … (the time to live of the probe) |
+| `IPAddress` | The router or target that answered; `null` when nothing answered in time (`*`) |
+| `RoundtripTime` | The time until the answer; `null` when nothing answered |
+| `Status` | `TtlExpired` (or `TimeExceeded` for IPv6) for a router, `Success` for the target, `TimedOut` for no answer |
+| `IsDestination` | Whether the target itself answered |
+
+The trace ends at the target, at a router that reports the target unreachable, or after `maxHops` hops (30 by default). Each hop waits up to `timeoutPerHop` (1 second by default) and gets one probe. IPv4 and IPv6 both work; when the machine has no route at all (for example no IPv6 internet), `Trace` throws a `PingException`. Many routers don't answer pings, so `*` hops in the middle are normal.
+
+To show router names, look each address up with `DnsLookupHelper.GetHostname`.
 
 ### 🪟 NetBiosHelper
 
