@@ -782,12 +782,7 @@ public partial class TcpClient : ITcpClient
                 return Array.Empty<byte>();
             }
 
-            using var memoryStream = new MemoryStream();
-            await memoryStream.WriteAsync(
-                receiveBuffer.AsMemory(0, numberOfBytesToRead),
-                cancellationToken);
-
-            return memoryStream.ToArray();
+            return receiveBuffer.AsSpan(0, numberOfBytesToRead).ToArray();
         }
         catch (OperationCanceledException)
         {

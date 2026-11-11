@@ -352,8 +352,9 @@ public partial class UdpServer : IUdpServer
         CancellationToken cancellationToken)
     {
         var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, endPointFrom);
-        var receivedBytes = new byte[res.ReceivedBytes];
-        Array.Copy(receiveBufferSegment.ToArray(), 0, receivedBytes, 0, res.ReceivedBytes);
+
+        // Copy only the received bytes, not the whole receive buffer.
+        var receivedBytes = receiveBufferSegment.AsSpan(0, res.ReceivedBytes).ToArray();
 
         LogDataReceived(receivedBytes.Length);
         InvokeDataReceived(receivedBytes, (IPEndPoint)res.RemoteEndPoint);
