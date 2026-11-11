@@ -81,6 +81,7 @@ var results = await scanner.ScanRange(
 | [🖥️ VNC Client](docs/vnc.md) | Remote desktop, encodings, pixel data, input forwarding |
 | [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, ARP, MAC vendor lookup |
 | [🧵 Events, Threads & Errors](docs/events.md) | Which thread raises events, handler exceptions, log event ids |
+| [🧪 Showcase with Aspire](sample/Showcase/README.md) | TCP and UDP test servers and clients, with logs and metrics in the Aspire dashboard |
 
 ---
 

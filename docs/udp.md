@@ -118,3 +118,5 @@ A handler that throws is logged and does not stop the server. An `async` handler
 ## 📂 Sample
 
 A complete working sample is available at [`sample/Atc.Network.Console.Udp/Program.cs`](../sample/Atc.Network.Console.Udp/Program.cs).
+
+For a real-world setup, with a UDP server and client running as hosted services under Aspire and their logs in the Aspire dashboard, see the [Showcase](../sample/Showcase/README.md).

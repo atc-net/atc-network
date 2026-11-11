@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="../../src/Atc.Network/Atc.Network.csproj" />
+  <Project Path="Showcase.Aspire/Showcase.Aspire.csproj" />
+  <Project Path="Showcase.ServiceDefaults/Showcase.ServiceDefaults.csproj" />
+  <Project Path="Showcase.TcpTestClient/Showcase.TcpTestClient.csproj" />
+  <Project Path="Showcase.TcpTestServer/Showcase.TcpTestServer.csproj" />
+  <Project Path="Showcase.UdpTestClient/Showcase.UdpTestClient.csproj" />
+  <Project Path="Showcase.UdpTestServer/Showcase.UdpTestServer.csproj" />
+</Solution>

@@ -1,0 +1,10 @@
+global using System.Net;
+global using System.Text;
+global using Atc.Network;
+global using Atc.Network.Tcp;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.Logging;
+global using Showcase.ServiceDefaults;
+global using Showcase.TcpTestClient;
