@@ -447,6 +447,24 @@ The names of the metrics and traces that Atc.Network emits, for use with OpenTel
 
 <br />
 
+## TcpMessageFraming
+How a `Atc.Network.Tcp.TcpClient` splits the TCP byte stream into messages.
+
+>```csharp
+>public enum TcpMessageFraming
+>```
+
+
+| Value | Name | Description | Summary | 
+| --- | --- | --- | --- | 
+| 0 | None | None | No framing: `DataReceived` is raised once per read from the socket, which can hold part of a message, a whole message or several messages. Sends append the `Atc.Network.TcpMessageFraming.TerminationType`. | 
+| 1 | TerminationType | Termination Type | Received data is collected until the configured `Atc.Network.TcpMessageFraming.TerminationType`, and `DataReceived` is raised once per message, including the terminator. Sends append the `Atc.Network.TcpMessageFraming.TerminationType`. | 
+| 2 | LengthPrefix | Length Prefix | Every message starts with its length as a 4-byte big-endian integer. Sends add the length, and `DataReceived` is raised once per message, without the length. The `Atc.Network.TcpMessageFraming.TerminationType` is not used. | 
+
+
+
+<br />
+
 ## TcpServerClientEventArgs
 Event data that identifies one client connected to a TCP server.
 

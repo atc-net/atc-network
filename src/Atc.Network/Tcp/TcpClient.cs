@@ -20,6 +20,7 @@ public partial class TcpClient : ITcpClient
     private readonly TcpClientReconnectConfig clientReconnectConfig;
     private readonly TcpClientKeepAliveConfig clientKeepAliveConfig;
     private readonly byte[] receiveBuffer;
+    private readonly TcpMessageFramer? messageFramer;
 
     private readonly int syncLockConnectTimeoutInMs;
     private readonly int syncLockSendTimeoutInMs;
@@ -74,6 +75,7 @@ public partial class TcpClient : ITcpClient
         clientKeepAliveConfig = keepAliveConfig ?? new TcpClientKeepAliveConfig();
 
         receiveBuffer = new byte[this.clientConfig.ReceiveBufferSize];
+        messageFramer = CreateMessageFramer(this.clientConfig);
 
         syncLockConnectTimeoutInMs = this.clientConfig.ConnectTimeout <= 0
                 ? TcpConstants.DefaultConnectTimeout
@@ -311,7 +313,7 @@ public partial class TcpClient : ITcpClient
             throw new TcpException("Client is not connected!");
         }
 
-        TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
+        data = FrameDataToSend(data, terminationType);
 
         LogDataSendingByteLength(IPAddressOrHostname, Port, data.Length);
 
@@ -609,6 +611,8 @@ public partial class TcpClient : ITcpClient
             return false;
         }
 
+        // A message cut off by the previous connection can't be completed by the new one.
+        messageFramer?.Reset();
         await SetConnected(raiseEventsAndLog, cancellationToken);
         PrepareKeepAliveInDoConnect();
 
@@ -872,11 +876,63 @@ public partial class TcpClient : ITcpClient
         }
     }
 
+    private byte[] FrameDataToSend(
+        byte[] data,
+        TerminationType terminationType)
+    {
+        if (clientConfig.MessageFraming == TcpMessageFraming.LengthPrefix)
+        {
+            return TcpMessageFramer.AddLengthPrefix(data);
+        }
+
+        TerminationHelper.AppendTerminationBytesIfNeeded(ref data, terminationType);
+        return data;
+    }
+
+    private static TcpMessageFramer? CreateMessageFramer(TcpClientConfig config)
+    {
+        if (config.MessageFraming == TcpMessageFraming.None)
+        {
+            return null;
+        }
+
+        if (config.MessageFraming == TcpMessageFraming.TerminationType &&
+            config.TerminationType == TerminationType.None)
+        {
+            throw new ArgumentException(
+                $"{nameof(TcpClientConfig.MessageFraming)} {nameof(TcpMessageFraming.TerminationType)} needs a {nameof(TcpClientConfig.TerminationType)} other than None.",
+                nameof(config));
+        }
+
+        if (config.MaxMessageSize <= 0)
+        {
+            throw new ArgumentException($"{nameof(TcpClientConfig.MaxMessageSize)} must be greater than 0.", nameof(config));
+        }
+
+        return new TcpMessageFramer(config.MessageFraming, config.TerminationType, config.MaxMessageSize);
+    }
+
+    /// <summary>
+    /// Raises DataReceived for one read, or, with message framing, once for each message the read completes.
+    /// A framing error (a message that is too long) goes to the receive loop, which reports it and disconnects.
+    /// </summary>
     private void HandleDataRead(byte[] data)
     {
         LogDataReceivedByteLength(IPAddressOrHostname, Port, data.Length);
-        Instrumentation.Received(data.Length);
-        InvokeDataReceived(data);
+        Instrumentation.BytesReceived(data.Length);
+
+        if (messageFramer is null)
+        {
+            Instrumentation.MessageReceived();
+            InvokeDataReceived(data);
+            return;
+        }
+
+        foreach (var message in messageFramer.Append(data))
+        {
+            Instrumentation.MessageReceived();
+            InvokeDataReceived(message);
+        }
     }
 
     private async Task<byte[]> ReadData(CancellationToken cancellationToken)

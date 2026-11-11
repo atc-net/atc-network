@@ -29,6 +29,9 @@ internal sealed partial class TcpTestClientWorker(
                 ConnectTimeout = 5_000,
                 DefaultEncoding = Encoding.UTF8,
                 TerminationType = TerminationType.LineFeed,
+
+                // One DataReceived per reply line, however the replies are split across reads.
+                MessageFraming = TcpMessageFraming.TerminationType,
             },
             new TcpClientReconnectConfig
             {

@@ -65,6 +65,7 @@
      - DisableKeepAlive(this TcpClient tcpClient)
      - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 600000, int sendBufferSize = 8192, int receiveTimeout = 600000, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
+- [TcpMessageFraming](Atc.Network.md#tcpmessageframing)
 - [TcpServerClientEventArgs](Atc.Network.md#tcpserverclienteventargs)
   -  Properties
      - ClientId
@@ -355,6 +356,8 @@
   -  Properties
      - ConnectTimeout
      - DefaultEncoding
+     - MaxMessageSize
+     - MessageFraming
      - ReceiveBufferSize
      - ReceiveTimeout
      - SendBufferSize
@@ -392,6 +395,7 @@
   -  Static Fields
      - int DefaultBufferSize
      - int DefaultConnectTimeout
+     - int DefaultMaxMessageSize
      - int DefaultReconnectRetryInterval
      - int DefaultReconnectRetryMaxAttempts
      - int DefaultSendReceiveTimeout

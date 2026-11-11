@@ -35,4 +35,9 @@ public static class TcpConstants
     /// The grace period timeout, in milliseconds (1 sec).
     /// </summary>
     public const int GracePeriodTimeout = 1_000;
+
+    /// <summary>
+    /// The largest message, in bytes, that message framing accepts (16 MB).
+    /// </summary>
+    public const int DefaultMaxMessageSize = 16 * 1024 * 1024;
 }

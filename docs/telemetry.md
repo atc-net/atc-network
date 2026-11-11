@@ -30,7 +30,7 @@ Both are named `Atc.Network`. To see them in the Aspire dashboard, run the [Show
 | `atc.network.bytes.sent` | Counter | `By` | Bytes sent |
 | `atc.network.bytes.received` | Counter | `By` | Bytes received |
 | `atc.network.messages.sent` | Counter | `{message}` | Send calls that succeeded |
-| `atc.network.messages.received` | Counter | `{message}` | `DataReceived` events: a TCP client read, a TCP server message, a UDP datagram |
+| `atc.network.messages.received` | Counter | `{message}` | `DataReceived` events: a TCP client read (or message, with `MessageFraming`), a TCP server message, a UDP datagram |
 | `atc.network.handler.errors` | Counter | `{error}` | Event handlers that threw, tagged `atc.network.event` with the event name |
 
 Which components record what:
