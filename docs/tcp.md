@@ -120,6 +120,27 @@ tcpServer.DataReceived += data =>
 await tcpServer.StartAsync(CancellationToken.None);
 ```
 
+`StartAsync` throws a `SocketException` if the listener can't start, for example because the port is in use.
+
+### 👥 Several clients
+
+The server serves every connected client at the same time. Each client gets an id when it connects. Use it to tell clients apart and to reply to one of them:
+
+```csharp
+tcpServer.ClientConnected += (_, e) => Console.WriteLine($"✅ {e.ClientId} from {e.RemoteEndPoint}");
+tcpServer.ClientDisconnected += (_, e) => Console.WriteLine($"❌ {e.ClientId}");
+
+tcpServer.ClientDataReceived += async (_, e) =>
+{
+    var text = Encoding.ASCII.GetString(e.Data.Span);
+    await tcpServer.Send(e.ClientId, $"echo: {text}", CancellationToken.None);
+};
+```
+
+- `Send` returns `false` if the client is no longer connected.
+- `StopAsync` stops accepting clients and closes the connected ones.
+- A handler that throws is logged and does not stop the server.
+
 ---
 
 ## 📂 Sample

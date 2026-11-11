@@ -93,4 +93,14 @@ public partial class TcpServer
         string ipAddress,
         int port,
         Exception exception);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpServer.EventHandlerError,
+        Level = LogLevel.Error,
+        Message = "A {eventName} handler failed on {ipAddress}:{port}.")]
+    private partial void LogEventHandlerError(
+        string ipAddress,
+        int port,
+        string eventName,
+        Exception exception);
 }

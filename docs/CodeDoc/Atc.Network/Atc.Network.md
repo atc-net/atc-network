@@ -307,6 +307,57 @@ Enumeration: NetworkQualityCategoryType.
 
 <br />
 
+## TcpServerClientEventArgs
+Event data that identifies one client connected to a TCP server.
+
+>```csharp
+>public class TcpServerClientEventArgs : EventArgs
+>```
+
+### Properties
+
+#### ClientId
+>```csharp
+>ClientId
+>```
+><b>Summary:</b> Gets the id the server gave the client when it connected. Use it to send to this client.
+#### RemoteEndPoint
+>```csharp
+>RemoteEndPoint
+>```
+><b>Summary:</b> Gets the client's endpoint.
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
+
+<br />
+
+## TcpServerDataReceivedEventArgs
+Event data for a message a TCP server received from one client.
+
+>```csharp
+>public class TcpServerDataReceivedEventArgs : TcpServerClientEventArgs
+>```
+
+### Properties
+
+#### Data
+>```csharp
+>Data
+>```
+><b>Summary:</b> Gets the received data.
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
+
+<br />
+
 ## TerminationType
 
 >```csharp

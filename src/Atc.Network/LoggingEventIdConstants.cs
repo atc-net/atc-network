@@ -36,6 +36,7 @@ public static class LoggingEventIdConstants
         public const int DataReceivedHandlerError = 10125;
         public const int ClientConnectionError = 10126;
         public const int ListenerError = 10127;
+        public const int EventHandlerError = 10128;
         public const int DataReceivedByteLength = 10111;
         public const int DataReceivedChunkByteLength = 10112;
     }
