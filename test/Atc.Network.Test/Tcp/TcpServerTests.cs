@@ -90,6 +90,40 @@ public sealed class TcpServerTests
         await tcpServer.StopAsync(CancellationToken.None);
     }
 
+    [Fact]
+    public async Task StartAsync_PortInUse_Throws()
+    {
+        // Arrange - another listener already owns the port.
+        using var occupyingListener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
+        occupyingListener.Start();
+        var port = ((IPEndPoint)occupyingListener.LocalEndpoint).Port;
+
+        using var tcpServer = new TcpServer(NullLogger.Instance, IPAddress.Loopback, port);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<System.Net.Sockets.SocketException>(() => tcpServer.StartAsync(CancellationToken.None));
+        Assert.False(tcpServer.IsRunning);
+    }
+
+    [Fact]
+    public async Task StartAsync_WhenItReturns_IsRunningAndAcceptsClients()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(NullLogger.Instance, IPAddress.Loopback, port);
+
+        // Act
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(tcpServer.IsRunning);
+        using var client = new System.Net.Sockets.TcpClient();
+        await client.ConnectAsync(IPAddress.Loopback, port);
+        Assert.True(client.Connected);
+
+        await tcpServer.StopAsync(CancellationToken.None);
+    }
+
     private static int GetFreePort()
     {
         using var listener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
