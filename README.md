@@ -2,7 +2,7 @@
 
 # 🌐 Atc.Network
 
-A .NET 8 library for network communication, scanning, and remote desktop — batteries included, zero external dependencies.
+A .NET 10 library for network communication, scanning, and remote desktop — batteries included, zero external dependencies.
 
 ---
 
@@ -85,7 +85,7 @@ var results = await scanner.ScanRange(
 
 ## 🔧 Requirements
 
-- .NET 8.0+
+- .NET 10.0+
 - No additional NuGet dependencies beyond the .NET SDK
 
 ---
