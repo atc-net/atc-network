@@ -40,6 +40,17 @@
      - DisableKeepAlive(this TcpClient tcpClient)
      - SetBufferSizeAndTimeouts(this TcpClient tcpClient, int sendTimeout = 600000, int sendBufferSize = 8192, int receiveTimeout = 600000, int receiveBufferSize = 8192)
      - SetKeepAlive(this TcpClient tcpClient, int tcpKeepAliveTime = 2, int tcpKeepAliveInterval = 2, int tcpKeepAliveRetryCount = 5)
+- [TcpServerClientEventArgs](Atc.Network.md#tcpserverclienteventargs)
+  -  Properties
+     - ClientId
+     - RemoteEndPoint
+  -  Methods
+     - ToString()
+- [TcpServerDataReceivedEventArgs](Atc.Network.md#tcpserverdatareceivedeventargs)
+  -  Properties
+     - Data
+  -  Methods
+     - ToString()
 - [TerminationType](Atc.Network.md#terminationtype)
 - [TransportProtocolType](Atc.Network.md#transportprotocoltype)
 - [UdpDatagramReceivedEventArgs](Atc.Network.md#udpdatagramreceivedeventargs)
@@ -285,7 +296,13 @@
      - IsRunning
      - Port
   -  Events
+     - ClientConnected
+     - ClientDataReceived
+     - ClientDisconnected
      - DataReceived
+  -  Methods
+     - Send(Guid clientId, byte[] data, CancellationToken cancellationToken)
+     - Send(Guid clientId, string data, CancellationToken cancellationToken)
 - [TcpClient](Atc.Network.Tcp.md#tcpclient)
   -  Properties
      - IPAddressOrHostname
@@ -355,9 +372,14 @@
      - IsRunning
      - Port
   -  Events
+     - ClientConnected
+     - ClientDataReceived
+     - ClientDisconnected
      - DataReceived
   -  Methods
      - Dispose()
+     - Send(Guid clientId, byte[] data, CancellationToken cancellationToken)
+     - Send(Guid clientId, string data, CancellationToken cancellationToken)
      - StartAsync(CancellationToken cancellationToken)
      - StopAsync(CancellationToken cancellationToken)
 - [TcpServerConfig](Atc.Network.Tcp.md#tcpserverconfig)

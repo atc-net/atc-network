@@ -124,6 +124,131 @@ public sealed class TcpServerTests
         await tcpServer.StopAsync(CancellationToken.None);
     }
 
+    [Fact]
+    public async Task TwoClientsConnectedAtTheSameTime_AreBothServed()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(NullLogger.Instance, IPAddress.Loopback, port);
+
+        var received = new ConcurrentQueue<string>();
+        tcpServer.DataReceived += data => received.Enqueue(Encoding.ASCII.GetString(data));
+
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        using var firstClient = new System.Net.Sockets.TcpClient();
+        await firstClient.ConnectAsync(IPAddress.Loopback, port);
+        using var secondClient = new System.Net.Sockets.TcpClient();
+        await secondClient.ConnectAsync(IPAddress.Loopback, port);
+
+        // Act - the second client sends while the first one is still connected.
+        await secondClient.GetStream().WriteAsync(Encoding.ASCII.GetBytes("B"));
+        await firstClient.GetStream().WriteAsync(Encoding.ASCII.GetBytes("A"));
+
+        // Assert
+        Assert.True(await WaitHelper.WaitUntil(() => received.Contains("B", StringComparer.Ordinal)), "The second client should be served while the first is connected.");
+        Assert.True(await WaitHelper.WaitUntil(() => received.Contains("A", StringComparer.Ordinal)), "The first client should still be served.");
+
+        await tcpServer.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task ClientConnectedAndClientDisconnected_AreRaisedWithTheSameClientId()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(NullLogger.Instance, IPAddress.Loopback, port);
+
+        var connected = new ConcurrentQueue<TcpServerClientEventArgs>();
+        var disconnected = new ConcurrentQueue<TcpServerClientEventArgs>();
+        tcpServer.ClientConnected += (_, e) => connected.Enqueue(e);
+        tcpServer.ClientDisconnected += (_, e) => disconnected.Enqueue(e);
+
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        // Act
+        using (var client = new System.Net.Sockets.TcpClient())
+        {
+            await client.ConnectAsync(IPAddress.Loopback, port);
+            Assert.True(await WaitHelper.WaitUntil(() => !connected.IsEmpty), "ClientConnected should be raised.");
+        }
+
+        // Assert
+        Assert.True(await WaitHelper.WaitUntil(() => !disconnected.IsEmpty), "ClientDisconnected should be raised.");
+        Assert.Equal(connected.Single().ClientId, disconnected.Single().ClientId);
+        Assert.Equal(IPAddress.Loopback, connected.Single().RemoteEndPoint.Address);
+
+        await tcpServer.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task ClientDataReceived_CarriesClientId_SoSendRepliesToThatClient()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(NullLogger.Instance, IPAddress.Loopback, port);
+
+        tcpServer.ClientDataReceived += async (_, e) =>
+        {
+            var text = Encoding.ASCII.GetString(e.Data.Span);
+            await tcpServer.Send(e.ClientId, $"reply to {text}", CancellationToken.None);
+        };
+
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        using var firstClient = new System.Net.Sockets.TcpClient();
+        await firstClient.ConnectAsync(IPAddress.Loopback, port);
+        using var secondClient = new System.Net.Sockets.TcpClient();
+        await secondClient.ConnectAsync(IPAddress.Loopback, port);
+
+        // Act
+        await secondClient.GetStream().WriteAsync(Encoding.ASCII.GetBytes("B"));
+
+        // Assert - only the sender gets the reply.
+        Assert.Equal("reply to B", await ReadText(secondClient));
+        Assert.Null(await ReadText(firstClient, timeoutInMs: 300));
+
+        await tcpServer.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Send_ToUnknownClient_ReturnsFalse()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(NullLogger.Instance, IPAddress.Loopback, port);
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        // Act
+        var actual = await tcpServer.Send(Guid.NewGuid(), "hello", CancellationToken.None);
+
+        // Assert
+        Assert.False(actual);
+
+        await tcpServer.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task StopAsync_ClosesConnectedClients()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var tcpServer = new TcpServer(NullLogger.Instance, IPAddress.Loopback, port);
+        var connected = false;
+        tcpServer.ClientConnected += (_, _) => connected = true;
+        await tcpServer.StartAsync(CancellationToken.None);
+
+        using var client = new System.Net.Sockets.TcpClient();
+        await client.ConnectAsync(IPAddress.Loopback, port);
+        Assert.True(await WaitHelper.WaitUntil(() => connected), "ClientConnected should be raised.");
+
+        // Act
+        await tcpServer.StopAsync(CancellationToken.None);
+
+        // Assert - the client sees the connection end (read returns 0 or fails).
+        Assert.True(await IsClosedByServer(client), "StopAsync should close connected clients.");
+    }
+
     private static int GetFreePort()
     {
         using var listener = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
@@ -131,6 +256,41 @@ public sealed class TcpServerTests
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
         return port;
+    }
+
+    private static async Task<string?> ReadText(
+        System.Net.Sockets.TcpClient client,
+        int timeoutInMs = 3000)
+    {
+        using var timeout = new CancellationTokenSource(timeoutInMs);
+        var buffer = new byte[1024];
+        try
+        {
+            var read = await client.GetStream().ReadAsync(buffer, timeout.Token);
+            return read == 0 ? null : Encoding.ASCII.GetString(buffer, 0, read);
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    private static async Task<bool> IsClosedByServer(
+        System.Net.Sockets.TcpClient client)
+    {
+        using var timeout = new CancellationTokenSource(3000);
+        try
+        {
+            return await client.GetStream().ReadAsync(new byte[1], timeout.Token) == 0;
+        }
+        catch (IOException)
+        {
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            return false;
+        }
     }
 
     /// <summary>

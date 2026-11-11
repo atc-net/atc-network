@@ -143,11 +143,52 @@ This is a interface for `Atc.Network.Tcp.TcpClient`.
 ><b>Summary:</b> Port number for server connection.
 ### Events
 
+#### ClientConnected
+>```csharp
+>ClientConnected
+>```
+><b>Summary:</b> Event to raise when a client connects.
+#### ClientDataReceived
+>```csharp
+>ClientDataReceived
+>```
+><b>Summary:</b> Event to raise when a message is received, with the client that sent it.
+#### ClientDisconnected
+>```csharp
+>ClientDisconnected
+>```
+><b>Summary:</b> Event to raise when a client disconnects or is closed by the server.
 #### DataReceived
 >```csharp
 >DataReceived
 >```
 ><b>Summary:</b> Event to raise when data has become available from the server.
+### Methods
+
+#### Send
+>```csharp
+>Task<bool> Send(Guid clientId, string data, CancellationToken cancellationToken)
+>```
+><b>Summary:</b> Send text to one connected client.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`clientId`&nbsp;&nbsp;-&nbsp;&nbsp;The client id from ClientConnected or ClientDataReceived.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The text to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Returns:</b> <see langword="true" /> if the data was sent.
+#### Send
+>```csharp
+>Task<bool> Send(Guid clientId, byte[] data, CancellationToken cancellationToken)
+>```
+><b>Summary:</b> Send text to one connected client.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`clientId`&nbsp;&nbsp;-&nbsp;&nbsp;The client id from ClientConnected or ClientDataReceived.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The text to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Returns:</b> <see langword="true" /> if the data was sent.
 
 <br />
 
@@ -532,10 +573,26 @@ The main TcpServer - Handles call execution.
 >```
 ### Events
 
+#### ClientConnected
+>```csharp
+>ClientConnected
+>```
+><b>Summary:</b> Event to raise when a client connects.
+#### ClientDataReceived
+>```csharp
+>ClientDataReceived
+>```
+><b>Summary:</b> Event to raise when a message is received, with the client that sent it.
+#### ClientDisconnected
+>```csharp
+>ClientDisconnected
+>```
+><b>Summary:</b> Event to raise when a client disconnects or is closed by the server.
 #### DataReceived
 >```csharp
 >DataReceived
 >```
+><b>Summary:</b> Event to raise when a message is received from any client.
 ### Methods
 
 #### Dispose
@@ -545,6 +602,30 @@ The main TcpServer - Handles call execution.
 >
 ><b>Parameters:</b><br>
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`disposing`&nbsp;&nbsp;-&nbsp;&nbsp;Indicates if we are disposing or not.<br />
+#### Send
+>```csharp
+>Task<bool> Send(Guid clientId, string data, CancellationToken cancellationToken)
+>```
+><b>Summary:</b> Send text to one connected client, encoded with `Atc.Network.Tcp.TcpConfigBase.DefaultEncoding`.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`clientId`&nbsp;&nbsp;-&nbsp;&nbsp;The client id from  or .<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The text to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Returns:</b> <see langword="true" /> if the data was sent; <see langword="false" /> if the client is not connected or the send failed.
+#### Send
+>```csharp
+>Task<bool> Send(Guid clientId, byte[] data, CancellationToken cancellationToken)
+>```
+><b>Summary:</b> Send text to one connected client, encoded with `Atc.Network.Tcp.TcpConfigBase.DefaultEncoding`.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`clientId`&nbsp;&nbsp;-&nbsp;&nbsp;The client id from  or .<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`data`&nbsp;&nbsp;-&nbsp;&nbsp;The text to send.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellationToken.<br />
+>
+><b>Returns:</b> <see langword="true" /> if the data was sent; <see langword="false" /> if the client is not connected or the send failed.
 #### StartAsync
 >```csharp
 >Task StartAsync(CancellationToken cancellationToken)
@@ -557,7 +638,7 @@ The main TcpServer - Handles call execution.
 >```csharp
 >Task StopAsync(CancellationToken cancellationToken)
 >```
-><b>Summary:</b> Triggered when the application host is performing a graceful shutdown.
+><b>Summary:</b> Triggered when the application host is performing a graceful shutdown. Stops accepting clients and closes the connected ones.
 >
 ><b>Parameters:</b><br>
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;Indicates that the shutdown process should no longer be graceful.<br />

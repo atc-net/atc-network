@@ -8,6 +8,21 @@ public interface ITcpServer : IHostedService, IDisposable
     event Action<byte[]>? DataReceived;
 
     /// <summary>
+    /// Event to raise when a message is received, with the client that sent it.
+    /// </summary>
+    event EventHandler<TcpServerDataReceivedEventArgs>? ClientDataReceived;
+
+    /// <summary>
+    /// Event to raise when a client connects.
+    /// </summary>
+    event EventHandler<TcpServerClientEventArgs>? ClientConnected;
+
+    /// <summary>
+    /// Event to raise when a client disconnects or is closed by the server.
+    /// </summary>
+    event EventHandler<TcpServerClientEventArgs>? ClientDisconnected;
+
+    /// <summary>
     /// IPAddress for server connection.
     /// </summary>
     IPAddress IpAddress { get; }
@@ -21,4 +36,28 @@ public interface ITcpServer : IHostedService, IDisposable
     /// Is running.
     /// </summary>
     bool IsRunning { get; }
+
+    /// <summary>
+    /// Send text to one connected client.
+    /// </summary>
+    /// <param name="clientId">The client id from ClientConnected or ClientDataReceived.</param>
+    /// <param name="data">The text to send.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    /// <returns><see langword="true"/> if the data was sent.</returns>
+    Task<bool> Send(
+        Guid clientId,
+        string data,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Send data to one connected client.
+    /// </summary>
+    /// <param name="clientId">The client id from ClientConnected or ClientDataReceived.</param>
+    /// <param name="data">The data to send.</param>
+    /// <param name="cancellationToken">The cancellationToken.</param>
+    /// <returns><see langword="true"/> if the data was sent.</returns>
+    Task<bool> Send(
+        Guid clientId,
+        byte[] data,
+        CancellationToken cancellationToken);
 }

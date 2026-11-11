@@ -19,6 +19,8 @@
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
+- [TcpServerClientEventArgs](Atc.Network.md#tcpserverclienteventargs)
+- [TcpServerDataReceivedEventArgs](Atc.Network.md#tcpserverdatareceivedeventargs)
 - [TerminationType](Atc.Network.md#terminationtype)
 - [TransportProtocolType](Atc.Network.md#transportprotocoltype)
 - [UdpDatagramReceivedEventArgs](Atc.Network.md#udpdatagramreceivedeventargs)
