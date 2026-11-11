@@ -59,6 +59,8 @@ public static class LoggingEventIdConstants
         public const int NotRunning = 10320;
         public const int DataSendingSocketError = 10321;
         public const int DataSendingError = 10322;
+        public const int DataReceivedHandlerError = 10323;
+        public const int DataReceiveSocketError = 10324;
     }
 
     internal static class VncClient

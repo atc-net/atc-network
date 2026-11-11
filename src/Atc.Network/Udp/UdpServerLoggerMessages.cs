@@ -36,4 +36,19 @@ public partial class UdpServer
         Message = "Received error when sending data: {errorMessage}.")]
     private partial void LogDataSendingError(
         string errorMessage);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpServer.DataReceivedHandlerError,
+        Level = LogLevel.Error,
+        Message = "A DataReceived handler failed.")]
+    private partial void LogDataReceivedHandlerError(
+        Exception exception);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.UdpServer.DataReceiveSocketError,
+        Level = LogLevel.Warning,
+        Message = "Received error when receiving data - {socketError}: {errorMessage}.")]
+    private partial void LogDataReceiveSocketError(
+        string socketError,
+        string errorMessage);
 }
