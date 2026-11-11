@@ -13,6 +13,7 @@ public partial class TcpServer : ITcpServer
     private readonly TcpListener? tcpListener;
     private readonly string ipAddressStr;
     private readonly ConcurrentDictionary<Guid, TcpServerConnection> clients = new();
+    private NetworkInstrumentation? instrumentation;
 
     /// <summary>
     /// Event to raise when a message is received from any client.
@@ -105,6 +106,12 @@ public partial class TcpServer : ITcpServer
     /// Is running.
     /// </summary>
     public bool IsRunning { get; private set; }
+
+    /// <summary>
+    /// Gets the metrics and activities of this instance. Created on first use, when the address and port are known.
+    /// </summary>
+    private NetworkInstrumentation Instrumentation
+        => LazyInitializer.EnsureInitialized(ref instrumentation, () => new NetworkInstrumentation("tcp_server", ipAddressStr, Port));
 
     /// <summary>
     /// Triggered when the application host is ready to start the service.
@@ -200,6 +207,7 @@ public partial class TcpServer : ITcpServer
 
         TerminationHelper.AppendTerminationBytesIfNeeded(ref data, serverConfig.TerminationType);
 
+        using var activity = Instrumentation.StartActivity("TcpServer.Send", ActivityKind.Internal);
         var lockAcquired = false;
         try
         {
@@ -207,11 +215,13 @@ public partial class TcpServer : ITcpServer
             lockAcquired = true;
 
             await connection.Stream.WriteAsync(data, cancellationToken);
+            Instrumentation.Sent(data.Length);
             return true;
         }
         catch (Exception ex) when (ex is IOException or SocketException or ObjectDisposedException or InvalidOperationException)
         {
             LogClientConnectionError(ipAddressStr, Port, ex.Message);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             return false;
         }
         finally
@@ -310,6 +320,7 @@ public partial class TcpServer : ITcpServer
         }
 
         clients[connection.ClientId] = connection;
+        Instrumentation.ConnectionOpened();
 
         var connectedEventArgs = new TcpServerClientEventArgs(connection.ClientId, connection.RemoteEndPoint);
         InvokeHandlers(
@@ -332,6 +343,7 @@ public partial class TcpServer : ITcpServer
         finally
         {
             clients.TryRemove(connection.ClientId, out _);
+            Instrumentation.ConnectionClosed();
             connection.Dispose();
 
             var eventArgs = new TcpServerClientEventArgs(connection.ClientId, connection.RemoteEndPoint);
@@ -373,6 +385,7 @@ public partial class TcpServer : ITcpServer
         }
         catch (Exception ex)
         {
+            Instrumentation.ConnectionFailed();
             if (serverConfig.SslOptions is null)
             {
                 LogClientConnectionError(ipAddressStr, Port, ex.Message);
@@ -447,6 +460,7 @@ public partial class TcpServer : ITcpServer
         while (!messageHasEnded);
 
         LogDataReceived(ipAddressStr, Port, (int)memoryStream.Length);
+        Instrumentation.Received((int)memoryStream.Length);
         InvokeDataReceived(memoryStream.ToArray(), connection);
     }
 
@@ -461,7 +475,7 @@ public partial class TcpServer : ITcpServer
         {
             foreach (var handler in handlers.GetInvocationList().Cast<Action<byte[]>>())
             {
-                InvokeDataReceivedHandler(() => handler(data));
+                InvokeDataReceivedHandler(nameof(DataReceived), () => handler(data));
             }
         }
 
@@ -471,14 +485,16 @@ public partial class TcpServer : ITcpServer
             var eventArgs = new TcpServerDataReceivedEventArgs(connection.ClientId, connection.RemoteEndPoint, data);
             foreach (var handler in clientHandlers.GetInvocationList().Cast<EventHandler<TcpServerDataReceivedEventArgs>>())
             {
-                InvokeDataReceivedHandler(() => handler(this, eventArgs));
+                InvokeDataReceivedHandler(nameof(ClientDataReceived), () => handler(this, eventArgs));
             }
         }
 
-        InvokeDataReceivedHandler(() => OnDataReceived(data));
+        InvokeDataReceivedHandler(nameof(OnDataReceived), () => OnDataReceived(data));
     }
 
-    private void InvokeDataReceivedHandler(Action invoke)
+    private void InvokeDataReceivedHandler(
+        string eventName,
+        Action invoke)
     {
         try
         {
@@ -487,6 +503,7 @@ public partial class TcpServer : ITcpServer
         catch (Exception ex)
         {
             LogDataReceivedHandlerError(ipAddressStr, Port, ex);
+            Instrumentation.HandlerFailed(eventName);
         }
     }
 
@@ -509,6 +526,7 @@ public partial class TcpServer : ITcpServer
             catch (Exception ex)
             {
                 LogEventHandlerError(ipAddressStr, Port, eventName, ex);
+                Instrumentation.HandlerFailed(eventName);
             }
         }
     }

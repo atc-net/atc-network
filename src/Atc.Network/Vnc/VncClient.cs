@@ -28,6 +28,7 @@ public partial class VncClient : IVncClient
     private Task? updateListenerTask;
     private string? storedPassword;
     private bool isConnected;
+    private NetworkInstrumentation? instrumentation;
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -227,8 +228,14 @@ public partial class VncClient : IVncClient
     public bool IsConnected
     {
         get => isConnected;
-        private set => isConnected = value;
+        private set => SetIsConnected(value);
     }
+
+    /// <summary>
+    /// Gets the metrics and activities of this instance. Created on first use, when the address and port are known.
+    /// </summary>
+    private NetworkInstrumentation Instrumentation
+        => LazyInitializer.EnsureInitialized(ref instrumentation, () => new NetworkInstrumentation("vnc_client", IPAddressOrHostname, Port));
 
     /// <summary>
     /// Gets the framebuffer after initialization.
@@ -253,6 +260,7 @@ public partial class VncClient : IVncClient
             return false;
         }
 
+        using var activity = Instrumentation.StartActivity("VncClient.Connect", ActivityKind.Client);
         LogConnecting(IPAddressOrHostname, Port);
         InvokeConnectionStateChanged(ConnectionState.Connecting);
 
@@ -306,6 +314,8 @@ public partial class VncClient : IVncClient
         catch (Exception ex)
         {
             LogConnectionError(IPAddressOrHostname, Port, ex.Message);
+            Instrumentation.ConnectionFailed();
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             InvokeConnectionStateChanged(ConnectionState.ConnectionFailed, ex.Message);
 
             CleanupTcpClient();
@@ -944,10 +954,12 @@ public partial class VncClient : IVncClient
             if (await DoConnectAuthenticateAndInitialize())
             {
                 LogReconnected(IPAddressOrHostname, Port);
+                Instrumentation.Reconnected(success: true);
                 InvokeConnectionStateChanged(ConnectionState.Reconnected);
                 return;
             }
 
+            Instrumentation.Reconnected(success: false);
             if (attempt < clientReconnectConfig.RetryMaxAttempts)
             {
                 LogReconnectionWarning(IPAddressOrHostname, Port, attempt, clientReconnectConfig.RetryMaxAttempts);
@@ -1064,6 +1076,12 @@ public partial class VncClient : IVncClient
         InvokeHandler(nameof(OnConnectionStateChanged), () => OnConnectionStateChanged(connectionState, errorMessage));
     }
 
+    private void SetIsConnected(bool value)
+    {
+        isConnected = value;
+        Instrumentation.SetConnected(value);
+    }
+
     private void InvokeHandler(
         string eventName,
         Action invoke)
@@ -1075,6 +1093,7 @@ public partial class VncClient : IVncClient
         catch (Exception ex)
         {
             LogEventHandlerError(IPAddressOrHostname, Port, eventName, ex);
+            Instrumentation.HandlerFailed(eventName);
         }
     }
 

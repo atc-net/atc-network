@@ -17,6 +17,7 @@
 - [IPStatusExtensions](Atc.Network.md#ipstatusextensions)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
+- [NetworkTelemetry](Atc.Network.md#networktelemetry)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)
 - [TcpClientExtensions](Atc.Network.md#tcpclientextensions)
 - [TcpServerClientEventArgs](Atc.Network.md#tcpserverclienteventargs)

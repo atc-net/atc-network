@@ -18,6 +18,7 @@ public partial class UdpServer : IUdpServer
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
     private readonly Socket? socket;
+    private NetworkInstrumentation? instrumentation;
 
     /// <summary>
     /// Event to raise when data has become available from the server.
@@ -104,6 +105,12 @@ public partial class UdpServer : IUdpServer
     /// Is running.
     /// </summary>
     public bool IsRunning { get; private set; }
+
+    /// <summary>
+    /// Gets the metrics and activities of this instance. Created on first use, when the address and port are known.
+    /// </summary>
+    private NetworkInstrumentation Instrumentation
+        => LazyInitializer.EnsureInitialized(ref instrumentation, () => CreateInstrumentation());
 
     /// <summary>
     /// Triggered when the application host is ready to start the service.
@@ -207,18 +214,22 @@ public partial class UdpServer : IUdpServer
         AppendTerminationBytesIfNeeded(ref data, terminationType);
 
         var buffer = new ArraySegment<byte>(data);
+        using var activity = Instrumentation.StartActivity("UdpServer.Send", ActivityKind.Internal);
 
         try
         {
             await socket!.SendToAsync(buffer, SocketFlags.None, recipient, cancellationToken);
+            Instrumentation.Sent(data.Length);
         }
         catch (SocketException ex)
         {
             LogDataSendingSocketError(ex.SocketErrorCode.ToString(), ex.Message);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
         }
         catch (Exception ex)
         {
             LogDataSendingError(ex.Message);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
         }
     }
 
@@ -273,7 +284,7 @@ public partial class UdpServer : IUdpServer
         {
             foreach (var handler in handlers.GetInvocationList().Cast<Action<byte[]>>())
             {
-                InvokeHandler(() => handler(data));
+                InvokeHandler(nameof(DataReceived), () => handler(data));
             }
         }
 
@@ -283,14 +294,16 @@ public partial class UdpServer : IUdpServer
             var eventArgs = new UdpDatagramReceivedEventArgs(data, remoteEndPoint);
             foreach (var handler in datagramHandlers.GetInvocationList().Cast<EventHandler<UdpDatagramReceivedEventArgs>>())
             {
-                InvokeHandler(() => handler(this, eventArgs));
+                InvokeHandler(nameof(DatagramReceived), () => handler(this, eventArgs));
             }
         }
 
-        InvokeHandler(() => OnDataReceived(data));
+        InvokeHandler(nameof(OnDataReceived), () => OnDataReceived(data));
     }
 
-    private void InvokeHandler(Action invoke)
+    private void InvokeHandler(
+        string eventName,
+        Action invoke)
     {
         try
         {
@@ -299,7 +312,18 @@ public partial class UdpServer : IUdpServer
         catch (Exception ex)
         {
             LogDataReceivedHandlerError(ex);
+            Instrumentation.HandlerFailed(eventName);
         }
+    }
+
+    private NetworkInstrumentation CreateInstrumentation()
+    {
+        // The bound address and port, which is the actual port also when port 0 was asked for.
+        var localEndPoint = socket?.LocalEndPoint as IPEndPoint;
+        return new NetworkInstrumentation(
+            "udp_server",
+            localEndPoint?.Address.ToString() ?? string.Empty,
+            localEndPoint?.Port ?? 0);
     }
 
     private static void AppendTerminationBytesIfNeeded(
@@ -357,6 +381,7 @@ public partial class UdpServer : IUdpServer
         var receivedBytes = receiveBufferSegment.AsSpan(0, res.ReceivedBytes).ToArray();
 
         LogDataReceived(receivedBytes.Length);
+        Instrumentation.Received(receivedBytes.Length);
         InvokeDataReceived(receivedBytes, (IPEndPoint)res.RemoteEndPoint);
 
         if (!serverConfig.RespondToPing && !serverConfig.EchoOnReceivedData)

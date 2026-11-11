@@ -28,6 +28,8 @@ public partial class TcpClient : ITcpClient
     private Task? receiveListenerTask;
     private System.Net.Sockets.TcpClient? tcpClient;
     private Stream? networkStream;
+    private NetworkInstrumentation? instrumentation;
+    private bool isConnected;
 
     /// <summary>
     /// Event to raise when connection is established.
@@ -196,14 +198,34 @@ public partial class TcpClient : ITcpClient
     /// <summary>
     /// Is client connected.
     /// </summary>
-    public bool IsConnected { get; private set; }
+    public bool IsConnected
+    {
+        get => isConnected;
+        private set => SetIsConnected(value);
+    }
+
+    /// <summary>
+    /// Gets the metrics and activities of this instance. Created on first use, when the address and port are known.
+    /// </summary>
+    private NetworkInstrumentation Instrumentation
+        => LazyInitializer.EnsureInitialized(ref instrumentation, () => new NetworkInstrumentation("tcp_client", IPAddressOrHostname, Port));
 
     /// <summary>
     /// Connect.
     /// </summary>
     /// <param name="cancellationToken">The cancellationToken.</param>
-    public Task<bool> Connect(CancellationToken cancellationToken = default)
-        => DoConnect(raiseEventsAndLog: true, cancellationToken);
+    public async Task<bool> Connect(
+        CancellationToken cancellationToken = default)
+    {
+        using var activity = Instrumentation.StartActivity("TcpClient.Connect", ActivityKind.Client);
+        var connected = await DoConnect(raiseEventsAndLog: true, cancellationToken);
+        if (!connected && !IsConnected)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error);
+        }
+
+        return connected;
+    }
 
     /// <summary>
     /// Disconnect.
@@ -287,6 +309,7 @@ public partial class TcpClient : ITcpClient
 
         LogDataSendingByteLength(IPAddressOrHostname, Port, data.Length);
 
+        using var activity = Instrumentation.StartActivity("TcpClient.Send", ActivityKind.Client);
         var disconnectedDueToException = false;
 
         var lockAcquired = false;
@@ -302,16 +325,19 @@ public partial class TcpClient : ITcpClient
 
             await networkStream!.WriteAsync(data.AsMemory(0, data.Length), cancellationToken);
             await networkStream.FlushAsync(cancellationToken);
+            Instrumentation.Sent(data.Length);
         }
         catch (SocketException ex)
         {
             LogDataSendingSocketError(IPAddressOrHostname, Port, ex.SocketErrorCode.ToString(), ex.Message);
             disconnectedDueToException = true;
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
         }
         catch (Exception ex)
         {
             LogDataSendingError(IPAddressOrHostname, Port, ex.Message);
             disconnectedDueToException = true;
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
         }
         finally
         {
@@ -434,6 +460,12 @@ public partial class TcpClient : ITcpClient
         }
     }
 
+    private void SetIsConnected(bool value)
+    {
+        isConnected = value;
+        Instrumentation.SetConnected(value);
+    }
+
     private void InvokeHandler(
         string eventName,
         Action invoke)
@@ -445,6 +477,7 @@ public partial class TcpClient : ITcpClient
         catch (Exception ex)
         {
             LogEventHandlerError(IPAddressOrHostname, Port, eventName, ex);
+            Instrumentation.HandlerFailed(eventName);
         }
     }
 
@@ -475,6 +508,7 @@ public partial class TcpClient : ITcpClient
         catch (Exception ex)
         {
             LogDataReceivedHandlerError(IPAddressOrHostname, Port, ex);
+            Instrumentation.HandlerFailed(nameof(DataReceived));
         }
     }
 
@@ -522,6 +556,7 @@ public partial class TcpClient : ITcpClient
         {
             if (raiseEventsAndLog)
             {
+                Instrumentation.ConnectionFailed();
                 LogConnectionError(IPAddressOrHostname, Port, ex.Message);
                 InvokeConnectionStateChanged(ConnectionState.ConnectionFailed, ex.Message);
             }
@@ -578,10 +613,12 @@ public partial class TcpClient : ITcpClient
             if (await DoConnect(raiseEventsAndLog: false, CancellationToken.None))
             {
                 LogReconnected(IPAddressOrHostname, Port);
+                Instrumentation.Reconnected(success: true);
                 InvokeConnectionStateChanged(ConnectionState.Reconnected);
                 return;
             }
 
+            Instrumentation.Reconnected(success: false);
             if (attempt < clientReconnectConfig.RetryMaxAttempts)
             {
                 LogReconnectionWarning(IPAddressOrHostname, Port, attempt, clientReconnectConfig.RetryMaxAttempts);
@@ -792,9 +829,15 @@ public partial class TcpClient : ITcpClient
         }
         else
         {
-            LogDataReceivedByteLength(IPAddressOrHostname, Port, data.Length);
-            InvokeDataReceived(data);
+            HandleDataRead(data);
         }
+    }
+
+    private void HandleDataRead(byte[] data)
+    {
+        LogDataReceivedByteLength(IPAddressOrHostname, Port, data.Length);
+        Instrumentation.Received(data.Length);
+        InvokeDataReceived(data);
     }
 
     private async Task<byte[]> ReadData(CancellationToken cancellationToken)
@@ -858,7 +901,7 @@ public partial class TcpClient : ITcpClient
             cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenRegistration = cancellationTokenSource.Token.Register(CancellationTokenCallback);
 
-            receiveListenerTask = Task.Run(
+            receiveListenerTask = NetworkInstrumentation.RunOutsideCurrentActivity(
                 async () => await DataReceiver(cancellationTokenSource.Token),
                 cancellationTokenSource.Token);
         }

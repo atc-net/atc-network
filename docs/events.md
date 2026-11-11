@@ -56,7 +56,7 @@ tcpServer.ClientDataReceived += async (_, e) =>
 
 ## 📋 Log event ids
 
-Use these ids to find handler failures and receive errors in your logs.
+Use these ids to find handler failures and receive errors in your logs. Handler failures are also counted in the `atc.network.handler.errors` metric (see [Metrics & Tracing](telemetry.md)).
 
 | Component | Event id | Logged when |
 |-----------|----------|-------------|
