@@ -126,6 +126,122 @@ A service found with mDNS / DNS-SD, such as a web interface, a printer or a Chro
 
 <br />
 
+## OnvifDevice
+An ONVIF device that answered a WS-Discovery probe: a camera (network video transmitter), an NVR or another device.
+
+>```csharp
+>public class OnvifDevice
+>```
+
+### Properties
+
+#### DeviceServiceUrl
+>```csharp
+>DeviceServiceUrl
+>```
+><b>Summary:</b> Gets the device service URL to use: the one on the address that answered, else the first IPv4 one, or <see langword="null" /> when the device listed none.
+#### EndpointReference
+>```csharp
+>EndpointReference
+>```
+><b>Summary:</b> Gets the device's endpoint reference, such as "urn:uuid:…": a stable id that stays the same when the device's address changes.
+#### Hardware
+>```csharp
+>Hardware
+>```
+><b>Summary:</b> Gets the hardware (model) from the "hardware" scope.
+#### IPAddress
+>```csharp
+>IPAddress
+>```
+><b>Summary:</b> Gets the address the answer came from.
+#### IsNetworkVideoTransmitter
+>```csharp
+>IsNetworkVideoTransmitter
+>```
+><b>Summary:</b> Gets a value indicating whether the device is a network video transmitter: a camera or video encoder.
+#### Location
+>```csharp
+>Location
+>```
+><b>Summary:</b> Gets the location from the first "location" scope.
+#### Name
+>```csharp
+>Name
+>```
+><b>Summary:</b> Gets the name from the "name" scope, such as "HIKVISION DS-2CD2183G0-IU" or "C210".
+#### Scopes
+>```csharp
+>Scopes
+>```
+><b>Summary:</b> Gets the scopes, percent-decoded, such as "onvif://www.onvif.org/name/C210" or "onvif://www.onvif.org/Profile/Streaming".
+#### Types
+>```csharp
+>Types
+>```
+><b>Summary:</b> Gets the device types, such as "tdn:NetworkVideoTransmitter" for a camera, as the device wrote them.
+#### XAddrs
+>```csharp
+>XAddrs
+>```
+><b>Summary:</b> Gets the device service URLs. A device can list several, such as one per address.
+### Methods
+
+#### ToString
+>```csharp
+>string ToString()
+>```
+
+<br />
+
+## OnvifDiscovery
+Finds ONVIF devices on the local network with WS-Discovery: IP cameras of every brand that support ONVIF, video encoders, NVRs and other ONVIF devices.
+><b>Remarks:</b> Two probes are sent to 239.255.255.250:3702 on every IPv4 network interface, from a random port: one for cameras (`NetworkVideoTransmitter`) and one for every ONVIF device (`Device`), since some devices only answer one of them. Devices answer by unicast with a ProbeMatch: their name, hardware and device service URL.<br>The sequence ends normally when the duration is over. Cancelling the token before that throws an `System.OperationCanceledException`. Many cameras ship with ONVIF turned off; those don't answer.
+
+>```csharp
+>public static class OnvifDiscovery
+>```
+
+### Static Fields
+
+#### DefaultDurationInMs
+>```csharp
+>int DefaultDurationInMs
+>```
+><b>Summary:</b> The default time to collect answers, in milliseconds.
+#### DeviceType
+>```csharp
+>string DeviceType
+>```
+><b>Summary:</b> The device type every ONVIF device has.
+#### NetworkVideoTransmitterType
+>```csharp
+>string NetworkVideoTransmitterType
+>```
+><b>Summary:</b> The device type of a camera or video encoder.
+### Static Properties
+
+#### MulticastEndPoint
+>```csharp
+>MulticastEndPoint
+>```
+><b>Summary:</b> Gets the WS-Discovery multicast endpoint: 239.255.255.250:3702.
+### Static Methods
+
+#### Probe
+>```csharp
+>IAsyncEnumerable<OnvifDevice> Probe(TimeSpan? duration = null, CancellationToken cancellationToken = null)
+>```
+><b>Summary:</b> Finds the ONVIF devices on the local network, and returns each as it answers.
+>
+><b>Parameters:</b><br>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`duration`&nbsp;&nbsp;-&nbsp;&nbsp;How long to collect answers. The default is 3 seconds.<br />
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`cancellationToken`&nbsp;&nbsp;-&nbsp;&nbsp;The cancellation token.<br />
+>
+><b>Returns:</b> Each device once (by its endpoint reference). The sequence ends when the duration is over.
+
+<br />
+
 ## SsdpDevice
 A device or service that answered an SSDP (UPnP) search.
 

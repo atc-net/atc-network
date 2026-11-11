@@ -50,6 +50,7 @@ public class CodeComplianceTests
         // that take the target endpoint (a fake responder); the public ones are covered by integration tests.
         typeof(MdnsDiscovery),
         typeof(SsdpDiscovery),
+        typeof(OnvifDiscovery),
     };
 
     public CodeComplianceTests(ITestOutputHelper testOutputHelper)

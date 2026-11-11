@@ -44,7 +44,7 @@ Which components record what:
 | `VncClient` | ✅ | ✅ | ✅ | – | ✅ |
 | `WakeOnLanHelper` | – | – | – | ✅ (sent) | – |
 | `NtpHelper` | – | – | – | ✅ | – |
-| `MdnsDiscovery`, `SsdpDiscovery` | – | – | – | ✅ | – |
+| `MdnsDiscovery`, `SsdpDiscovery`, `OnvifDiscovery` | – | – | – | ✅ | – |
 | `NetBiosHelper` | – | – | – | ✅ | – |
 | `TracerouteHelper` | – | – | – | ✅ (probes) | – |
 
@@ -54,7 +54,7 @@ Every measurement and span has these tags:
 
 | Tag | Value |
 |-----|-------|
-| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client`, `wake_on_lan`, `ntp_client`, `mdns_discovery`, `ssdp_discovery`, `netbios_client` or `traceroute` |
+| `atc.network.component` | `tcp_client`, `tcp_server`, `udp_client`, `udp_server`, `vnc_client`, `wake_on_lan`, `ntp_client`, `mdns_discovery`, `ssdp_discovery`, `onvif_discovery`, `netbios_client` or `traceroute` |
 | `server.address` | The server a client connects to, the address a server listens on, where a Wake-on-LAN packet is sent, the NTP or NetBIOS host asked, the traceroute target, or the multicast address a discovery queries |
 | `server.port` | The server's port |
 
@@ -77,6 +77,7 @@ Client endpoints of a server are not tags, so the number of time series stays sm
 | `Ntp.GetTime` | Client | Each `GetTime`. Status `Error` on a timeout or a refused reply |
 | `MdnsDiscovery.Browse`, `MdnsDiscovery.BrowseAll`, `MdnsDiscovery.GetServiceTypes` | Client | Each discovery, for its whole duration |
 | `SsdpDiscovery.Search` | Client | Each search, for its whole duration |
+| `OnvifDiscovery.Probe` | Client | Each probe, for its whole duration |
 | `NetBios.GetNodeStatus` | Client | Each `GetNodeStatus` |
 | `Traceroute.Trace` | Client | Each trace, from the first probe to the last hop (`server.port` is 0, since ICMP has no port) |
 

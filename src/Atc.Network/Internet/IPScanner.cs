@@ -111,6 +111,11 @@ public partial class IPScanner : IIPScanner, IDisposable
     internal int NetBiosPort { get; set; } = NetBiosHelper.DefaultPort;
 
     /// <summary>
+    /// Gets or sets where ONVIF WS-Discovery probes are sent. Tests point it at a fake responder.
+    /// </summary>
+    internal IPEndPoint OnvifQueryEndPoint { get; set; } = OnvifDiscovery.MulticastEndPoint;
+
+    /// <summary>
     /// Initiates an asynchronous scan for the specified IP address.
     /// </summary>
     /// <param name="ipAddress">The IP address to scan.</param>
@@ -301,7 +306,7 @@ public partial class IPScanner : IIPScanner, IDisposable
         IReadOnlyCollection<IPAddress> ipAddresses,
         CancellationToken cancellationToken)
     {
-        var discoveryTask = Configuration.DiscoverServices
+        var discoveryTask = Configuration.DiscoverServices || Configuration.DiscoverOnvif
             ? DiscoverServices(cancellationToken)
             : null;
 
@@ -328,42 +333,46 @@ public partial class IPScanner : IIPScanner, IDisposable
 
         if (discoveryTask is not null)
         {
-            var (mdnsServices, ssdpDevices) = await discoveryTask;
-            AttachDiscoveredServices(mdnsServices, ssdpDevices);
+            AttachDiscoveredServices(await discoveryTask);
         }
     }
 
     /// <summary>
-    /// Attaches the services to the scanned addresses, matched by the addresses in the mDNS records
-    /// and the address an SSDP answer came from.
+    /// Attaches the discovered services and devices to the scanned addresses, matched by the addresses in the mDNS records,
+    /// the address an SSDP or ONVIF answer came from, and the host of an ONVIF device service URL.
     /// </summary>
-    private void AttachDiscoveredServices(
-        IReadOnlyList<MdnsServiceInstance> mdnsServices,
-        IReadOnlyList<SsdpDevice> ssdpDevices)
+    private void AttachDiscoveredServices(DiscoveredServices discovered)
     {
         foreach (var scanResult in processedScanResults)
         {
             var ipAddress = WithoutIPv4Mapping(scanResult.IPAddress);
-            scanResult.MdnsServices = mdnsServices
+            scanResult.MdnsServices = discovered.MdnsServices
                 .Where(x => x.IPAddresses.Any(a => WithoutIPv4Mapping(a).Equals(ipAddress)))
                 .ToList();
-            scanResult.SsdpDevices = ssdpDevices
+            scanResult.SsdpDevices = discovered.SsdpDevices
                 .Where(x => WithoutIPv4Mapping(x.IPAddress).Equals(ipAddress))
+                .ToList();
+            scanResult.OnvifDevices = discovered.OnvifDevices
+                .Where(x => WithoutIPv4Mapping(x.IPAddress).Equals(ipAddress) ||
+                            (IPAddress.TryParse(x.DeviceServiceUrl?.Host.Trim('[', ']'), out var host) && host.Equals(ipAddress)))
                 .ToList();
         }
     }
 
-    private async Task<(IReadOnlyList<MdnsServiceInstance> MdnsServices, IReadOnlyList<SsdpDevice> SsdpDevices)> DiscoverServices(
+    private async Task<DiscoveredServices> DiscoverServices(
         CancellationToken cancellationToken)
     {
-        var mdnsTask = CollectDiscovered(
-            MdnsDiscovery.BrowseAll(Configuration.TimeoutDiscovery, MdnsQueryEndPoint, cancellationToken),
-            "mDNS");
-        var ssdpTask = CollectDiscovered(
-            SsdpDiscovery.Search(SsdpDiscovery.DefaultSearchTarget, Configuration.TimeoutDiscovery, SsdpQueryEndPoint, cancellationToken),
-            "SSDP");
+        var mdnsTask = Configuration.DiscoverServices
+            ? CollectDiscovered(MdnsDiscovery.BrowseAll(Configuration.TimeoutDiscovery, MdnsQueryEndPoint, cancellationToken), "mDNS")
+            : Task.FromResult<IReadOnlyList<MdnsServiceInstance>>([]);
+        var ssdpTask = Configuration.DiscoverServices
+            ? CollectDiscovered(SsdpDiscovery.Search(SsdpDiscovery.DefaultSearchTarget, Configuration.TimeoutDiscovery, SsdpQueryEndPoint, cancellationToken), "SSDP")
+            : Task.FromResult<IReadOnlyList<SsdpDevice>>([]);
+        var onvifTask = Configuration.DiscoverOnvif
+            ? CollectDiscovered(OnvifDiscovery.Probe(Configuration.TimeoutDiscovery, OnvifQueryEndPoint, cancellationToken), "ONVIF")
+            : Task.FromResult<IReadOnlyList<OnvifDevice>>([]);
 
-        return (await mdnsTask, await ssdpTask);
+        return new DiscoveredServices(await mdnsTask, await ssdpTask, await onvifTask);
     }
 
     /// <summary>
@@ -687,4 +696,12 @@ public partial class IPScanner : IIPScanner, IDisposable
         Interlocked.Increment(ref tasksProcessedCount);
         RaiseProgressReporting(IPScannerProgressReportingType.ServiceHttp, ipScanResult);
     }
+
+    /// <summary>
+    /// What one discovery pass found.
+    /// </summary>
+    private sealed record DiscoveredServices(
+        IReadOnlyList<MdnsServiceInstance> MdnsServices,
+        IReadOnlyList<SsdpDevice> SsdpDevices,
+        IReadOnlyList<OnvifDevice> OnvifDevices);
 }

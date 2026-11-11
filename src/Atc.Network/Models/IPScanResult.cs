@@ -42,6 +42,11 @@ public class IPScanResult
     public NetBiosNodeStatus? NetBiosStatus { get; set; }
 
     /// <summary>
+    /// Gets or sets the ONVIF devices (cameras, NVRs) found on this address, when <see cref="IPScannerConfig.DiscoverOnvif"/> is on.
+    /// </summary>
+    public IList<OnvifDevice> OnvifDevices { get; set; } = new List<OnvifDevice>();
+
+    /// <summary>
     /// Gets the host name the address announces with mDNS, such as "printer.local", or <see langword="null"/>.
     /// It often names devices that reverse DNS (<see cref="Hostname"/>) does not know.
     /// </summary>
@@ -71,6 +76,7 @@ public class IPScanResult
            OpenPortNumbers.Any() ||
            MdnsServices.Count > 0 ||
            SsdpDevices.Count > 0 ||
+           OnvifDevices.Count > 0 ||
            NetBiosStatus is not null;
 
     public override string ToString()
@@ -82,7 +88,7 @@ public class IPScanResult
 
         if (HasConnection)
         {
-            var hostname = new[] { Hostname, MdnsHostName, NetBiosStatus?.ComputerName }
+            var hostname = new[] { Hostname, MdnsHostName, NetBiosStatus?.ComputerName, OnvifDevices.FirstOrDefault()?.Name }
                 .FirstOrDefault(x => !string.IsNullOrEmpty(x));
             if (!string.IsNullOrEmpty(hostname))
             {
@@ -90,10 +96,10 @@ public class IPScanResult
                 sb.Append(" # ");
             }
 
-            if (MdnsServices.Count > 0 || SsdpDevices.Count > 0)
+            if (MdnsServices.Count > 0 || SsdpDevices.Count > 0 || OnvifDevices.Count > 0)
             {
                 sb.Append("Services ");
-                sb.Append(MdnsServices.Count + SsdpDevices.Count);
+                sb.Append(MdnsServices.Count + SsdpDevices.Count + OnvifDevices.Count);
                 sb.Append(" # ");
             }
 

@@ -94,6 +94,63 @@ public sealed class IPScannerDiscoveryTests
         Assert.Equal(2, logger.Entries.Count(x => x.EventId.Id == 10500));
     }
 
+    [Fact]
+    public async Task Scan_DiscoverOnvif_AttachesTheOnvifDeviceOfTheAddress()
+    {
+        // Arrange - a camera on 127.0.0.1 answers the probes.
+        using var onvifResponder = new FakeResponder(request =>
+        [
+            OnvifFixtures.RelatedTo(
+                OnvifFixtures.TapoC210ProbeMatch.Replace("192.168.1.132", "127.0.0.1", StringComparison.Ordinal),
+                OnvifFixtures.ReadProbe(request).MessageId),
+        ]);
+        using var ipScanner = CreateOnvifScanner(onvifResponder, discoverOnvif: true);
+
+        // Act
+        var results = await ipScanner.Scan(IPAddress.Loopback, CancellationToken.None);
+
+        // Assert
+        var result = Assert.Single(results.CollectedResults);
+        var device = Assert.Single(result.OnvifDevices);
+        Assert.Equal("C210", device.Name);
+        Assert.True(result.HasConnection);
+        Assert.Contains("C210", result.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Scan_DiscoverOnvifOff_SendsNoProbe()
+    {
+        // Arrange
+        using var onvifResponder = new FakeResponder(_ => []);
+        using var ipScanner = CreateOnvifScanner(onvifResponder, discoverOnvif: false);
+
+        // Act
+        var results = await ipScanner.Scan(IPAddress.Loopback, CancellationToken.None);
+
+        // Assert
+        Assert.Empty(Assert.Single(results.CollectedResults).OnvifDevices);
+        Assert.Empty(onvifResponder.Requests);
+    }
+
+    private static IPScanner CreateOnvifScanner(
+        FakeResponder onvifResponder,
+        bool discoverOnvif)
+        => new(
+            NullLogger.Instance,
+            new IPScannerConfig
+            {
+                IcmpPing = false,
+                ResolveHostName = false,
+                ResolveMacAddress = false,
+                ResolveVendorFromMacAddress = false,
+                TreatOpenPortsAsWebServices = IPServicePortExaminationLevel.None,
+                DiscoverOnvif = discoverOnvif,
+                TimeoutDiscovery = TimeSpan.FromMilliseconds(500),
+            })
+        {
+            OnvifQueryEndPoint = onvifResponder.EndPoint,
+        };
+
     private static IPScanner CreateScanner(
         FakeResponder mdnsResponder,
         FakeResponder ssdpResponder,

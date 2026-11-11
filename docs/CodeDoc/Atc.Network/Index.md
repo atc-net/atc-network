@@ -38,6 +38,8 @@
 
 - [MdnsDiscovery](Atc.Network.Discovery.md#mdnsdiscovery)
 - [MdnsServiceInstance](Atc.Network.Discovery.md#mdnsserviceinstance)
+- [OnvifDevice](Atc.Network.Discovery.md#onvifdevice)
+- [OnvifDiscovery](Atc.Network.Discovery.md#onvifdiscovery)
 - [SsdpDevice](Atc.Network.Discovery.md#ssdpdevice)
 - [SsdpDiscovery](Atc.Network.Discovery.md#ssdpdiscovery)
 

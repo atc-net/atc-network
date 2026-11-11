@@ -138,6 +138,29 @@
      - ServiceType
   -  Methods
      - ToString()
+- [OnvifDevice](Atc.Network.Discovery.md#onvifdevice)
+  -  Properties
+     - DeviceServiceUrl
+     - EndpointReference
+     - Hardware
+     - IPAddress
+     - IsNetworkVideoTransmitter
+     - Location
+     - Name
+     - Scopes
+     - Types
+     - XAddrs
+  -  Methods
+     - ToString()
+- [OnvifDiscovery](Atc.Network.Discovery.md#onvifdiscovery)
+  -  Static Fields
+     - int DefaultDurationInMs
+     - string DeviceType
+     - string NetworkVideoTransmitterType
+  -  Static Properties
+     - MulticastEndPoint
+  -  Static Methods
+     - Probe(TimeSpan? duration = null, CancellationToken cancellationToken = null)
 - [SsdpDevice](Atc.Network.Discovery.md#ssdpdevice)
   -  Properties
      - Headers
@@ -292,6 +315,7 @@
      - ScanRange(IPAddress startIpAddress, IPAddress endIpAddress, CancellationToken cancellationToken = null)
 - [IPScannerConfig](Atc.Network.Internet.md#ipscannerconfig)
   -  Properties
+     - DiscoverOnvif
      - DiscoverServices
      - IcmpPing
      - PortNumbers
@@ -361,6 +385,7 @@
      - MdnsHostName
      - MdnsServices
      - NetBiosStatus
+     - OnvifDevices
      - OpenPortNumbers
      - PingStatus
      - Ports

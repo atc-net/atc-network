@@ -128,6 +128,11 @@
 >NetBiosStatus
 >```
 ><b>Summary:</b> Gets or sets the NetBIOS names and MAC address the address reported, when `Atc.Network.Internet.IPScannerConfig.ResolveNetBiosName` is on and it answered; otherwise <see langword="null" />.
+#### OnvifDevices
+>```csharp
+>OnvifDevices
+>```
+><b>Summary:</b> Gets or sets the ONVIF devices (cameras, NVRs) found on this address, when `Atc.Network.Internet.IPScannerConfig.DiscoverOnvif` is on.
 #### OpenPortNumbers
 >```csharp
 >OpenPortNumbers

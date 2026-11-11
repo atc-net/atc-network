@@ -66,6 +66,15 @@ public class IPScannerConfig
     public bool DiscoverServices { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the scan also finds ONVIF devices (IP cameras, NVRs) with WS-Discovery
+    /// and attaches them to the scanned addresses (<see cref="IPScanResult.OnvifDevices"/>). The default is <see langword="false"/>.
+    /// </summary>
+    /// <remarks>
+    /// Runs once per scan, together with <see cref="DiscoverServices"/>, for up to <see cref="TimeoutDiscovery"/>.
+    /// </remarks>
+    public bool DiscoverOnvif { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether each address is asked for its NetBIOS names and MAC address
     /// (<see cref="IPScanResult.NetBiosStatus"/>). Windows computers and Samba servers (NAS boxes) answer with their
     /// computer name and workgroup, even when DNS knows nothing about them. The default is <see langword="false"/>.
@@ -147,5 +156,5 @@ public class IPScannerConfig
     }
 
     public override string ToString()
-        => $"{nameof(Timeout)}: {Timeout}, {nameof(TimeoutPing)}: {TimeoutPing}, {nameof(TimeoutTcp)}: {TimeoutTcp}, {nameof(TimeoutHttp)}: {TimeoutHttp}, {nameof(IcmpPing)}: {IcmpPing}, {nameof(ResolveHostName)}: {ResolveHostName}, {nameof(ResolveMacAddress)}: {ResolveMacAddress}, {nameof(ResolveVendorFromMacAddress)}: {ResolveVendorFromMacAddress}, {nameof(PortNumbers)}: {PortNumbers.Count} ports, {nameof(TreatOpenPortsAsWebServices)}: {TreatOpenPortsAsWebServices}, {nameof(DiscoverServices)}: {DiscoverServices}, {nameof(TimeoutDiscovery)}: {TimeoutDiscovery}, {nameof(ResolveNetBiosName)}: {ResolveNetBiosName}, {nameof(TimeoutNetBios)}: {TimeoutNetBios}";
+        => $"{nameof(Timeout)}: {Timeout}, {nameof(TimeoutPing)}: {TimeoutPing}, {nameof(TimeoutTcp)}: {TimeoutTcp}, {nameof(TimeoutHttp)}: {TimeoutHttp}, {nameof(IcmpPing)}: {IcmpPing}, {nameof(ResolveHostName)}: {ResolveHostName}, {nameof(ResolveMacAddress)}: {ResolveMacAddress}, {nameof(ResolveVendorFromMacAddress)}: {ResolveVendorFromMacAddress}, {nameof(PortNumbers)}: {PortNumbers.Count} ports, {nameof(TreatOpenPortsAsWebServices)}: {TreatOpenPortsAsWebServices}, {nameof(DiscoverServices)}: {DiscoverServices}, {nameof(DiscoverOnvif)}: {DiscoverOnvif}, {nameof(TimeoutDiscovery)}: {TimeoutDiscovery}, {nameof(ResolveNetBiosName)}: {ResolveNetBiosName}, {nameof(TimeoutNetBios)}: {TimeoutNetBios}";
 }
