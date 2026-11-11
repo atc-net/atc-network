@@ -33,6 +33,14 @@
   -  Static Methods
      - GetLocalizedDescription(this IPStatus ipStatus)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
+- [NetworkErrorEventArgs](Atc.Network.md#networkerroreventargs)
+  -  Properties
+     - EventName
+     - Exception
+     - Kind
+  -  Methods
+     - ToString()
+- [NetworkErrorKind](Atc.Network.md#networkerrorkind)
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [NetworkTelemetry](Atc.Network.md#networktelemetry)
   -  Static Fields
@@ -300,6 +308,7 @@
      - ConnectionStateChanged
      - DataReceived
      - Disconnected
+     - ErrorOccurred
      - NoDataReceived
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
@@ -318,6 +327,7 @@
      - ClientDataReceived
      - ClientDisconnected
      - DataReceived
+     - ErrorOccurred
   -  Methods
      - Send(Guid clientId, byte[] data, CancellationToken cancellationToken)
      - Send(Guid clientId, string data, CancellationToken cancellationToken)
@@ -331,6 +341,7 @@
      - ConnectionStateChanged
      - DataReceived
      - Disconnected
+     - ErrorOccurred
      - NoDataReceived
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
@@ -395,6 +406,7 @@
      - ClientDataReceived
      - ClientDisconnected
      - DataReceived
+     - ErrorOccurred
   -  Methods
      - Dispose()
      - Send(Guid clientId, byte[] data, CancellationToken cancellationToken)
@@ -416,6 +428,7 @@
      - ConnectionStateChanged
      - DataReceived
      - Disconnected
+     - ErrorOccurred
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
@@ -429,6 +442,7 @@
   -  Events
      - DataReceived
      - DatagramReceived
+     - ErrorOccurred
   -  Methods
      - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)
      - Send(EndPoint recipient, byte[] data, CancellationToken cancellationToken)
@@ -443,6 +457,7 @@
      - ConnectionStateChanged
      - DataReceived
      - Disconnected
+     - ErrorOccurred
   -  Methods
      - Connect(CancellationToken cancellationToken = null)
      - Disconnect()
@@ -479,6 +494,7 @@
   -  Events
      - DataReceived
      - DatagramReceived
+     - ErrorOccurred
   -  Methods
      - Dispose()
      - Send(EndPoint recipient, Encoding encoding, string data, CancellationToken cancellationToken)

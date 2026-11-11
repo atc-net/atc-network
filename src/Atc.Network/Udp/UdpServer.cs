@@ -30,6 +30,12 @@ public partial class UdpServer : IUdpServer
     /// </summary>
     public event EventHandler<UdpDatagramReceivedEventArgs>? DatagramReceived;
 
+    /// <summary>
+    /// Event to raise when an error was handled and logged, so the server keeps running:
+    /// an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
+    /// </summary>
+    public event EventHandler<NetworkErrorEventArgs>? ErrorOccurred;
+
     private UdpServer(
         ILogger logger,
         UdpServerConfig? serverConfig)
@@ -301,6 +307,36 @@ public partial class UdpServer : IUdpServer
         InvokeHandler(nameof(OnDataReceived), () => OnDataReceived(data));
     }
 
+    /// <summary>
+    /// Raises <see cref="ErrorOccurred"/>. Each subscriber is called on its own; one that throws is only logged,
+    /// so an error handler can't cause another error.
+    /// </summary>
+    private void InvokeError(
+        NetworkErrorKind kind,
+        Exception exception,
+        string? eventName = null)
+    {
+        var handlers = ErrorOccurred;
+        if (handlers is null)
+        {
+            return;
+        }
+
+        var eventArgs = new NetworkErrorEventArgs(kind, exception, eventName);
+        foreach (var handler in handlers.GetInvocationList().Cast<EventHandler<NetworkErrorEventArgs>>())
+        {
+            try
+            {
+                handler(this, eventArgs);
+            }
+            catch (Exception ex)
+            {
+                LogDataReceivedHandlerError(ex);
+                Instrumentation.HandlerFailed(nameof(ErrorOccurred));
+            }
+        }
+    }
+
     private void InvokeHandler(
         string eventName,
         Action invoke)
@@ -313,6 +349,7 @@ public partial class UdpServer : IUdpServer
         {
             LogDataReceivedHandlerError(ex);
             Instrumentation.HandlerFailed(eventName);
+            InvokeError(NetworkErrorKind.EventHandler, ex, eventName);
         }
     }
 
@@ -367,6 +404,7 @@ public partial class UdpServer : IUdpServer
                 // For example ConnectionReset on Windows after a send to a closed port.
                 // The socket is still usable, so log it and keep receiving.
                 LogDataReceiveSocketError(ex.SocketErrorCode.ToString(), ex.Message);
+                InvokeError(NetworkErrorKind.Receive, ex);
             }
         }
     }

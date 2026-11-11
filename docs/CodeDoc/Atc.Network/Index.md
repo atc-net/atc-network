@@ -16,6 +16,8 @@
 - [IPServicePortExaminationLevel](Atc.Network.md#ipserviceportexaminationlevel)
 - [IPStatusExtensions](Atc.Network.md#ipstatusextensions)
 - [LoggingEventIdConstants](Atc.Network.md#loggingeventidconstants)
+- [NetworkErrorEventArgs](Atc.Network.md#networkerroreventargs)
+- [NetworkErrorKind](Atc.Network.md#networkerrorkind)
 - [NetworkQualityCategoryType](Atc.Network.md#networkqualitycategorytype)
 - [NetworkTelemetry](Atc.Network.md#networktelemetry)
 - [ServiceProtocolType](Atc.Network.md#serviceprotocoltype)

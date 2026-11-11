@@ -35,6 +35,12 @@ public partial class TcpServer : ITcpServer
     /// </summary>
     public event EventHandler<TcpServerClientEventArgs>? ClientDisconnected;
 
+    /// <summary>
+    /// Event to raise when an error was handled and logged, so the server keeps running:
+    /// an event handler that threw, a client connection that failed, or the listener stopping. A handler of this event that throws is only logged.
+    /// </summary>
+    public event EventHandler<NetworkErrorEventArgs>? ErrorOccurred;
+
     private TcpServer(
         ILogger logger,
         TcpServerConfig? serverConfig)
@@ -298,6 +304,7 @@ public partial class TcpServer : ITcpServer
         catch (Exception ex)
         {
             LogListenerError(ipAddressStr, Port, ex);
+            InvokeError(NetworkErrorKind.Listener, ex);
         }
         finally
         {
@@ -339,6 +346,7 @@ public partial class TcpServer : ITcpServer
         {
             // The client task runs in the background, so log every failure here.
             LogClientConnectionError(ipAddressStr, Port, ex.Message);
+            InvokeError(NetworkErrorKind.ClientConnection, ex);
         }
         finally
         {
@@ -386,6 +394,7 @@ public partial class TcpServer : ITcpServer
         catch (Exception ex)
         {
             Instrumentation.ConnectionFailed();
+            InvokeError(NetworkErrorKind.ClientConnection, ex);
             if (serverConfig.SslOptions is null)
             {
                 LogClientConnectionError(ipAddressStr, Port, ex.Message);
@@ -504,6 +513,37 @@ public partial class TcpServer : ITcpServer
         {
             LogDataReceivedHandlerError(ipAddressStr, Port, ex);
             Instrumentation.HandlerFailed(eventName);
+            InvokeError(NetworkErrorKind.EventHandler, ex, eventName);
+        }
+    }
+
+    /// <summary>
+    /// Raises <see cref="ErrorOccurred"/>. Each subscriber is called on its own; one that throws is only logged,
+    /// so an error handler can't cause another error.
+    /// </summary>
+    private void InvokeError(
+        NetworkErrorKind kind,
+        Exception exception,
+        string? eventName = null)
+    {
+        var handlers = ErrorOccurred;
+        if (handlers is null)
+        {
+            return;
+        }
+
+        var eventArgs = new NetworkErrorEventArgs(kind, exception, eventName);
+        foreach (var handler in handlers.GetInvocationList().Cast<EventHandler<NetworkErrorEventArgs>>())
+        {
+            try
+            {
+                handler(this, eventArgs);
+            }
+            catch (Exception ex)
+            {
+                LogEventHandlerError(ipAddressStr, Port, nameof(ErrorOccurred), ex);
+                Instrumentation.HandlerFailed(nameof(ErrorOccurred));
+            }
         }
     }
 
@@ -527,6 +567,7 @@ public partial class TcpServer : ITcpServer
             {
                 LogEventHandlerError(ipAddressStr, Port, eventName, ex);
                 Instrumentation.HandlerFailed(eventName);
+                InvokeError(NetworkErrorKind.EventHandler, ex, eventName);
             }
         }
     }

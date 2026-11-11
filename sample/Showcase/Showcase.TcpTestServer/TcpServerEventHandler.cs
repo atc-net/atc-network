@@ -15,6 +15,7 @@ internal sealed partial class TcpServerEventHandler(
         tcpServer.ClientConnected += OnClientConnected;
         tcpServer.ClientDisconnected += OnClientDisconnected;
         tcpServer.ClientDataReceived += OnClientDataReceived;
+        tcpServer.ErrorOccurred += OnErrorOccurred;
         return Task.CompletedTask;
     }
 
@@ -23,6 +24,7 @@ internal sealed partial class TcpServerEventHandler(
         tcpServer.ClientConnected -= OnClientConnected;
         tcpServer.ClientDisconnected -= OnClientDisconnected;
         tcpServer.ClientDataReceived -= OnClientDataReceived;
+        tcpServer.ErrorOccurred -= OnErrorOccurred;
         return Task.CompletedTask;
     }
 
@@ -35,6 +37,11 @@ internal sealed partial class TcpServerEventHandler(
         object? sender,
         TcpServerClientEventArgs e)
         => LogClientDisconnected(e.ClientId, e.RemoteEndPoint);
+
+    private void OnErrorOccurred(
+        object? sender,
+        NetworkErrorEventArgs e)
+        => LogNetworkError(e.Kind, e.EventName, e.Exception);
 
     private void OnClientDataReceived(
         object? sender,
@@ -79,4 +86,7 @@ internal sealed partial class TcpServerEventHandler(
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Reply to client {clientId} failed")]
     private partial void LogReplyFailed(Guid clientId, Exception exception);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "TCP server reported a {kind} error (event: {eventName})")]
+    private partial void LogNetworkError(NetworkErrorKind kind, string? eventName, Exception exception);
 }

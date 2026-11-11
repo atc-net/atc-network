@@ -48,6 +48,11 @@ This is a interface for `Atc.Network.Udp.UdpClient`.
 >Disconnected
 >```
 ><b>Summary:</b> Event to raise when connection is destroyed.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the client keeps running: an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
 ### Methods
 
 #### Connect
@@ -126,6 +131,11 @@ This is a interface for `Atc.Network.Udp.UdpServer`.
 >DatagramReceived
 >```
 ><b>Summary:</b> Event to raise when a datagram is received, with the endpoint that sent it.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the server keeps running: an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
 ### Methods
 
 #### Send
@@ -212,6 +222,11 @@ The main UdpClient - Handles call execution.
 >Disconnected
 >```
 ><b>Summary:</b> Event to raise when connection is destroyed.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the client keeps running: an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
 ### Methods
 
 #### Connect
@@ -414,6 +429,11 @@ The main UdpServer - Handles call execution.
 >DatagramReceived
 >```
 ><b>Summary:</b> Event to raise when a datagram is received, with the endpoint that sent it.
+#### ErrorOccurred
+>```csharp
+>ErrorOccurred
+>```
+><b>Summary:</b> Event to raise when an error was handled and logged, so the server keeps running: an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
 ### Methods
 
 #### Dispose

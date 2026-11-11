@@ -56,6 +56,12 @@ public partial class TcpClient : ITcpClient
     /// </summary>
     public event Action<byte[]>? DataReceived;
 
+    /// <summary>
+    /// Event to raise when an error was handled and logged, so the client keeps running:
+    /// an event handler that threw, or a failed receive. A handler of this event that throws is only logged.
+    /// </summary>
+    public event EventHandler<NetworkErrorEventArgs>? ErrorOccurred;
+
     private TcpClient(
         ILogger logger,
         TcpClientConfig? clientConfig,
@@ -466,6 +472,36 @@ public partial class TcpClient : ITcpClient
         Instrumentation.SetConnected(value);
     }
 
+    /// <summary>
+    /// Raises <see cref="ErrorOccurred"/>. Each subscriber is called on its own; one that throws is only logged,
+    /// so an error handler can't cause another error.
+    /// </summary>
+    private void InvokeError(
+        NetworkErrorKind kind,
+        Exception exception,
+        string? eventName = null)
+    {
+        var handlers = ErrorOccurred;
+        if (handlers is null)
+        {
+            return;
+        }
+
+        var eventArgs = new NetworkErrorEventArgs(kind, exception, eventName);
+        foreach (var handler in handlers.GetInvocationList().Cast<EventHandler<NetworkErrorEventArgs>>())
+        {
+            try
+            {
+                handler(this, eventArgs);
+            }
+            catch (Exception ex)
+            {
+                LogEventHandlerError(IPAddressOrHostname, Port, nameof(ErrorOccurred), ex);
+                Instrumentation.HandlerFailed(nameof(ErrorOccurred));
+            }
+        }
+    }
+
     private void InvokeHandler(
         string eventName,
         Action invoke)
@@ -478,6 +514,7 @@ public partial class TcpClient : ITcpClient
         {
             LogEventHandlerError(IPAddressOrHostname, Port, eventName, ex);
             Instrumentation.HandlerFailed(eventName);
+            InvokeError(NetworkErrorKind.EventHandler, ex, eventName);
         }
     }
 
@@ -509,6 +546,7 @@ public partial class TcpClient : ITcpClient
         {
             LogDataReceivedHandlerError(IPAddressOrHostname, Port, ex);
             Instrumentation.HandlerFailed(nameof(DataReceived));
+            InvokeError(NetworkErrorKind.EventHandler, ex, nameof(DataReceived));
         }
     }
 
@@ -751,6 +789,7 @@ public partial class TcpClient : ITcpClient
     private async Task HandleDataReceiverUnexpectedError(Exception exception)
     {
         LogDataReceiverUnexpectedError(IPAddressOrHostname, Port, exception);
+        InvokeError(NetworkErrorKind.Receive, exception);
 
         try
         {
@@ -875,6 +914,7 @@ public partial class TcpClient : ITcpClient
             if (!isKnownException)
             {
                 LogDataReceiveError(IPAddressOrHostname, Port, ex.Message);
+                InvokeError(NetworkErrorKind.Receive, ex);
             }
         }
 
