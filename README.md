@@ -10,7 +10,7 @@ A .NET 10 library for network communication, scanning, and remote desktop — ba
 
 | | |
 |---|---|
-| 🔌 **TCP & UDP** | Event-driven clients and servers with auto-reconnect, keep-alive, and configurable timeouts |
+| 🔌 **TCP & UDP** | Event-driven clients and servers with auto-reconnect, keep-alive, optional TLS, and configurable timeouts |
 | 🖥️ **VNC Client** | Cross-platform RFB protocol client — Raw, CopyRect, RRE, CoRRE, Hextile, ZRLE encodings |
 | 🔍 **IP Scanning** | Scan ranges or CIDR blocks with ICMP ping, hostname/MAC resolution, vendor lookup, and port scanning |
 | 🧩 **Interface-first** | Every component has an `I*` interface — built for DI and unit testing |
@@ -76,7 +76,7 @@ var results = await scanner.ScanRange(
 
 | Topic | Description |
 |-------|-------------|
-| [🔌 TCP Client & Server](docs/tcp.md) | Connections, reconnection, keep-alive, events |
+| [🔌 TCP Client & Server](docs/tcp.md) | Connections, TLS, reconnection, keep-alive, events |
 | [📡 UDP Client & Server](docs/udp.md) | Datagram communication, hosted server |
 | [🖥️ VNC Client](docs/vnc.md) | Remote desktop, encodings, pixel data, input forwarding |
 | [🔍 IP Scanning & Helpers](docs/ip-scanning.md) | IP scanner, port scan, ping, DNS, ARP, MAC vendor lookup |

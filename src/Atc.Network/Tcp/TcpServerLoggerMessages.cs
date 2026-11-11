@@ -103,4 +103,13 @@ public partial class TcpServer
         int port,
         string eventName,
         Exception exception);
+
+    [LoggerMessage(
+        EventId = LoggingEventIdConstants.TcpServer.ClientTlsHandshakeError,
+        Level = LogLevel.Warning,
+        Message = "TLS handshake with a client on {ipAddress}:{port} failed: {errorMessage}.")]
+    private partial void LogClientTlsHandshakeError(
+        string ipAddress,
+        int port,
+        string errorMessage);
 }

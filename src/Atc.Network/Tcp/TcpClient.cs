@@ -514,6 +514,9 @@ public partial class TcpClient : ITcpClient
                 // we'll consider it to be a timeout.
                 throw new TcpException("Timed out");
             }
+
+            // The TLS handshake runs here, so a failed handshake fails Connect before Connected is raised.
+            networkStream = await CreateStream(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -534,7 +537,7 @@ public partial class TcpClient : ITcpClient
         }
 
         await SetConnected(raiseEventsAndLog, cancellationToken);
-        PrepareNetworkStreamAndKeepAliveInDoConnect();
+        PrepareKeepAliveInDoConnect();
 
         if (raiseEventsAndLog)
         {
@@ -660,7 +663,8 @@ public partial class TcpClient : ITcpClient
                 }
                 else
                 {
-                    tcpClient.GetStream().Close();
+                    // Close the stream in use, which is the TLS stream when TLS is enabled.
+                    networkStream?.Close();
                     tcpClient.Close();
                 }
             }
@@ -865,20 +869,94 @@ public partial class TcpClient : ITcpClient
         }
     }
 
-    private void PrepareNetworkStreamAndKeepAliveInDoConnect()
+    /// <summary>
+    /// Returns the stream to read from and write to: the network stream, or, when
+    /// <see cref="TcpClientConfig.SslOptions"/> is set, a TLS stream that is authenticated
+    /// within <see cref="TcpClientConfig.ConnectTimeout"/>.
+    /// </summary>
+    private async Task<Stream> CreateStream(CancellationToken cancellationToken)
     {
-        networkStream = tcpClient!.GetStream();
+        var stream = tcpClient!.GetStream();
+        if (clientConfig.SslOptions is null)
+        {
+            return stream;
+        }
 
+        var sslStream = new SslStream(stream, leaveInnerStreamOpen: false);
+        try
+        {
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            if (clientConfig.ConnectTimeout > 0)
+            {
+                timeoutCts.CancelAfter(clientConfig.ConnectTimeout);
+            }
+
+            await sslStream.AuthenticateAsClientAsync(
+                CreateSslClientAuthenticationOptions(clientConfig.SslOptions),
+                timeoutCts.Token);
+
+            return sslStream;
+        }
+        catch
+        {
+            await sslStream.DisposeAsync();
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Returns the configured options, or a copy that uses the host this client connects to
+    /// when <see cref="SslClientAuthenticationOptions.TargetHost"/> is empty.
+    /// The configured options are not changed, as they may be shared by several clients.
+    /// </summary>
+    private SslClientAuthenticationOptions CreateSslClientAuthenticationOptions(
+        SslClientAuthenticationOptions options)
+    {
+        if (!string.IsNullOrEmpty(options.TargetHost))
+        {
+            return options;
+        }
+
+        var copy = new SslClientAuthenticationOptions
+        {
+            AllowRenegotiation = options.AllowRenegotiation,
+            AllowTlsResume = options.AllowTlsResume,
+            ApplicationProtocols = options.ApplicationProtocols,
+            CertificateChainPolicy = options.CertificateChainPolicy,
+            CertificateRevocationCheckMode = options.CertificateRevocationCheckMode,
+            CipherSuitesPolicy = options.CipherSuitesPolicy,
+            ClientCertificateContext = options.ClientCertificateContext,
+            ClientCertificates = options.ClientCertificates,
+            EnabledSslProtocols = options.EnabledSslProtocols,
+            EncryptionPolicy = options.EncryptionPolicy,
+            LocalCertificateSelectionCallback = options.LocalCertificateSelectionCallback,
+            RemoteCertificateValidationCallback = options.RemoteCertificateValidationCallback,
+            TargetHost = IPAddressOrHostname,
+        };
+
+        // These can only be set on Windows and Linux, so elsewhere they always have their defaults.
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+        {
+            copy.AllowRsaPkcs1Padding = options.AllowRsaPkcs1Padding;
+            copy.AllowRsaPssPadding = options.AllowRsaPssPadding;
+        }
+
+        return copy;
+    }
+
+    private void PrepareKeepAliveInDoConnect()
+    {
+        var client = tcpClient!;
         if (clientKeepAliveConfig.Enable)
         {
-            tcpClient.SetKeepAlive(
+            client.SetKeepAlive(
                 clientKeepAliveConfig.Time,
                 clientKeepAliveConfig.Interval,
                 clientKeepAliveConfig.RetryCount);
         }
         else
         {
-            tcpClient.DisableKeepAlive();
+            client.DisableKeepAlive();
         }
     }
 

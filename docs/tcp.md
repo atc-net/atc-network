@@ -6,6 +6,7 @@ Atc.Network provides a robust, event-driven TCP client and server with automatic
 
 - 🔄 Automatic reconnection with configurable retry policy
 - 💓 TCP keep-alive support
+- 🔐 Optional TLS for client and server (see [TLS](#-tls))
 - 📡 Event-driven architecture (Connected, Disconnected, DataReceived, etc.)
 - 🔒 Thread-safe with `SemaphoreSlim` synchronization
 - 🧩 Interface-based design (`ITcpClient`, `ITcpServer`) for easy DI and testing
@@ -61,6 +62,7 @@ tcpClient.Dispose();
 | `ReceiveBufferSize` | 8,192 bytes | Receive buffer size |
 | `DefaultEncoding` | ASCII | Default text encoding |
 | `TerminationType` | None | Appended to data you send, if it is not already there |
+| `SslOptions` | `null` | TLS options; `null` means plain TCP (see [TLS](#-tls)) |
 
 ### 📥 What `DataReceived` delivers
 
@@ -149,6 +151,52 @@ tcpServer.ClientDataReceived += async (_, e) =>
 - `StopAsync` stops accepting clients and closes the connected ones.
 - A handler that throws is logged and does not stop the server.
 - An `async` handler runs as `async void`: an exception after its first `await` is not caught by the server and can end the process. Catch exceptions inside `async` handlers yourself.
+
+---
+
+## 🔐 TLS
+
+TLS is off by default. Set `SslOptions` on the client or server config to encrypt the connection with TLS (`SslStream`). The options are the standard .NET types, so certificate validation, client certificates and protocol versions are set the usual way.
+
+### Client
+
+```csharp
+var tcpClient = new TcpClient(
+    logger,
+    "device.example.com",
+    8443,
+    new TcpClientConfig
+    {
+        SslOptions = new SslClientAuthenticationOptions(),
+    });
+```
+
+- The server certificate is validated by the operating system: it must be trusted and match the host name.
+- When `TargetHost` is empty, the hostname or IP address you connect to is used. Your options object is not changed, so several clients can share it.
+- The TLS handshake runs inside `Connect` and must finish within `ConnectTimeout`. If it fails, `Connect` returns `false` and raises `ConnectionStateChanged` with `ConnectionFailed`; `Connected` is not raised.
+- Every reconnect does a new handshake.
+- For a self-signed or private certificate, set `RemoteCertificateValidationCallback` and check the certificate yourself, for example by its thumbprint. Do not return `true` for every certificate: that turns off the protection TLS gives.
+- For a client certificate, set `ClientCertificates`.
+
+### Server
+
+```csharp
+var tcpServer = new TcpServer(
+    logger,
+    IPAddress.Any,
+    8443,
+    new TcpServerConfig
+    {
+        SslOptions = new SslServerAuthenticationOptions
+        {
+            ServerCertificate = X509CertificateLoader.LoadPkcs12FromFile("server.pfx", password),
+        },
+    });
+```
+
+- Each client does its TLS handshake in its own task, so a slow client does not hold up the others.
+- A client counts as connected only after its handshake succeeds. A client that fails the handshake, or doesn't finish it within 10 seconds, is closed without `ClientConnected` and is logged (event 10129).
+- To require client certificates, set `ClientCertificateRequired = true`, and set `RemoteCertificateValidationCallback` if the client certificates are not trusted by the operating system.
 
 ---
 

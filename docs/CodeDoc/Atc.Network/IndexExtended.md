@@ -331,6 +331,7 @@
      - ReceiveTimeout
      - SendBufferSize
      - SendTimeout
+     - SslOptions
      - TerminationType
   -  Methods
      - ToString()
@@ -384,6 +385,8 @@
      - StartAsync(CancellationToken cancellationToken)
      - StopAsync(CancellationToken cancellationToken)
 - [TcpServerConfig](Atc.Network.Tcp.md#tcpserverconfig)
+  -  Properties
+     - SslOptions
 
 ## [Atc.Network.Udp](Atc.Network.Udp.md)
 
