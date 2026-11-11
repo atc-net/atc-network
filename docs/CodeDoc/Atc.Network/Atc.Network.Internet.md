@@ -293,6 +293,13 @@ Provides functionality for scanning IP addresses and ranges to determine open po
 
 ### Properties
 
+#### DiscoverOnvif
+>```csharp
+>DiscoverOnvif
+>```
+><b>Summary:</b> Gets or sets a value indicating whether the scan also finds ONVIF devices (IP cameras, NVRs) with WS-Discovery and attaches them to the scanned addresses (`Atc.Network.Models.IPScanResult.OnvifDevices`). The default is <see langword="false" />.
+>
+><b>Remarks:</b> Runs once per scan, together with `Atc.Network.Internet.IPScannerConfig.DiscoverServices`, for up to `Atc.Network.Internet.IPScannerConfig.TimeoutDiscovery`.
 #### DiscoverServices
 >```csharp
 >DiscoverServices

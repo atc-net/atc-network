@@ -1,11 +1,12 @@
-# 📡 Service Discovery (mDNS & SSDP)
+# 📡 Service Discovery (mDNS, SSDP & ONVIF)
 
-Find devices and services on the local network that announce themselves: printers, cameras, speakers, TVs, Chromecasts, NAS boxes, routers and smart-home hubs. Reverse DNS usually knows nothing about these devices; mDNS and SSDP give their names, models and services.
+Find devices and services on the local network that announce themselves: printers, cameras, speakers, TVs, Chromecasts, NAS boxes, routers and smart-home hubs. Reverse DNS usually knows nothing about these devices; mDNS, SSDP and ONVIF give their names, models and services.
 
 | Protocol | Also known as | Typical devices |
 |----------|---------------|-----------------|
 | **mDNS / DNS-SD** (RFC 6762 / 6763) | Bonjour, Avahi, Zeroconf | Printers, AirPlay, Chromecast, Sonos, NAS, cameras, Matter devices |
 | **SSDP** | UPnP | Routers, media servers and renderers, TVs, receivers |
+| **ONVIF WS-Discovery** | ONVIF | IP cameras of every brand with ONVIF on, video encoders, NVRs |
 
 ---
 
@@ -99,14 +100,43 @@ The device description at `Location` is not fetched.
 
 ---
 
+## 📹 ONVIF (WS-Discovery)
+
+```csharp
+await foreach (var device in OnvifDiscovery.Probe())
+{
+    Console.WriteLine($"{device.IPAddress} {device.Name} ({device.Hardware}) - {device.DeviceServiceUrl}");
+}
+// 192.168.1.132 C210 (C210) - http://192.168.1.132:2020/onvif/device_service
+```
+
+Two probes are sent: one for cameras (`NetworkVideoTransmitter`) and one for every ONVIF device (`Device`), since some devices only answer one of them.
+
+### 📋 OnvifDevice
+
+| Property | Meaning |
+|----------|---------|
+| `IPAddress` | The address the answer came from |
+| `Name`, `Hardware`, `Location` | From the device's scopes, such as `C210`, `HIKVISION DS-2CD2183G0-IU` |
+| `DeviceServiceUrl` | The ONVIF device service, such as `http://192.168.1.132:2020/onvif/device_service` |
+| `XAddrs` | Every device service URL the device listed |
+| `IsNetworkVideoTransmitter` | Whether it is a camera or video encoder (not, say, an NVR) |
+| `Types`, `Scopes` | As the device sent them (scopes percent-decoded) |
+| `EndpointReference` | A stable id that stays the same when the device's IP changes; each device is returned once by it |
+
+Many cameras ship with ONVIF turned off (common on Hikvision); turn it on in the camera's web interface, or find the camera through mDNS or SSDP instead.
+
+---
+
 ## 🌐 Use It in the IP Scanner
 
-Turn on `DiscoverServices` to attach the services to the scanned addresses:
+Turn on `DiscoverServices` (mDNS and SSDP) and `DiscoverOnvif` to attach the services and devices to the scanned addresses:
 
 ```csharp
 var scanner = new IPScanner(new IPScannerConfig
 {
     DiscoverServices = true,
+    DiscoverOnvif = true,
     TimeoutDiscovery = TimeSpan.FromSeconds(3),
 });
 
@@ -129,6 +159,7 @@ foreach (var result in results.CollectedResults.Where(x => x.MdnsServices.Count 
 |-------------------------|---------|
 | `MdnsServices` | The mDNS services whose host has this address |
 | `SsdpDevices` | The SSDP answers that came from this address |
+| `OnvifDevices` | The ONVIF devices that answered from this address, or whose device service URL is on it |
 | `MdnsHostName` | The host name the address announces, such as `printer.local`; `ToString()` shows it when reverse DNS found none |
 
 Discovery runs once per scan, next to the other checks, so it adds at most `TimeoutDiscovery` to a scan. When it fails (for example without a network), the failure is logged (event id 10500) and the scan completes without services.
@@ -143,7 +174,7 @@ Discovery collects answers for a fixed time: 3 seconds by default, or the `durat
 
 ## ⚙️ How It Works
 
-- Queries are sent from a random port, never from 5353 or 1900, which the operating system often uses already (Windows' DNS Client and SSDP Discovery services, Bonjour). Responders answer by unicast to that port.
+- Queries are sent from a random port, never from 5353, 1900 or 3702, which the operating system often uses already (Windows' DNS Client and SSDP Discovery services, Bonjour). Responders answer by unicast to that port.
 - Queries go out on every network interface that is up and has an IPv4 address, so devices behind every adapter are found, not only those behind the default one.
 - Answers are read defensively: malformed packets are ignored.
 
@@ -153,4 +184,4 @@ Discovery collects answers for a fixed time: 3 seconds by default, or the `durat
 
 ## 📈 Telemetry
 
-Queries and answers are recorded on the message and byte counters with the component tags `mdns_discovery` and `ssdp_discovery`, with the spans `MdnsDiscovery.Browse`, `MdnsDiscovery.BrowseAll`, `MdnsDiscovery.GetServiceTypes` and `SsdpDiscovery.Search`. See [Metrics & Tracing](telemetry.md).
+Queries and answers are recorded on the message and byte counters with the component tags `mdns_discovery`, `ssdp_discovery` and `onvif_discovery`, with the spans `MdnsDiscovery.Browse`, `MdnsDiscovery.BrowseAll`, `MdnsDiscovery.GetServiceTypes`, `SsdpDiscovery.Search` and `OnvifDiscovery.Probe`. See [Metrics & Tracing](telemetry.md).
