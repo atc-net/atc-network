@@ -343,8 +343,14 @@ public partial class UdpServer : IUdpServer
         LogDataReceived(receivedBytes.Length);
         InvokeDataReceived(receivedBytes);
 
+        if (!serverConfig.RespondToPing && !serverConfig.EchoOnReceivedData)
+        {
+            return;
+        }
+
         var receivedStr = serverConfig.DefaultEncoding.GetString(receivedBytes);
-        if (receivedStr.StartsWith("ping", StringComparison.OrdinalIgnoreCase))
+        if (serverConfig.RespondToPing &&
+            receivedStr.StartsWith("ping", StringComparison.OrdinalIgnoreCase))
         {
             await Send(res.RemoteEndPoint, "pong", cancellationToken);
         }

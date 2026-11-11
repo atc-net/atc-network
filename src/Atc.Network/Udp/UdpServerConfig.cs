@@ -10,7 +10,12 @@ public class UdpServerConfig : UdpConfigBase
     /// </summary>
     public bool EchoOnReceivedData { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the server answers a datagram that starts with "ping" with "pong".
+    /// </summary>
+    public bool RespondToPing { get; set; }
+
     /// <inheritdoc />
     public override string ToString()
-        => $"{base.ToString()}, {nameof(EchoOnReceivedData)}: {EchoOnReceivedData}";
+        => $"{base.ToString()}, {nameof(EchoOnReceivedData)}: {EchoOnReceivedData}, {nameof(RespondToPing)}: {RespondToPing}";
 }
