@@ -198,6 +198,7 @@
      - ToString()
 - [IPScannerConstants](Atc.Network.Internet.md#ipscannerconstants)
   -  Static Fields
+     - int MaxConcurrentPortScansPerIPAddress
      - int TimeoutHttpInMs
      - int TimeoutInMs
      - int TimeoutPingInMs

@@ -280,10 +280,18 @@ public partial class IPScanner : IIPScanner, IDisposable
 
         if (Configuration.PortNumbers.Count != 0)
         {
-            foreach (var portNumber in Configuration.PortNumbers)
+            // Scan the ports concurrently: closed or filtered ports each wait for the TCP timeout,
+            // so one after another they cost PortNumbers.Count x TimeoutTcp per IP address.
+            var portScanOptions = new ParallelOptions
             {
-                await HandleTcpPort(ipScanResult, ipAddress, portNumber, cancellationToken);
-            }
+                MaxDegreeOfParallelism = IPScannerConstants.MaxConcurrentPortScansPerIPAddress,
+                CancellationToken = cancellationToken,
+            };
+
+            await Parallel.ForEachAsync(
+                Configuration.PortNumbers,
+                portScanOptions,
+                async (portNumber, token) => await HandleTcpPort(ipScanResult, ipAddress, portNumber, token));
 
             if (Configuration.TreatOpenPortsAsWebServices != IPServicePortExaminationLevel.None)
             {

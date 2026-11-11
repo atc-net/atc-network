@@ -26,4 +26,10 @@ public static class IPScannerConstants
     /// The connect time-out for http/https value, in milliseconds. The default is 500 (500 msec);
     /// </summary>
     public const int TimeoutHttpInMs = 500;
+
+    /// <summary>
+    /// The maximum number of ports scanned at the same time for one IP address.
+    /// IP addresses are scanned in parallel too, so this keeps the total number of open sockets bounded.
+    /// </summary>
+    public const int MaxConcurrentPortScansPerIPAddress = 16;
 }
