@@ -6,6 +6,24 @@ public sealed class ArpHelperTests
     public void GetArpResult()
         => Assert.NotNull(ArpHelper.GetArpResult());
 
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(30, false)]
+    [InlineData(89, false)]
+    [InlineData(90, true)]
+    [InlineData(100, true)]
+    [InlineData(3600, true)]
+    public void IsCacheExpired(
+        int cacheAgeInSeconds,
+        bool expected)
+    {
+        // Act
+        var result = ArpHelper.IsCacheExpired(TimeSpan.FromSeconds(cacheAgeInSeconds));
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
     [Fact]
     public void IsLoopbackAddress_WithLoopbackAddress_ReturnsTrue()
     {

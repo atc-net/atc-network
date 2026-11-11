@@ -35,7 +35,7 @@ public static class ArpHelper
     public static ArpEntity[] GetArpResult()
     {
         var timeSpan = DateTimeOffset.Now - lastLookup;
-        if (arpEntities is not null && timeSpan.Seconds < 90)
+        if (arpEntities is not null && !IsCacheExpired(timeSpan))
         {
             return arpEntities;
         }
@@ -113,6 +113,14 @@ public static class ArpHelper
         var macAddress = GetLocalMacAddress() ?? LoopbackMacAddress;
         return new ArpEntity(ipAddress, macAddress, LoopbackType);
     }
+
+    /// <summary>
+    /// Determines whether cached ARP results of the given age must be refreshed.
+    /// </summary>
+    /// <param name="cacheAge">The time since the last ARP lookup.</param>
+    /// <returns><see langword="true"/> if the cache is too old to use.</returns>
+    internal static bool IsCacheExpired(TimeSpan cacheAge)
+        => cacheAge.TotalSeconds >= 90;
 
     /// <summary>
     /// Gets the MAC address of the local machine's main network adapter.
