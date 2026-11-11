@@ -483,6 +483,11 @@ Configurations for `Atc.Network.Udp.UdpServer`.
 >EchoOnReceivedData
 >```
 ><b>Summary:</b> Gets or sets the echo on received data.
+#### RespondToPing
+>```csharp
+>RespondToPing
+>```
+><b>Summary:</b> Gets or sets a value indicating whether the server answers a datagram that starts with "ping" with "pong".
 ### Methods
 
 #### ToString

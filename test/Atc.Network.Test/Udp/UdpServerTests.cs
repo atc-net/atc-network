@@ -96,10 +96,70 @@ public sealed class UdpServerTests
         await udpServer.StopAsync(CancellationToken.None);
     }
 
+    [Fact]
+    public async Task UdpServer_PingDatagram_NoReplyByDefault()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var udpServer = new UdpServer(NullLogger.Instance, IPAddress.Loopback, port);
+        await udpServer.StartAsync(CancellationToken.None);
+
+        // Act
+        var reply = await SendAndReceiveReply(port, "ping");
+
+        // Assert
+        Assert.Null(reply);
+
+        await udpServer.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task UdpServer_PingDatagram_RepliesPong_WhenRespondToPingIsEnabled()
+    {
+        // Arrange
+        var port = GetFreePort();
+        using var udpServer = new UdpServer(
+            NullLogger.Instance,
+            IPAddress.Loopback,
+            port,
+            new UdpServerConfig { RespondToPing = true });
+        await udpServer.StartAsync(CancellationToken.None);
+
+        // Act
+        var reply = await SendAndReceiveReply(port, "ping");
+
+        // Assert
+        Assert.Equal("pong", reply);
+
+        await udpServer.StopAsync(CancellationToken.None);
+    }
+
     private static int GetFreePort()
     {
         using var probe = new System.Net.Sockets.UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
         return ((IPEndPoint)probe.Client.LocalEndPoint).Port;
+    }
+
+    /// <summary>
+    /// Sends one datagram and returns the server's reply, or null when none arrives within 500 ms.
+    /// </summary>
+    private static async Task<string?> SendAndReceiveReply(
+        int port,
+        string message)
+    {
+        using var client = new System.Net.Sockets.UdpClient(new IPEndPoint(IPAddress.Loopback, 0));
+        await client.SendAsync(Encoding.ASCII.GetBytes(message), new IPEndPoint(IPAddress.Loopback, port));
+
+        using var timeout = new CancellationTokenSource(500);
+        try
+        {
+            var result = await client.ReceiveAsync(timeout.Token);
+            return Encoding.ASCII.GetString(result.Buffer);
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
     }
 
     private static async Task SendDatagrams(

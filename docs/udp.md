@@ -88,6 +88,17 @@ await udpServer.Send(
     CancellationToken.None);
 ```
 
+### ⚙️ Server Configuration
+
+`UdpServerConfig` adds two automatic replies to the settings above. Both are off by default.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `RespondToPing` | false | Answer a datagram that starts with `ping` with `pong` |
+| `EchoOnReceivedData` | false | Send every other datagram back to the sender as `echo: <data>` |
+
+> ⚠️ An echo reply is larger than the datagram it answers. Don't enable `EchoOnReceivedData` on a server that is reachable from untrusted networks, because it can be abused to reflect traffic.
+
 ---
 
 ## 📂 Sample
