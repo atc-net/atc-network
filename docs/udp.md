@@ -126,7 +126,7 @@ await foreach (var datagram in udpClient.ReadAllAsync(cancellationToken))
 }
 ```
 
-Each enumeration buffers up to 256 datagrams; when it falls behind, the client waits before receiving more. See [Reading as an async stream](tcp.md#-reading-as-an-async-stream) for the details.
+Each enumeration buffers up to 256 datagrams; when it falls behind, the client waits before receiving more. Unlike TCP, this doesn't slow down the sender: UDP has no flow control, so datagrams that arrive while the socket's receive buffer is full are dropped. Keep the reader fast, or increase `ReceiveBufferSize`, when no datagram may be lost. See [Reading as an async stream](tcp.md#-reading-as-an-async-stream) for the details.
 
 ---
 

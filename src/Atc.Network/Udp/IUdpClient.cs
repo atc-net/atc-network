@@ -59,8 +59,10 @@ public interface IUdpClient : IDisposable
     /// </summary>
     /// <remarks>
     /// Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items;
-    /// when it falls behind, the client waits before reading more, so a slow reader slows down the sender
-    /// instead of using more memory.
+    /// when it falls behind, the client waits before reading more instead of using more memory. UDP has no flow
+    /// control, so this doesn't slow down the sender: datagrams that arrive while the socket's receive buffer is full
+    /// are dropped. Keep the reader fast, or increase <see cref="UdpConfigBase.ReceiveBufferSize"/>, when no
+    /// datagram may be lost.
     /// </remarks>
     /// <param name="cancellationToken">Ends the stream.</param>
     /// <returns>The received data.</returns>

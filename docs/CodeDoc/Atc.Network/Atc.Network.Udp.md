@@ -77,7 +77,7 @@ This is a interface for `Atc.Network.Udp.UdpClient`.
 >
 ><b>Returns:</b> The received data.
 >
-><b>Remarks:</b> Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items; when it falls behind, the client waits before reading more, so a slow reader slows down the sender instead of using more memory.
+><b>Remarks:</b> Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items; when it falls behind, the client waits before reading more instead of using more memory. UDP has no flow control, so this doesn't slow down the sender: datagrams that arrive while the socket's receive buffer is full are dropped. Keep the reader fast, or increase `Atc.Network.Udp.UdpConfigBase.ReceiveBufferSize`, when no datagram may be lost.
 #### Send
 >```csharp
 >Task Send(string data, CancellationToken cancellationToken)
@@ -267,7 +267,7 @@ The main UdpClient - Handles call execution.
 >
 ><b>Returns:</b> The received data.
 >
-><b>Remarks:</b> Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items; when it falls behind, the client waits before reading more, so a slow reader slows down the sender instead of using more memory.
+><b>Remarks:</b> Data received before the enumeration starts is not included. Each enumeration buffers up to 256 items; when it falls behind, the client waits before reading more instead of using more memory. UDP has no flow control, so this doesn't slow down the sender: datagrams that arrive while the socket's receive buffer is full are dropped. Keep the reader fast, or increase `Atc.Network.Udp.UdpConfigBase.ReceiveBufferSize`, when no datagram may be lost.
 #### Send
 >```csharp
 >Task Send(string data, CancellationToken cancellationToken)
