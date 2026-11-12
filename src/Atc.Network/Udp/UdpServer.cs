@@ -422,7 +422,9 @@ public partial class UdpServer : IUdpServer
         IPEndPoint endPointFrom,
         CancellationToken cancellationToken)
     {
-        var res = await socket!.ReceiveMessageFromAsync(receiveBufferSegment, SocketFlags.None, endPointFrom);
+        // ReceiveFrom, not ReceiveMessageFrom: the packet information isn't used, and on macOS asking for it on a
+        // dual-mode socket fails, so no datagram is received.
+        var res = await socket!.ReceiveFromAsync(receiveBufferSegment, SocketFlags.None, endPointFrom);
 
         // Copy only the received bytes, not the whole receive buffer.
         var receivedBytes = receiveBufferSegment.AsSpan(0, res.ReceivedBytes).ToArray();
