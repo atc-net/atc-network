@@ -34,6 +34,23 @@ public sealed class IPPortScanHttpTests : IDisposable
     }
 
     [Fact]
+    public async Task CanConnectWithHttp_ServerRedirectsToAnUnreachableAddress_ReturnsTrue()
+    {
+        // Arrange - the redirect points at a port nothing listens on.
+        var closedPort = GetClosedPort();
+        var redirectResponse = $"HTTP/1.1 302 Found\r\nLocation: http://127.0.0.1:{closedPort}/\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";
+        var serverTask = AnswerFirstRequest(useTls: false, redirectResponse);
+        using var ipPortScan = new IPPortScan(IPAddress.Loopback, timeoutInMs: 2000);
+
+        // Act
+        var actual = await ipPortScan.CanConnectWithHttp(ListenerPort, CancellationToken.None);
+        await serverTask;
+
+        // Assert
+        Assert.True(actual, "A redirect is an HTTP response, so the port answered with HTTP.");
+    }
+
+    [Fact]
     public async Task CanConnectWithHttps_SelfSignedCertificate_ReturnsTrue()
     {
         // Arrange
@@ -89,16 +106,27 @@ public sealed class IPPortScanHttpTests : IDisposable
         listener.Dispose();
     }
 
+    private static int GetClosedPort()
+    {
+        using var probe = new System.Net.Sockets.TcpListener(IPAddress.Loopback, 0);
+        probe.Start();
+        var port = ((IPEndPoint)probe.LocalEndpoint).Port;
+        probe.Stop();
+        return port;
+    }
+
     /// <summary>
     /// Accepts one connection, reads the request headers and answers with 401.
     /// A client that rejects the connection (for example the TLS certificate) is not an error here;
     /// the test asserts on the client's result instead.
     /// </summary>
-    private async Task AnswerFirstRequest(bool useTls)
+    private async Task AnswerFirstRequest(
+        bool useTls,
+        string response = UnauthorizedResponse)
     {
         try
         {
-            await AnswerFirstRequestCore(useTls);
+            await AnswerFirstRequestCore(useTls, response);
         }
         catch (Exception ex) when (ex is IOException or AuthenticationException)
         {
@@ -106,7 +134,9 @@ public sealed class IPPortScanHttpTests : IDisposable
         }
     }
 
-    private async Task AnswerFirstRequestCore(bool useTls)
+    private async Task AnswerFirstRequestCore(
+        bool useTls,
+        string response)
     {
         using var serverSide = await listener.AcceptTcpClientAsync();
         Stream stream = serverSide.GetStream();
@@ -134,7 +164,7 @@ public sealed class IPPortScanHttpTests : IDisposable
                 request.Append(Encoding.ASCII.GetString(buffer, 0, read));
             }
 
-            await stream.WriteAsync(Encoding.ASCII.GetBytes(UnauthorizedResponse));
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(response));
             await stream.FlushAsync();
         }
     }

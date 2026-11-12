@@ -21,6 +21,8 @@ internal static class SharedHttpClients
     /// It accepts any server certificate, because only reachability is checked and no data is sent,
     /// and it has no client-wide timeout: each probe passes its own timeout as a cancellation token.
     /// Probe requests should send "Connection: close", so no idle connections stay open to scanned devices.
+    /// Redirects are not followed: a redirect already shows that an HTTP server answered, and following it
+    /// to an address that doesn't answer would report the port as unreachable.
     /// </summary>
     [SuppressMessage("Security", "S4830:Server certificates should be verified during SSL/TLS connections", Justification = "OK - only reachability is checked and no data is sent.")]
     [SuppressMessage("Security", "MA0039:Do not write your own certificate validation method", Justification = "OK - only reachability is checked and no data is sent.")]
@@ -29,6 +31,7 @@ internal static class SharedHttpClients
         new SocketsHttpHandler
         {
             PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+            AllowAutoRedirect = false,
             SslOptions = new SslClientAuthenticationOptions
             {
                 RemoteCertificateValidationCallback = (_, _, _, _) => true,
