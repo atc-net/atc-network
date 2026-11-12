@@ -99,7 +99,7 @@ var results = await scanner.ScanRange(
 - .NET 10.0+
 - NuGet dependencies, pulled in automatically:
   - [Atc](https://www.nuget.org/packages/Atc): ATC base library
-  - [Microsoft.Extensions.Hosting](https://www.nuget.org/packages/Microsoft.Extensions.Hosting): `IHostedService` for `TcpServer` and `UdpServer`
+  - [Microsoft.Extensions.Hosting.Abstractions](https://www.nuget.org/packages/Microsoft.Extensions.Hosting.Abstractions): `IHostedService` for `TcpServer` and `UdpServer`
   - [Microsoft.Extensions.Logging.Abstractions](https://www.nuget.org/packages/Microsoft.Extensions.Logging.Abstractions): `ILogger`
 
 ---
