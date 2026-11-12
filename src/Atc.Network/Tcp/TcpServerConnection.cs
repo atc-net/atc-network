@@ -39,6 +39,8 @@ internal sealed class TcpServerConnection : IDisposable
 
     /// <summary>
     /// Gets the lock that keeps sends to this client from interleaving.
+    /// It is not disposed with the connection: sends still queued when the client disconnects must get it,
+    /// find the stream closed and return. It is only waited on asynchronously, so it holds no wait handle.
     /// </summary>
     public SemaphoreSlim SendLock { get; } = new(1, 1);
 
@@ -46,6 +48,5 @@ internal sealed class TcpServerConnection : IDisposable
     {
         Stream.Dispose();
         Client.Dispose();
-        SendLock.Dispose();
     }
 }

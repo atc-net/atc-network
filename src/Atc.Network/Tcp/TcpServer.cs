@@ -241,7 +241,7 @@ public partial class TcpServer : ITcpServer
         {
             if (lockAcquired)
             {
-                ReleaseSendLock(connection);
+                connection.SendLock.Release();
             }
         }
     }
@@ -275,18 +275,6 @@ public partial class TcpServer : ITcpServer
     {
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
-    }
-
-    private static void ReleaseSendLock(TcpServerConnection connection)
-    {
-        try
-        {
-            connection.SendLock.Release();
-        }
-        catch (ObjectDisposedException)
-        {
-            // The client was closed while sending.
-        }
     }
 
     private async Task AcceptClients()
