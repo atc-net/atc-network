@@ -235,7 +235,8 @@ public partial class UdpClient : IUdpClient
                 return;
             }
 
-            await socket!.SendToAsync(buffer, SocketFlags.None, RemoteEndPoint, cancellationToken);
+            // The socket is connected; macOS rejects SendTo with an address on a connected socket (EISCONN).
+            await socket!.SendAsync(buffer, SocketFlags.None, cancellationToken);
             Instrumentation.Sent(data.Length);
             await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
         }
