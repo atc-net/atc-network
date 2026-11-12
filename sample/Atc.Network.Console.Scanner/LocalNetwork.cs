@@ -40,7 +40,7 @@ public sealed record LocalNetwork(
                         x.NetworkInterfaceType is not (NetworkInterfaceType.Loopback or NetworkInterfaceType.Tunnel))
             .SelectMany(x => x.GetIPProperties().UnicastAddresses
                 .Where(a => a.Address.AddressFamily == AddressFamily.InterNetwork &&
-                            a.Address.GetAddressBytes()[0] != 169)
+                            !IsLinkLocal(a.Address))
                 .Select(a => new LocalNetwork(x.Name, a.Address, a.PrefixLength)))
             .ToList();
 
@@ -50,5 +50,17 @@ public sealed record LocalNetwork(
         var (start, end) = Range;
         var note = ScannedPrefixLength == PrefixLength ? string.Empty : $" (the /{ScannedPrefixLength} of a /{PrefixLength})";
         return $"{start} - {end}  {InterfaceName}, this machine is {Address}{note}";
+    }
+
+    /// <summary>
+    /// Returns whether the address is an IPv4 link-local address (169.254.0.0/16), which Windows gives
+    /// an adapter that got no address from DHCP.
+    /// </summary>
+    /// <param name="address">The IPv4 address.</param>
+    /// <returns><see langword="true"/> for 169.254.x.x.</returns>
+    internal static bool IsLinkLocal(IPAddress address)
+    {
+        var bytes = address.GetAddressBytes();
+        return bytes[0] == 169 && bytes[1] == 254;
     }
 }
